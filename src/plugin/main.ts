@@ -11,6 +11,8 @@ import { handleIssueMessage, isIssueMessage } from "./lifecycle/issuesProtocol";
 import { handleRootMessage, isRootMessage } from "./lifecycle/rootActionsProtocol";
 import { handleSelectionMessage, isSelectionMessage } from "./lifecycle/selectionProtocol";
 import { startDetectionLifecycle } from "./lifecycle/startup";
+import { handleStudyMessage, sendStudyState } from "./lifecycle/studyProtocol";
+import { isStudyMessage } from "../shared/study/studyMessageGuards";
 import { resetCalibration, type CalibrationResetResult } from "./storage/resetCalibration";
 
 const RESET_COMMAND = "reset-calibration";
@@ -34,7 +36,16 @@ async function handleUiMessage(rawMessage: unknown): Promise<void> {
     return;
   }
 
+  if (isStudyMessage(message)) {
+    handleStudyMessage(message, (reply) => figma.ui.postMessage(reply));
+    return;
+  }
+
   if (isIssueMessage(message)) {
+    // The study state goes first so the UI never draws the unrestricted panel
+    if (message.type === "ISSUES_SUBSCRIBE") {
+      sendStudyState((reply) => figma.ui.postMessage(reply));
+    }
     await handleIssueMessage(message, (reply) => figma.ui.postMessage(reply));
     return;
   }
@@ -101,6 +112,8 @@ if (figma.command === RESET_COMMAND) {
   void exportIssuesToConsole().finally(() => figma.closePlugin());
 } else {
   startCalibrationUi();
+  // Ahead of detection so no issue list can reach the UI before the study state
+  sendStudyState((reply) => figma.ui.postMessage(reply));
   registerAdjustSelectionRestore();
   registerAdjustCloseRestore();
   // Fire and forget so the calibration UI does not wait on live detection

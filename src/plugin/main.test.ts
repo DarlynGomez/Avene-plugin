@@ -143,6 +143,8 @@ describe("sandbox to UI message envelope", () => {
     await import("./main");
 
     expect(typeof ui.onmessage).toBe("function");
+    // Startup now sends the study state first, this test is about the load reply
+    uiPostMessage.mockClear();
     await ui.onmessage?.({ type: "CALIBRATION_LOAD" });
 
     expect(uiPostMessage).toHaveBeenCalledTimes(1);

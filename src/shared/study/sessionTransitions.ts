@@ -90,3 +90,11 @@ export function endBlock(session: StudySession, clock: Clock): TransitionResult 
   }
   return { ok: true, session: { ...session, phase: "ended", endedAt: clock() } };
 }
+
+/** Leaves study mode, allowed in any phase, and keeps every record */
+export function exitStudy(session: StudySession, clock: Clock): TransitionResult {
+  if (session.exitedAt !== null) {
+    return refuse("exited", "Study mode has already been exited for this file.");
+  }
+  return { ok: true, session: { ...session, exitedAt: clock() } };
+}

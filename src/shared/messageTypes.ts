@@ -4,6 +4,7 @@ import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
 import type { SelectionMessage } from "./selectionMessageTypes";
+import type { StudyMessage, StudyStateMessage } from "./study/studyMessageTypes";
 
 /** Asks the sandbox to save a finished calibration profile */
 export interface CalibrationSaveMessage {
@@ -103,7 +104,8 @@ export type UiToPluginMessage =
   | IssueMessage
   | RootMessage
   | SelectionMessage
-  | AdjustMessage;
+  | AdjustMessage
+  | StudyMessage;
 
 /** Sandbox to UI messages */
 export type PluginToUiMessage =
@@ -113,7 +115,8 @@ export type PluginToUiMessage =
   | IssuesUpdatedMessage
   | IssueActionFailedMessage
   | RootActionFailedMessage
-  | AdjustReplyMessage;
+  | AdjustReplyMessage
+  | StudyStateMessage;
 
 /** Every message that crosses the plugin boundary */
 export type PluginMessage = UiToPluginMessage | PluginToUiMessage;

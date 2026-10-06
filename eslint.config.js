@@ -79,6 +79,7 @@ export default tseslint.config(
       "src/plugin/detection/adapter/**/*.{ts,tsx}",
       "src/plugin/adjust/adapter/**/*.{ts,tsx}",
       "src/plugin/accountability/adapter/**/*.{ts,tsx}",
+      "src/plugin/study/adapter/**/*.{ts,tsx}",
       "src/plugin/storage/**/*.{ts,tsx}",
       "src/plugin/lifecycle/**/*.{ts,tsx}",
       "src/plugin/accountability/issueStore.ts",
