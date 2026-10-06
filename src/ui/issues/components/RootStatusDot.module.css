@@ -1,3 +1,17 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.word {
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-severity-label);
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
 .dot {
   width: 8px;
   height: 8px;

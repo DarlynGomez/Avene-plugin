@@ -10,7 +10,7 @@ export const TOKEN_VALUES = {
   // Red orange for the issue panel only, 5.60:1 on the background
   "--color-warning": "#A8471F",
   // Status and severity colours, always paired with a word so colour is never the only signal
-  "--color-status-open": "#10B981",
+  "--color-status-open": "#059669",
   "--color-severity-high-bg": "#FDF2F0",
   "--color-severity-medium-bg": "#FFFBEB",
   "--color-severity-medium-text": "#92400E",

@@ -69,7 +69,7 @@ export function OptionsList({
       <div className={styles.wheelCard}>
         <OptionTile
           label="Choose your own"
-          reason={`Evaluates background parent "${backgroundAncestorName}" (${rgbToHex(background)}) to guarantee accessible AA or AAA compliance on the color wheel.`}
+          reason={`Colours too faint to read against "${backgroundAncestorName}" (${rgbToHex(background)}) are faded.`}
           sampleText={sampleText}
           color={wheelColor ?? optionA}
           hex={rgbToHex(wheelColor ?? optionA)}

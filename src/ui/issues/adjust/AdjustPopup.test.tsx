@@ -165,6 +165,23 @@ describe("AdjustPopup", () => {
     expect(screen.getByRole("button", { name: /choose your own/i })).toBeInTheDocument();
   });
 
+  it("explains the third option in plain words with the real background", () => {
+    render(
+      <AdjustPopup
+        root={rootFor(ISSUE.id)}
+        representativeIssue={ISSUE}
+        selectedInstanceIds={new Set()}
+        aiAssistanceLevel={3}
+        onClose={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.getByText(/^Colours too faint to read against ".+" \(#[0-9A-F]{6}\) are faded\.$/)
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/guarantee|compliance/i)).not.toBeInTheDocument();
+  });
+
   it("shows a close button and the node name in the header", () => {
     render(
       <AdjustPopup

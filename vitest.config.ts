@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],
-    passWithNoTests: true
+    passWithNoTests: true,
+    // Module css is applied with plain class names so tests can assert on computed style
+    css: { include: [/\.module\.css$/], modules: { classNameStrategy: "non-scoped" } }
   }
 });
