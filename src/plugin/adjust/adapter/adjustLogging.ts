@@ -2,7 +2,6 @@ import type { AdjustScopeChoice } from "../../../shared/adjustMessageTypes";
 import { resolveCalibration } from "../../storage/calibrationStore";
 import { STORAGE_KEY_ADJUST_LOG } from "../../storage/storageKeys";
 
-
 export interface AdjustLogEntry {
   issueId: string;
   optionChosen: "a" | "b" | "c" | null;
@@ -18,6 +17,8 @@ export interface AdjustLogEntry {
   scope: AdjustScopeChoice;
   instanceCount: number;
   loggedAt: string;
+  /** Set only while a study session is active, consent then came from the signed paper form */
+  consentSource?: "study-session";
 }
 
 function readStoredLog(): unknown[] {
@@ -58,7 +59,7 @@ export async function logAdjustEvent(entry: AdjustLogEntry): Promise<void> {
   }
 
   const log = readStoredLog();
-  log.push(entry);
+  log.push(resolution.scope === "study" ? { ...entry, consentSource: "study-session" } : entry);
   try {
     figma.root.setPluginData(STORAGE_KEY_ADJUST_LOG, JSON.stringify(log));
   } catch (error) {

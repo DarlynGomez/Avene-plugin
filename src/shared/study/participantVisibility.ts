@@ -1,3 +1,4 @@
+import { isStudyActive } from "./studyActive";
 import type { StudySession } from "./studyTypes";
 
 export const WAITING_MESSAGE = "Feedback will appear when you finish designing.";
@@ -57,7 +58,7 @@ export function participantVisibility(
   session: StudySession | null,
   features: VisibilityFeatures = NOT_BUILT
 ): ParticipantVisibility {
-  if (session === null || session.exitedAt !== null) {
+  if (!isStudyActive(session)) {
     return UNRESTRICTED;
   }
 

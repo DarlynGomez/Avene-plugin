@@ -1,3 +1,4 @@
+import { isStudyActive } from "../../../shared/study/studyActive";
 import { studySessionProblem } from "../../../shared/study/studySessionSchema";
 import type { StudySession } from "../../../shared/study/studyTypes";
 import { STORAGE_KEY_STUDY_SESSION } from "../../storage/storageKeys";
@@ -47,4 +48,15 @@ export function saveStudySession(session: StudySession): StudySaveResult {
 /** Not used by exit, which keeps the record, this exists for tooling and tests */
 export function clearStudySession(): void {
   figma.root.setPluginData(STORAGE_KEY_STUDY_SESSION, "");
+}
+
+/** The session while study mode is on, null when there is none, it was exited, or it cannot be read */
+export function activeStudySession(): StudySession | null {
+  try {
+    const session = loadStudySession();
+    return isStudyActive(session) ? session : null;
+  } catch (error) {
+    console.error("activeStudySession: the session could not be read", error);
+    return null;
+  }
 }

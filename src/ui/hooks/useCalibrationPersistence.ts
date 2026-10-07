@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { isCalibrationProfile, type CalibrationProfile } from "../../shared/calibrationSchema";
+import type { CalibrationScope } from "../../shared/calibrationScope";
 import type { PluginToUiMessage, UiToPluginMessage } from "../../shared/messageTypes";
 
 function isPluginToUiMessage(value: unknown): value is PluginToUiMessage {
@@ -13,6 +14,7 @@ function isPluginToUiMessage(value: unknown): value is PluginToUiMessage {
     return (
       (message.resolvedScope === "file" ||
         message.resolvedScope === "user" ||
+        message.resolvedScope === "study" ||
         message.resolvedScope === null) &&
       (message.profile === null || isCalibrationProfile(message.profile))
     );
@@ -30,7 +32,7 @@ function sendMessage(message: UiToPluginMessage) {
 /** Load and save calibration profiles through the Figma sandbox boundary */
 export function useCalibrationPersistence() {
   const [loadedProfile, setLoadedProfile] = useState<CalibrationProfile | null>(null);
-  const [resolvedScope, setResolvedScope] = useState<"file" | "user" | null>(null);
+  const [resolvedScope, setResolvedScope] = useState<CalibrationScope | null>(null);
   const [loading, setLoading] = useState(true);
   const [saveError, setSaveError] = useState<string | null>(null);
 

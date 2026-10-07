@@ -1,5 +1,6 @@
 import type { AdjustMessage, AdjustReplyMessage } from "./adjustMessageTypes";
 import type { CalibrationProfile } from "./calibrationSchema";
+import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
@@ -21,7 +22,7 @@ export interface CalibrationLoadMessage {
 export interface CalibrationLoadedMessage {
   type: "CALIBRATION_LOADED";
   profile: CalibrationProfile | null;
-  resolvedScope: "file" | "user" | null;
+  resolvedScope: CalibrationScope | null;
 }
 
 /** The sandbox could not save the profile */

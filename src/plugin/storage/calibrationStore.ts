@@ -1,8 +1,11 @@
 import { isCalibrationProfile, type CalibrationProfile } from "../../shared/calibrationSchema";
+import type { CalibrationScope } from "../../shared/calibrationScope";
+import { buildStudyProfile } from "../../shared/study/studyProfile";
+import { activeStudySession } from "../study/adapter/studySessionStore";
 import { STORAGE_KEY_PROFILE } from "./storageKeys";
 
 export interface CalibrationResolution {
-  scope: "file" | "user";
+  scope: CalibrationScope;
   profile: CalibrationProfile;
 }
 
@@ -29,8 +32,15 @@ async function readUserProfile(): Promise<CalibrationResolution | null> {
   return isCalibrationProfile(profile) ? { scope: "user", profile } : null;
 }
 
-/** Resolves file first while the ownership rule is provisional */
+/**
+ * An active study session wins over both stored scopes
+ * Otherwise file first while the ownership rule is provisional
+ */
 export async function resolveCalibration(): Promise<CalibrationResolution | null> {
+  const session = activeStudySession();
+  if (session) {
+    return { scope: "study", profile: buildStudyProfile(session) };
+  }
   const [fileProfile, userProfile] = await Promise.all([readFileProfile(), readUserProfile()]);
   return fileProfile ?? userProfile ?? null;
 }
@@ -54,10 +64,14 @@ function describeError(error: unknown): string {
  * Writes the profile to both surfaces independently, it counts as saved if either accepts it
  * So one surface failing does not block the designer, each failure keeps its reason
  */
-export async function saveCalibration(
-  profile: CalibrationProfile
-): Promise<CalibrationSaveResult> {
+export async function saveCalibration(profile: CalibrationProfile): Promise<CalibrationSaveResult> {
   const result: CalibrationSaveResult = { fileSaved: false, userSaved: false };
+
+  // A session profile is fixed, so nothing may reach either stored scope while it is active
+  if (activeStudySession()) {
+    result.fileError = "Calibration is not available during a study session";
+    return result;
+  }
 
   try {
     // Per file, travels to collaborators
