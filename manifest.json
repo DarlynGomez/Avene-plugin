@@ -18,6 +18,10 @@
       "command": "reset-calibration"
     },
     {
+      "name": "Reset study and records (dev)",
+      "command": "reset-study"
+    },
+    {
       "name": "Export issues JSON (dev, temporary)",
       "command": "export-issues"
     }

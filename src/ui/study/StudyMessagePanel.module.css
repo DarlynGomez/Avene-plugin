@@ -1,0 +1,26 @@
+.panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100vh;
+  padding: var(--space-4);
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  text-align: center;
+}
+
+.wordmark {
+  font-family: var(--font-headline);
+  font-size: var(--font-size-issue-title);
+  font-weight: var(--font-weight-medium);
+}
+
+.message {
+  margin: 0;
+  font-size: var(--font-size-button);
+  line-height: var(--font-line-height-helper);
+}

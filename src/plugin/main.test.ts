@@ -238,3 +238,17 @@ describe("sandbox to UI message envelope", () => {
     expect(setAsync).not.toHaveBeenCalled();
   });
 });
+
+describe("reset study command", () => {
+  it("clears the study records, then closes without opening the UI", async () => {
+    stubFigma("reset-study");
+    await import("./main");
+
+    expect(showUI).not.toHaveBeenCalled();
+    expect(setPluginData).toHaveBeenCalledWith("cadt.study.session.v1", "");
+    expect(setPluginData).toHaveBeenCalledWith("cadt.issues.v1", "");
+    expect(setPluginData).not.toHaveBeenCalledWith(STORAGE_KEY_PROFILE, "");
+    expect(closePlugin).toHaveBeenCalledTimes(1);
+    expect(loadAllPagesAsync).not.toHaveBeenCalled();
+  });
+});

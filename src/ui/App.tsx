@@ -2,6 +2,7 @@ import { CalibrationFlow } from "./calibration/CalibrationFlow";
 import { useCalibrationPersistence } from "./hooks/useCalibrationPersistence";
 import { IssuePanel } from "./issues/IssuePanel";
 import { StudyHost } from "./study/StudyHost";
+import { useParticipantVisibility } from "./study/useParticipantVisibility";
 
 /** The raw 1 to 4 answer to how much CADT should do on its own, or null if unanswered */
 function readAiAssistanceLevel(
@@ -13,6 +14,7 @@ function readAiAssistanceLevel(
 
 function AppScreens() {
   const { loadedProfile, loading, saveProfile, saveError } = useCalibrationPersistence();
+  const visibility = useParticipantVisibility();
 
   if (loading) {
     return <p>Loading calibration...</p>;
@@ -21,6 +23,11 @@ function AppScreens() {
   // A resolved profile hands off to the issue panel, whether loaded on open or just saved
   if (loadedProfile) {
     return <IssuePanel aiAssistanceLevel={readAiAssistanceLevel(loadedProfile)} />;
+  }
+
+  // Calibration and consent never appear while a study session is active
+  if (!visibility.calibrationAndConsent) {
+    return <p>Loading calibration...</p>;
   }
 
   return <CalibrationFlow onComplete={saveProfile} saveError={saveError} />;

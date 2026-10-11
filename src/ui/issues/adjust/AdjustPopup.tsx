@@ -14,6 +14,7 @@ import { AdjustHeader } from "./components/AdjustHeader";
 import { BindingNotice } from "./components/BindingNotice";
 import { ScopeSection } from "./components/ScopeSection";
 import { useAdjustMessages } from "./useAdjustMessages";
+import { useEndRequest } from "./useEndRequest";
 import { useAdjustSession } from "./useAdjustSession";
 import { useAdjustVariableScope } from "./useAdjustVariableScope";
 
@@ -24,6 +25,8 @@ interface AdjustPopupProps {
   selectedInstanceIds: ReadonlySet<string>;
   /** The raw 1 to 4 calibration answer for how much CADT should do on its own */
   aiAssistanceLevel: number;
+  /** Set when the study block ends, closes through the same path as Cancel */
+  endRequested?: boolean;
   onClose: () => void;
 }
 
@@ -36,6 +39,7 @@ export function AdjustPopup({
   representativeIssue: issue,
   selectedInstanceIds,
   aiAssistanceLevel,
+  endRequested = false,
   onClose
 }: AdjustPopupProps) {
   const evidence = readContrastEvidence(issue.ruleId, issue.evidence);
@@ -64,6 +68,8 @@ export function AdjustPopup({
     applyVariable,
     onClose
   });
+
+  useEndRequest(endRequested, session.handleCancel);
 
   const headline = `Adjust contrast for “${issue.nodeName}”`;
 

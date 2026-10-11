@@ -16,6 +16,8 @@ interface RootSheetHostProps {
   /** Keyed by root signature */
   selectedInstances: Readonly<Record<string, ReadonlySet<string>>>;
   aiAssistanceLevel: number | null;
+  /** True when the block has ended, the adjust sheet then closes itself through Cancel */
+  endAdjustRequested: boolean;
   onCloseAdjust: () => void;
   onCancelIgnore: () => void;
   onRecordIgnore: (root: Root, reason: string) => void;
@@ -31,6 +33,7 @@ export function RootSheetHost({
   issuesById,
   selectedInstances,
   aiAssistanceLevel,
+  endAdjustRequested,
   onCloseAdjust,
   onCancelIgnore,
   onRecordIgnore
@@ -55,6 +58,7 @@ export function RootSheetHost({
           representativeIssue={representativeIssue}
           selectedInstanceIds={selectedInstances[root.signature] ?? new Set()}
           aiAssistanceLevel={aiAssistanceLevel ?? 1}
+          endRequested={endAdjustRequested}
           onClose={onCloseAdjust}
         />
       </SheetOverlay>

@@ -1,9 +1,6 @@
 import { useState } from "react";
 
-import type { Root, RootDecision } from "../../shared/grouping/groupingTypes";
-import type { GroupBy } from "../../shared/grouping/sectionRoots";
 import { Header, type MainTab } from "./components/Header";
-import type { StateFilter } from "./components/FilterBar";
 import { LiveWatchBody } from "./components/LiveWatchBody";
 import { RootSheetHost } from "./components/RootSheetHost";
 import { SelectionBanner } from "./components/SelectionBanner";
@@ -11,14 +8,14 @@ import { TeachMeWhyPlaceholder } from "./components/TeachMeWhyPlaceholder";
 import { useEscapePrecedence } from "./hooks/useEscapePrecedence";
 import { useInstanceSelection } from "./hooks/useInstanceSelection";
 import { useIssues } from "./hooks/useIssues";
-import { useRoots } from "./hooks/useRoots";
+import { useSheetGating } from "./hooks/useSheetGating";
+import { StudyMessagePanel } from "../study/StudyMessagePanel";
+import { useParticipantVisibility } from "../study/useParticipantVisibility";
+import { usePanelView } from "./hooks/usePanelView";
+import { instanceIds, useRootHandlers } from "./hooks/useRootHandlers";
 import { useRootSheet } from "./hooks/useRootSheet";
 import { useSelectionBanner } from "./hooks/useSelectionBanner";
 import styles from "./IssuePanel.module.css";
-
-function instanceIds(root: Root): string[] {
-  return root.instances.map((instance) => instance.issueId);
-}
 
 interface IssuePanelProps {
   /**
@@ -49,9 +46,8 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
     restoreSelection
   } = useIssues();
 
+  const visibility = useParticipantVisibility();
   const [mainTab, setMainTab] = useState<MainTab>("live-watch");
-  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
-  const [groupBy, setGroupBy] = useState<GroupBy>("root-cause");
   const { selectedInstances, toggleInstanceSelected, selectAllInstances } = useInstanceSelection();
   const { sheet, openAdjust, openIgnore, closeSheet } = useRootSheet();
   const {
@@ -60,31 +56,41 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
     restore: restoreShownSelection
   } = useSelectionBanner(showOnCanvas, restoreSelection);
 
-  const { headline, counts, reviewRoots, filteredSections, decisionRoots, issuesById } = useRoots(
-    issues,
-    decisions,
-    groupBy,
-    stateFilter
-  );
-  const canAdjust = (aiAssistanceLevel ?? 1) >= 2;
+  const view = usePanelView(issues, decisions);
+  const canAdjust = (aiAssistanceLevel ?? 1) >= 2 && visibility.adjustSheet;
+  const { endAdjustRequested } = useSheetGating(visibility, sheet, closeSheet);
+  const activeTab = visibility.teachMeWhyTab ? mainTab : "live-watch";
 
   useEscapePrecedence(sheet, closeSheet, showingCount, restoreShownSelection);
+  const { handleToggleImportant, handleApplyDecisionOffer, handleRecordIgnore } = useRootHandlers({
+    markRootImportant,
+    unmarkRootImportant,
+    ignoreRoot,
+    closeSheet
+  });
 
-  function handleToggleImportant(root: Root) {
-    if (root.displayState === "important") {
-      unmarkRootImportant(instanceIds(root));
-    } else {
-      markRootImportant(instanceIds(root));
-    }
-  }
+  const sheets = (
+    <RootSheetHost
+      sheet={sheet}
+      roots={view.reviewRoots}
+      issuesById={view.issuesById}
+      selectedInstances={selectedInstances}
+      aiAssistanceLevel={aiAssistanceLevel}
+      endAdjustRequested={endAdjustRequested}
+      onCloseAdjust={closeSheet}
+      onCancelIgnore={closeSheet}
+      onRecordIgnore={handleRecordIgnore}
+    />
+  );
 
-  function handleApplyDecisionOffer(root: Root, decision: RootDecision) {
-    ignoreRoot(instanceIds(root), decision.reason, root.signature, true);
-  }
-
-  function handleRecordIgnore(root: Root, reason: string) {
-    ignoreRoot(instanceIds(root), reason, root.signature, false);
-    closeSheet();
+  // Feedback withheld or the block over, the hooks above keep collecting while this shows
+  if (visibility.message !== null) {
+    return (
+      <>
+        <StudyMessagePanel message={visibility.message} showWordmark={visibility.wordmark} />
+        {sheets}
+      </>
+    );
   }
 
   if (loading) {
@@ -93,24 +99,30 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
 
   return (
     <main className={styles.panel} aria-label="Accessibility issues">
-      <Header headline={headline} activeMainTab={mainTab} onMainTabChange={setMainTab} />
-      {showingCount !== null && (
+      <Header
+        visibility={visibility}
+        headline={view.headline}
+        activeMainTab={activeTab}
+        onMainTabChange={setMainTab}
+      />
+      {showingCount !== null && visibility.showOnCanvas && (
         <SelectionBanner count={showingCount} onRestore={restoreShownSelection} />
       )}
       <div className={styles.scrollRegion}>
-        {mainTab === "teach-me-why" ? (
+        {activeTab === "teach-me-why" ? (
           <TeachMeWhyPlaceholder />
         ) : (
           <LiveWatchBody
+            visibility={visibility}
             actionError={actionError}
-            stateFilter={stateFilter}
-            onStateFilterChange={setStateFilter}
-            counts={counts}
-            filteredSections={filteredSections}
-            decisionRoots={decisionRoots}
-            groupBy={groupBy}
-            onGroupByChange={setGroupBy}
-            issuesById={issuesById}
+            stateFilter={view.stateFilter}
+            onStateFilterChange={view.setStateFilter}
+            counts={view.counts}
+            filteredSections={view.filteredSections}
+            decisionRoots={view.decisionRoots}
+            groupBy={view.groupBy}
+            onGroupByChange={view.setGroupBy}
+            issuesById={view.issuesById}
             decisions={decisions}
             canAdjust={canAdjust}
             selectedInstances={selectedInstances}
@@ -128,16 +140,7 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
           />
         )}
       </div>
-      <RootSheetHost
-        sheet={sheet}
-        roots={reviewRoots}
-        issuesById={issuesById}
-        selectedInstances={selectedInstances}
-        aiAssistanceLevel={aiAssistanceLevel}
-        onCloseAdjust={closeSheet}
-        onCancelIgnore={closeSheet}
-        onRecordIgnore={handleRecordIgnore}
-      />
+      {sheets}
     </main>
   );
 }

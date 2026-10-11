@@ -20,6 +20,9 @@ interface ToReviewListProps {
     clearDecision: boolean
   ) => void;
   canAdjust: boolean;
+  /** Both default to shown, the study session turns them off */
+  showOffers?: boolean;
+  showTray?: boolean;
   selectedInstances: Readonly<Record<string, ReadonlySet<string>>>;
   onToggleInstanceSelected: (signature: string, issueId: string) => void;
   onSelectAllInstances: (root: Root) => void;
@@ -41,11 +44,13 @@ export function ToReviewList(props: ToReviewListProps) {
     return (
       <div className={styles.sections}>
         <p className={styles.empty}>Nothing to review. Nice work.</p>
-        <IgnoredTray
-          roots={props.ignoredRoots}
-          decisions={decisions}
-          onRestore={props.onRestoreIgnored}
-        />
+        {(props.showTray ?? true) && (
+          <IgnoredTray
+            roots={props.ignoredRoots}
+            decisions={decisions}
+            onRestore={props.onRestoreIgnored}
+          />
+        )}
       </div>
     );
   }
@@ -58,14 +63,16 @@ export function ToReviewList(props: ToReviewListProps) {
           <ul className={styles.list}>
             {section.roots.map((root) => {
               // Ignored instances mean a decision still covers part of this root
-              const decisionOffer = root.stateBreakdown.ignored
-                ? NO_OFFER
-                : matchRootDecision(root, decisions);
+              const decisionOffer =
+                root.stateBreakdown.ignored || props.showOffers === false
+                  ? NO_OFFER
+                  : matchRootDecision(root, decisions);
               // A partly reopened root can still hold its old decision on some instances
               // The offer banner is for new matches, this note is for a decision already made on part of it
-              const recordedReason = root.stateBreakdown.ignored
-                ? (decisions[root.signature]?.reason ?? null)
-                : null;
+              const recordedReason =
+                root.stateBreakdown.ignored && props.showOffers !== false
+                  ? (decisions[root.signature]?.reason ?? null)
+                  : null;
               return (
                 <RootCard
                   key={root.signature}
@@ -96,11 +103,13 @@ export function ToReviewList(props: ToReviewListProps) {
           </ul>
         </section>
       ))}
-      <IgnoredTray
-        roots={props.ignoredRoots}
-        decisions={decisions}
-        onRestore={props.onRestoreIgnored}
-      />
+      {(props.showTray ?? true) && (
+        <IgnoredTray
+          roots={props.ignoredRoots}
+          decisions={decisions}
+          onRestore={props.onRestoreIgnored}
+        />
+      )}
     </div>
   );
 }

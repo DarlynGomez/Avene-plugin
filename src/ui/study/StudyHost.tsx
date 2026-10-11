@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { exitStudyPlaceholder, exportBlockPlaceholder } from "./placeholders";
 import { ResearcherPanel } from "./ResearcherPanel";
+import { StudyStateContext } from "./StudyStateContext";
 import { useResearcherChord } from "./useResearcherChord";
 import { useStudyState } from "./useStudyState";
 
@@ -21,7 +22,7 @@ export function StudyHost({ children }: StudyHostProps) {
   }, [open, refresh]);
 
   return (
-    <>
+    <StudyStateContext.Provider value={state}>
       {children}
       {open && (
         <ResearcherPanel
@@ -32,6 +33,6 @@ export function StudyHost({ children }: StudyHostProps) {
           onClose={close}
         />
       )}
-    </>
+    </StudyStateContext.Provider>
   );
 }

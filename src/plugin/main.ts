@@ -10,12 +10,14 @@ import { exportIssuesToConsole } from "./lifecycle/exportIssuesDebug";
 import { handleIssueMessage, isIssueMessage } from "./lifecycle/issuesProtocol";
 import { handleRootMessage, isRootMessage } from "./lifecycle/rootActionsProtocol";
 import { handleSelectionMessage, isSelectionMessage } from "./lifecycle/selectionProtocol";
+import { resetStudyData } from "./study/adapter/resetStudyData";
 import { startDetectionLifecycle } from "./lifecycle/startup";
 import { handleStudyMessage, sendStudyState } from "./lifecycle/studyProtocol";
 import { isStudyMessage } from "../shared/study/studyMessageGuards";
 import { resetCalibration, type CalibrationResetResult } from "./storage/resetCalibration";
 
 const RESET_COMMAND = "reset-calibration";
+const RESET_STUDY_COMMAND = "reset-study";
 const EXPORT_ISSUES_COMMAND = "export-issues"; // TEMPORARY, see exportIssuesDebug.ts
 const UI_WIDTH = 460;
 const UI_HEIGHT = 680;
@@ -100,6 +102,19 @@ export async function runReset(): Promise<void> {
   }
 }
 
+/** Development only: empties the study session and block records so a file can be tested again */
+function runResetStudy(): void {
+  const result = resetStudyData();
+  const ok = result.failed.length === 0;
+  figma.notify(
+    ok
+      ? "Cleared the study session and recorded issues, decisions and Adjust log"
+      : `Could not clear: ${result.failed.map((item) => `${item.key} (${item.reason})`).join(", ")}`,
+    ok ? undefined : { error: true }
+  );
+  figma.closePlugin();
+}
+
 /** Normal startup: wire the message router and open the calibration UI */
 export function startCalibrationUi(): void {
   figma.ui.onmessage = handleUiMessage;
@@ -108,6 +123,8 @@ export function startCalibrationUi(): void {
 
 if (figma.command === RESET_COMMAND) {
   void runReset();
+} else if (figma.command === RESET_STUDY_COMMAND) {
+  runResetStudy();
 } else if (figma.command === EXPORT_ISSUES_COMMAND) {
   void exportIssuesToConsole().finally(() => figma.closePlugin());
 } else {

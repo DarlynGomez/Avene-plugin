@@ -1,13 +1,20 @@
 import type { Root, RootDecision } from "../../../shared/grouping/groupingTypes";
 import type { GroupBy, RootSection } from "../../../shared/grouping/sectionRoots";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
+import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
 import type { ActionError } from "../hooks/useIssues";
 import { DecisionsView } from "./DecisionsView";
 import { FilterBar, type FilterCounts, type StateFilter } from "./FilterBar";
 import styles from "./LiveWatchBody.module.css";
 import { ToReviewList } from "./ToReviewList";
 
+export type BodyVisibility = Pick<
+  ParticipantVisibility,
+  "filterAndGrouping" | "issueList" | "ignoredTrayAndDecisions" | "decisionOffers"
+>;
+
 interface LiveWatchBodyProps {
+  visibility: BodyVisibility;
   actionError: ActionError | null;
   stateFilter: StateFilter;
   onStateFilterChange: (filter: StateFilter) => void;
@@ -42,14 +49,17 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           {props.actionError.message}
         </p>
       )}
-      <FilterBar
-        groupBy={props.groupBy}
-        onGroupByChange={props.onGroupByChange}
-        stateFilter={props.stateFilter}
-        onStateFilterChange={props.onStateFilterChange}
-        counts={props.counts}
-      />
-      {props.stateFilter === "ignored" ? (
+      {props.visibility.filterAndGrouping && (
+        <FilterBar
+          groupBy={props.groupBy}
+          onGroupByChange={props.onGroupByChange}
+          stateFilter={props.stateFilter}
+          onStateFilterChange={props.onStateFilterChange}
+          counts={props.counts}
+        />
+      )}
+      {!props.visibility.issueList ? null : props.stateFilter === "ignored" &&
+        props.visibility.ignoredTrayAndDecisions ? (
         <DecisionsView
           roots={props.decisionRoots}
           decisions={props.decisions}
@@ -63,6 +73,8 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           decisions={props.decisions}
           ignoredRoots={props.decisionRoots.filter((root) => root.stateBreakdown.ignored)}
           onRestoreIgnored={props.onReopen}
+          showOffers={props.visibility.decisionOffers}
+          showTray={props.visibility.ignoredTrayAndDecisions}
           canAdjust={props.canAdjust}
           selectedInstances={props.selectedInstances}
           onToggleInstanceSelected={props.onToggleInstanceSelected}
