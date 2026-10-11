@@ -196,6 +196,24 @@ describe("STUDY_START_BLOCK", () => {
   });
 });
 
+describe("STUDY_SUBSCRIBE", () => {
+  it("answers with the current state and saves nothing", () => {
+    handleStudyMessage({ type: "STUDY_SUBSCRIBE" }, reply, clock(NOW));
+
+    expect(replies).toHaveLength(1);
+    expect(replies[0]).toMatchObject({ type: "STUDY_STATE", session: null, refusal: null });
+    expectNothingSaved();
+  });
+
+  it("answers with the stored session", () => {
+    handleStudyMessage(START, reply, clock(NOW));
+    replies = [];
+    handleStudyMessage({ type: "STUDY_SUBSCRIBE" }, reply, clock(LATER));
+
+    expect(replies[0]?.session?.phase).toBe("designing");
+  });
+});
+
 describe("STUDY_REVEAL, STUDY_END_BLOCK and STUDY_EXIT", () => {
   function started(condition: "live" | "post-task") {
     handleStudyMessage({ ...START, condition } as StudyMessage, reply, clock(NOW));

@@ -28,6 +28,11 @@ export interface StudyStartBlockMessage {
   paperConsentSigned: boolean;
 }
 
+/** Asks for the current state, answered with STUDY_STATE, so the UI never has to catch the startup push */
+export interface StudySubscribeMessage {
+  type: "STUDY_SUBSCRIBE";
+}
+
 export interface StudyRevealMessage {
   type: "STUDY_REVEAL";
 }
@@ -42,4 +47,8 @@ export interface StudyExitMessage {
 
 /** Every study message the researcher panel sends */
 export type StudyMessage =
-  StudyStartBlockMessage | StudyRevealMessage | StudyEndBlockMessage | StudyExitMessage;
+  | StudySubscribeMessage
+  | StudyStartBlockMessage
+  | StudyRevealMessage
+  | StudyEndBlockMessage
+  | StudyExitMessage;

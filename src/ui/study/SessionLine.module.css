@@ -1,0 +1,29 @@
+.line {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-card);
+}
+
+.summary {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  list-style: none;
+}

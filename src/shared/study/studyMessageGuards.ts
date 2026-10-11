@@ -31,6 +31,7 @@ export function isStudyMessage(value: unknown): value is StudyMessage {
     return false;
   }
   switch (value.type) {
+    case "STUDY_SUBSCRIBE":
     case "STUDY_REVEAL":
     case "STUDY_END_BLOCK":
     case "STUDY_EXIT":

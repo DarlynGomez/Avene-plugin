@@ -68,6 +68,10 @@ export function handleStudyMessage(
   reply: Reply,
   clock: Clock = systemClock
 ): void {
+  if (message.type === "STUDY_SUBSCRIBE") {
+    sendStudyState(reply);
+    return;
+  }
   if (message.type === "STUDY_START_BLOCK") {
     start(message, reply, clock);
     return;

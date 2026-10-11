@@ -13,7 +13,7 @@ const START = {
 };
 
 describe("isStudyMessage", () => {
-  it.each(["STUDY_REVEAL", "STUDY_END_BLOCK", "STUDY_EXIT"])(
+  it.each(["STUDY_SUBSCRIBE", "STUDY_REVEAL", "STUDY_END_BLOCK", "STUDY_EXIT"])(
     "accepts %s with no fields",
     (type) => {
       expect(isStudyMessage({ type })).toBe(true);
