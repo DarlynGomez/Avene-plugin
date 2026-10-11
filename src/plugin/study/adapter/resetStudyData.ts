@@ -4,6 +4,7 @@ import {
   STORAGE_KEY_ISSUES,
   STORAGE_KEY_STUDY_SESSION
 } from "../../storage/storageKeys";
+import { clearStudyLog } from "./studyLogStore";
 
 export interface StudyResetResult {
   cleared: string[];
@@ -32,6 +33,14 @@ export function resetStudyData(): StudyResetResult {
       console.error(`resetStudyData: could not clear ${key}`, error);
       result.failed.push({ key, reason });
     }
+  }
+  try {
+    clearStudyLog();
+    result.cleared.push("cadt.study.log.v1");
+  } catch (error) {
+    const reason = error instanceof Error && error.message ? error.message : String(error);
+    console.error("resetStudyData: could not clear the study log", error);
+    result.failed.push({ key: "cadt.study.log.v1", reason });
   }
   return result;
 }

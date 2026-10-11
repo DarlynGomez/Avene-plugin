@@ -1,4 +1,5 @@
 import { isStudyActive } from "./studyActive";
+import { isFeedbackVisible } from "./studyBlockEvents";
 import type { StudySession } from "./studyTypes";
 
 export const WAITING_MESSAGE = "Feedback will appear when you finish designing.";
@@ -62,8 +63,7 @@ export function participantVisibility(
     return UNRESTRICTED;
   }
 
-  const feedbackShown =
-    session.phase !== "ended" && (session.condition === "live" || session.phase === "reviewing");
+  const feedbackShown = isFeedbackVisible(session);
 
   return {
     wordmark: true,

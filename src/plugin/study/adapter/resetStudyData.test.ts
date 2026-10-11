@@ -13,7 +13,7 @@ let setPluginData: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   setPluginData = vi.fn();
-  vi.stubGlobal("figma", { root: { setPluginData } });
+  vi.stubGlobal("figma", { root: { setPluginData, getPluginData: () => "" } });
   vi.spyOn(console, "error").mockImplementation(() => undefined);
 });
 
@@ -35,7 +35,7 @@ describe("resetStudyData", () => {
       expect(setPluginData).toHaveBeenCalledWith(key, "");
     }
     expect(result.failed).toEqual([]);
-    expect(result.cleared).toHaveLength(4);
+    expect(result.cleared).toHaveLength(5);
   });
 
   it("leaves calibration alone", () => {
@@ -51,6 +51,6 @@ describe("resetStudyData", () => {
     const result = resetStudyData();
 
     expect(result.failed).toEqual([{ key: STORAGE_KEY_STUDY_SESSION, reason: "read only" }]);
-    expect(result.cleared).toHaveLength(3);
+    expect(result.cleared).toHaveLength(4);
   });
 });
