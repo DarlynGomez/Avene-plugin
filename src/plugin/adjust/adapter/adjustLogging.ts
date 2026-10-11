@@ -1,4 +1,10 @@
 import type { AdjustScopeChoice } from "../../../shared/adjustMessageTypes";
+import {
+  buildAdjustEvent,
+  buildIssueFirstResponse
+} from "../../../shared/study/studyEventBuilders";
+import type { StudyEvent } from "../../../shared/study/studyEvents";
+import { emitStudy } from "../../study/adapter/studyEmitter";
 import { resolveCalibration } from "../../storage/calibrationStore";
 import { STORAGE_KEY_ADJUST_LOG } from "../../storage/storageKeys";
 
@@ -51,6 +57,29 @@ export function loadAdjustLog(): AdjustLogEntry[] {
     }));
 }
 
+/** Points the study log at the entry just written, and counts the adjustment as a response */
+function recordAdjustEvent(entry: AdjustLogEntry, adjustLogIndex: number): void {
+  emitStudy((ctx, seen) => {
+    const events: StudyEvent[] = [];
+    const response = buildIssueFirstResponse(
+      ctx,
+      entry.loggedAt,
+      entry.issueId,
+      { kind: "action", via: "adjust" },
+      seen.responded
+    );
+    if (response) events.push(response);
+    events.push(
+      buildAdjustEvent(ctx, entry.loggedAt, {
+        adjustLogIndex,
+        issueId: entry.issueId,
+        loggedAt: entry.loggedAt
+      })
+    );
+    return events;
+  });
+}
+
 /** Only when loggingConsent is true, a silent no-op otherwise, never an error */
 export async function logAdjustEvent(entry: AdjustLogEntry): Promise<void> {
   const resolution = await resolveCalibration();
@@ -62,6 +91,7 @@ export async function logAdjustEvent(entry: AdjustLogEntry): Promise<void> {
   log.push(resolution.scope === "study" ? { ...entry, consentSource: "study-session" } : entry);
   try {
     figma.root.setPluginData(STORAGE_KEY_ADJUST_LOG, JSON.stringify(log));
+    recordAdjustEvent(entry, log.length - 1);
   } catch (error) {
     console.error("logAdjustEvent: figma.root.setPluginData failed", error);
   }

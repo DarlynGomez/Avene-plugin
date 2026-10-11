@@ -83,16 +83,16 @@ export function useIssues() {
     sendMessage({ type: "ISSUE_FOCUS", issueId });
   }, []);
 
-  const deferRoot = useCallback((issueIds: string[]) => {
-    sendMessage({ type: "ROOT_DEFER", issueIds });
+  const deferRoot = useCallback((issueIds: string[], signature?: string) => {
+    sendMessage({ type: "ROOT_DEFER", issueIds, ...(signature && { signature }) });
   }, []);
 
-  const markRootImportant = useCallback((issueIds: string[]) => {
-    sendMessage({ type: "ROOT_MARK_IMPORTANT", issueIds });
+  const markRootImportant = useCallback((issueIds: string[], signature?: string) => {
+    sendMessage({ type: "ROOT_MARK_IMPORTANT", issueIds, ...(signature && { signature }) });
   }, []);
 
-  const unmarkRootImportant = useCallback((issueIds: string[]) => {
-    sendMessage({ type: "ROOT_UNMARK_IMPORTANT", issueIds });
+  const unmarkRootImportant = useCallback((issueIds: string[], signature?: string) => {
+    sendMessage({ type: "ROOT_UNMARK_IMPORTANT", issueIds, ...(signature && { signature }) });
   }, []);
 
   const ignoreRoot = useCallback(
@@ -109,12 +109,12 @@ export function useIssues() {
     []
   );
 
-  const restoreDeferredRoot = useCallback((issueIds: string[]) => {
-    sendMessage({ type: "ROOT_RESTORE_DEFERRED", issueIds });
+  const restoreDeferredRoot = useCallback((issueIds: string[], signature?: string) => {
+    sendMessage({ type: "ROOT_RESTORE_DEFERRED", issueIds, ...(signature && { signature }) });
   }, []);
 
-  const showOnCanvas = useCallback((nodeIds: string[]) => {
-    sendMessage({ type: "SHOW_ON_CANVAS", nodeIds });
+  const showOnCanvas = useCallback((nodeIds: string[], signature?: string) => {
+    sendMessage({ type: "SHOW_ON_CANVAS", nodeIds, ...(signature && { signature }) });
   }, []);
 
   const restoreSelection = useCallback(() => {

@@ -5,8 +5,8 @@ export function instanceIds(root: Root): string[] {
 }
 
 interface RootActions {
-  markRootImportant: (issueIds: string[]) => void;
-  unmarkRootImportant: (issueIds: string[]) => void;
+  markRootImportant: (issueIds: string[], signature?: string) => void;
+  unmarkRootImportant: (issueIds: string[], signature?: string) => void;
   ignoreRoot: (
     issueIds: string[],
     reason: string,
@@ -25,9 +25,9 @@ export function useRootHandlers({
 }: RootActions) {
   function handleToggleImportant(root: Root) {
     if (root.displayState === "important") {
-      unmarkRootImportant(instanceIds(root));
+      unmarkRootImportant(instanceIds(root), root.signature);
     } else {
-      markRootImportant(instanceIds(root));
+      markRootImportant(instanceIds(root), root.signature);
     }
   }
 

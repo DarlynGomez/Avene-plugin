@@ -2,7 +2,15 @@ import { parseIssueId } from "../../shared/issues/issueId";
 import { selectResolvedNodesAndZoom } from "../accountability/adapter/canvasSelection";
 import type { Issue } from "../../shared/issues/issueTypes";
 import type { IssueMessage, PluginToUiMessage } from "../../shared/messageTypes";
-import { loadIssues, saveIssues, type IssueRecordMap } from "../accountability/issueStore";
+import {
+  loadIssues,
+  loadRawIssues,
+  saveIssues,
+  type IssueRecordMap
+} from "../accountability/issueStore";
+import { activeStudySession } from "../study/adapter/studySessionStore";
+import { isIssueMessage } from "./isIssueMessage";
+import { recordIssueAction } from "./recordIssueAction";
 import { buildIssuesUpdatedMessage } from "./issueDisplay";
 import { markIssueDeferred } from "./selectionListener";
 import {
@@ -14,28 +22,6 @@ import {
 } from "../accountability/stateMachine";
 
 type Reply = (message: PluginToUiMessage) => void;
-
-/** Validates both the message type and the shape its fields must carry */
-export function isIssueMessage(value: unknown): value is IssueMessage {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-  const message = value as Record<string, unknown>;
-
-  switch (message.type) {
-    case "ISSUES_SUBSCRIBE":
-      return true;
-    case "ISSUE_DEFER":
-    case "ISSUE_FLAG_IMPORTANT":
-    case "ISSUE_REOPEN":
-    case "ISSUE_FOCUS":
-      return typeof message.issueId === "string";
-    case "ISSUE_IGNORE":
-      return typeof message.issueId === "string" && typeof message.reason === "string";
-    default:
-      return false;
-  }
-}
 
 function actionFailed(issueId: string, message: string): PluginToUiMessage {
   return { type: "ISSUE_ACTION_FAILED", issueId, message };
@@ -54,7 +40,7 @@ async function applyTransition(
   issueId: string,
   reply: Reply,
   transition: (record: IssueRecordMap) => TransitionOutcome | { ok: false; reason: string },
-  onSaved?: () => void
+  onSaved?: (record: IssueRecordMap) => void
 ): Promise<void> {
   const record = await loadIssues();
   const result = transition(record);
@@ -71,7 +57,7 @@ async function applyTransition(
     return;
   }
 
-  onSaved?.();
+  onSaved?.(updated);
   reply(await buildIssuesUpdatedMessage(updated));
 }
 
@@ -102,6 +88,9 @@ async function focusIssue(issueId: string, reply: Reply): Promise<void> {
   }
 
   selectResolvedNodesAndZoom([node]);
+  if (activeStudySession()) {
+    recordIssueAction("locate", issueId, loadRawIssues());
+  }
 }
 
 /** Handles the six inbound issue messages */
@@ -116,24 +105,37 @@ export async function handleIssueMessage(message: IssueMessage, reply: Reply): P
         message.issueId,
         reply,
         (record) => transitionFor(record, message.issueId, deferIssue),
-        () => markIssueDeferred(message.issueId)
+        (saved) => {
+          markIssueDeferred(message.issueId);
+          recordIssueAction("defer", message.issueId, saved);
+        }
       );
       return;
     case "ISSUE_FLAG_IMPORTANT":
-      await applyTransition(message.issueId, reply, (record) =>
-        transitionFor(record, message.issueId, flagImportant)
+      await applyTransition(
+        message.issueId,
+        reply,
+        (record) => transitionFor(record, message.issueId, flagImportant),
+        (saved) => recordIssueAction("pin", message.issueId, saved)
       );
       return;
     case "ISSUE_REOPEN":
-      await applyTransition(message.issueId, reply, (record) =>
-        transitionFor(record, message.issueId, reopenIssue)
+      await applyTransition(
+        message.issueId,
+        reply,
+        (record) => transitionFor(record, message.issueId, reopenIssue),
+        (saved) => recordIssueAction("reopen", message.issueId, saved)
       );
       return;
     case "ISSUE_IGNORE":
-      await applyTransition(message.issueId, reply, (record) =>
-        transitionFor(record, message.issueId, (issue) =>
-          ignoreIssue(issue, message.reason, new Date().toISOString())
-        )
+      await applyTransition(
+        message.issueId,
+        reply,
+        (record) =>
+          transitionFor(record, message.issueId, (issue) =>
+            ignoreIssue(issue, message.reason, new Date().toISOString())
+          ),
+        (saved) => recordIssueAction("ignore", message.issueId, saved, message.reason)
       );
       return;
     case "ISSUE_FOCUS":
@@ -141,3 +143,5 @@ export async function handleIssueMessage(message: IssueMessage, reply: Reply): P
       return;
   }
 }
+
+export { isIssueMessage };

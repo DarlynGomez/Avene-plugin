@@ -132,10 +132,10 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
             onLocate={focusIssue}
             onAdjust={openAdjust}
             onIgnore={openIgnore}
-            onDefer={(root) => deferRoot(instanceIds(root))}
+            onDefer={(root) => deferRoot(instanceIds(root), root.signature)}
             onToggleImportant={handleToggleImportant}
             onApplyDecisionOffer={handleApplyDecisionOffer}
-            onRestoreDeferred={(root) => restoreDeferredRoot(instanceIds(root))}
+            onRestoreDeferred={(root) => restoreDeferredRoot(instanceIds(root), root.signature)}
             onReopen={reopenRoot}
           />
         )}

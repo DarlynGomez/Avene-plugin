@@ -2,6 +2,8 @@
 export interface ShowOnCanvasMessage {
   type: "SHOW_ON_CANVAS";
   nodeIds: string[];
+  /** Names the root for the study log */
+  signature?: string;
 }
 
 /** Puts back the selection the designer had before */

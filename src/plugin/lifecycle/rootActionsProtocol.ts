@@ -11,6 +11,8 @@ import {
   type GroupTransitionResult
 } from "../accountability/groupActions";
 import { loadIssues, saveIssues, type IssueRecordMap } from "../accountability/issueStore";
+import type { IssueActionType } from "../../shared/study/studyEvents";
+import { emitIssueAction } from "../study/emitIssueAction";
 import { buildIssuesUpdatedMessage } from "./issueDisplay";
 import { clearRootDecision, recordRootDecision } from "./rootDecisionEffects";
 
@@ -30,7 +32,9 @@ export function isRootMessage(value: unknown): value is RootMessage {
     case "ROOT_MARK_IMPORTANT":
     case "ROOT_UNMARK_IMPORTANT":
     case "ROOT_RESTORE_DEFERRED":
-      return hasIssueIds();
+      return (
+        hasIssueIds() && (message.signature === undefined || typeof message.signature === "string")
+      );
     case "ROOT_REOPEN":
       return (
         hasIssueIds() &&
@@ -74,6 +78,37 @@ function computeGroupResult(
   }
 }
 
+const ACTION_BY_MESSAGE: Record<RootMessage["type"], IssueActionType> = {
+  ROOT_DEFER: "defer",
+  ROOT_MARK_IMPORTANT: "pin",
+  ROOT_UNMARK_IMPORTANT: "unpin",
+  ROOT_IGNORE: "ignore",
+  ROOT_REOPEN: "reopen",
+  ROOT_RESTORE_DEFERRED: "restore_deferred"
+};
+
+/** One event for the whole group, named by its signature when the panel sent it */
+function recordGroupAction(message: RootMessage, result: GroupTransitionResult): void {
+  const changed = message.issueIds.filter((_id, index) => result.outcomes[index]?.ok !== false);
+  const signature = "signature" in message ? message.signature : undefined;
+  const first = changed[0] ?? message.issueIds[0];
+  const isIgnore = message.type === "ROOT_IGNORE";
+  emitIssueAction({
+    action: ACTION_BY_MESSAGE[message.type],
+    target: signature ? { kind: "root", signature } : { kind: "issue", issueId: first ?? "" },
+    issueIds: changed,
+    instanceCount: changed.length,
+    resultingState: (first && result.record[first]?.state) || "open",
+    fromDecisionOffer: isIgnore ? message.fromDecisionOffer : undefined,
+    reason: isIgnore
+      ? {
+          text: message.reason,
+          source: message.fromDecisionOffer ? "decision_offer" : "ignore_sheet"
+        }
+      : undefined
+  });
+}
+
 /** Handles every group action message */
 export async function handleRootMessage(message: RootMessage, reply: Reply): Promise<void> {
   const record = await loadIssues();
@@ -93,6 +128,8 @@ export async function handleRootMessage(message: RootMessage, reply: Reply): Pro
     reply(failed(message.issueIds, saveResult.error ?? "The change could not be saved."));
     return;
   }
+
+  recordGroupAction(message, result);
 
   if (message.type === "ROOT_IGNORE") {
     recordRootDecision(message, result.record, loadDecisions(), at);
