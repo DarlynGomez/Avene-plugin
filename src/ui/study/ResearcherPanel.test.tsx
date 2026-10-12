@@ -336,23 +336,71 @@ describe("block controls", () => {
     expect(sentTypes()).toContain("STUDY_END_BLOCK");
   });
 
-  it("says Export and Exit are placeholders, and neither sends anything yet", async () => {
+  it("asks the sandbox for the file when Export block is pressed", async () => {
     const user = userEvent.setup();
     openPanel(SESSION);
-
-    expect(screen.getByText(/Export and Exit are not connected yet/)).toBeInTheDocument();
-    posted = [];
     await user.click(screen.getByRole("button", { name: "Export block" }));
+
+    expect(sentTypes()).toContain("STUDY_EXPORT");
+  });
+
+  it("no longer says Export and Exit are placeholders", () => {
+    openPanel(SESSION);
+
+    expect(screen.queryByText(/not connected yet/)).not.toBeInTheDocument();
+  });
+
+  it("warns that an unended block has no export and exits only on the skip button", async () => {
+    const user = userEvent.setup();
+    openPanel(SESSION);
     await user.click(screen.getByRole("button", { name: "Exit study mode" }));
-    expect(screen.getByText(/This block has not ended/)).toBeInTheDocument();
-    await user.click(
-      within(screen.getByRole("group", { name: "Confirm" })).getByRole("button", {
-        name: "Exit study mode"
-      })
-    );
+
+    const confirm = screen.getByRole("group", { name: "Confirm" });
+    expect(within(confirm).getByText(/This block has not ended/)).toBeInTheDocument();
+    expect(within(confirm).getByText(/no export taken after it ended/)).toBeInTheDocument();
+    expect(sentTypes()).not.toContain("STUDY_EXIT");
+    await user.click(within(confirm).getByRole("button", { name: "Exit without exporting" }));
+    expect(sentTypes()).toContain("STUDY_EXIT");
+  });
+
+  it("warns when the only export was taken before the block ended", async () => {
+    const user = userEvent.setup();
+    openPanel({
+      ...SESSION,
+      phase: "ended",
+      endedAt: "2026-10-06T09:40:00.000Z",
+      exports: ["2026-10-06T09:30:00.000Z"]
+    });
+    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
+
+    expect(screen.getByText(/no export taken after it ended/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Exit without exporting" })).toBeInTheDocument();
+  });
+
+  it("exits on a plain confirm once the ended block has been exported", async () => {
+    const user = userEvent.setup();
+    openPanel({
+      ...SESSION,
+      phase: "ended",
+      endedAt: "2026-10-06T09:40:00.000Z",
+      exports: ["2026-10-06T09:41:00.000Z"]
+    });
+    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
+
+    const confirm = screen.getByRole("group", { name: "Confirm" });
+    expect(within(confirm).queryByText(/no export taken/)).not.toBeInTheDocument();
+    expect(within(confirm).queryByRole("button", { name: "Exit without exporting" })).toBeNull();
+    await user.click(within(confirm).getByRole("button", { name: "Exit study mode" }));
+    expect(sentTypes()).toContain("STUDY_EXIT");
+  });
+
+  it("sends nothing on Exit when it is cancelled", async () => {
+    const user = userEvent.setup();
+    openPanel(SESSION);
+    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
 
     expect(sentTypes()).not.toContain("STUDY_EXIT");
-    expect(posted).toEqual([]);
   });
 
   it("shows no block controls and no start form while waiting for the plugin", () => {
@@ -361,5 +409,66 @@ describe("block controls", () => {
 
     expect(screen.getByText(/Waiting for the plugin/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start block" })).not.toBeInTheDocument();
+  });
+});
+
+describe("export result", () => {
+  const FILE = {
+    type: "STUDY_EXPORT_READY",
+    fileName: "cadt-study-P01-block1-taskA.json",
+    text: '{"schemaVersion":1}',
+    eventCount: 12
+  };
+  let createObjectURL: ReturnType<typeof vi.fn>;
+  let clicked: string[];
+
+  beforeEach(() => {
+    clicked = [];
+    createObjectURL = vi.fn(() => "blob:probe");
+    Object.defineProperty(URL, "createObjectURL", { value: createObjectURL, configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: vi.fn(), configurable: true });
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+      this: HTMLAnchorElement
+    ) {
+      clicked.push(this.download);
+    });
+  });
+
+  it("offers the file for download as soon as it arrives, under the right name", () => {
+    openPanel(SESSION);
+    act(() => {
+      window.dispatchEvent(new MessageEvent("message", { data: { pluginMessage: FILE } }));
+    });
+
+    expect(clicked).toEqual(["cadt-study-P01-block1-taskA.json"]);
+    expect(screen.getByRole("region", { name: "Export" })).toHaveTextContent("12 study events");
+    expect(screen.getByLabelText("Export contents")).toHaveValue('{"schemaVersion":1}');
+  });
+
+  it("can save again and copy, and says when copying failed", async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    openPanel(SESSION);
+    act(() => {
+      window.dispatchEvent(new MessageEvent("message", { data: { pluginMessage: FILE } }));
+    });
+
+    await user.click(screen.getByRole("button", { name: "Save file again" }));
+    expect(clicked).toHaveLength(2);
+    await user.click(screen.getByRole("button", { name: "Copy contents" }));
+    expect(writeText).toHaveBeenCalledWith('{"schemaVersion":1}');
+    expect(screen.getByText("Copied.")).toBeInTheDocument();
+
+    writeText.mockRejectedValue(new Error("blocked"));
+    document.execCommand = vi.fn(() => false);
+    await user.click(screen.getByRole("button", { name: "Copy contents" }));
+    expect(screen.getByText(/Could not copy/)).toBeInTheDocument();
+  });
+
+  it("shows nothing about an export before one has been made", () => {
+    openPanel(SESSION);
+
+    expect(screen.queryByRole("region", { name: "Export" })).not.toBeInTheDocument();
   });
 });

@@ -34,15 +34,20 @@ const START: StudyMessage = {
 
 let data: Map<string, string>;
 let nodes: Map<string, ReturnType<typeof failingText>>;
+let failWrites = false;
 
 function stubFigma() {
+  failWrites = false;
   data = new Map();
   nodes = new Map(["1:1", "1:2", "1:3"].map((id) => [id, failingText(id)]));
   vi.stubGlobal("figma", {
     mixed: Symbol("figma.mixed"),
     root: {
       getPluginData: (key: string) => data.get(key) ?? "",
-      setPluginData: (key: string, value: string) => void data.set(key, value)
+      setPluginData: (key: string, value: string) => {
+        if (failWrites) throw new Error("read only");
+        data.set(key, value);
+      }
     },
     clientStorage: { getAsync: async () => undefined },
     getNodeByIdAsync: async (id: string) => nodes.get(id) ?? null,
@@ -358,5 +363,122 @@ describe("starting issues", () => {
     ]);
     const started = m.log.loadStudyEvents().find((event) => event.type === "block_started");
     expect(detected[0]?.at).toBe(started?.at);
+  });
+});
+
+describe("exporting a block through the real handlers", () => {
+  function exportReply(replies: PluginToUiMessage[]) {
+    return replies.find((reply) => reply.type === "STUDY_EXPORT_READY");
+  }
+
+  it("sends one file with the schema version, session, events, adjust log and final snapshot", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    const ready = exportReply(replies);
+    expect(ready).toMatchObject({
+      type: "STUDY_EXPORT_READY",
+      fileName: "cadt-study-P01-block1-taskA.json"
+    });
+    const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
+    expect(file.schemaVersion).toBe(1);
+    expect(file.session).toMatchObject({ participantId: "P01", phase: "ended" });
+    expect(file.events).toEqual(m.log.loadStudyEvents());
+    expect(file.events.length).toBe(ready && "eventCount" in ready ? ready.eventCount : -1);
+    expect(file.adjustLog).toHaveLength(1);
+    expect(file.finalSnapshot.map((row: { id: string }) => row.id)).toEqual([
+      "contrast:1:1",
+      "contrast:1:2",
+      "contrast:1:3"
+    ]);
+    expect(file.droppedWrites).toBeDefined();
+  });
+
+  it("notes the export on the session and lists that time in the file itself", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    const stored = JSON.parse(data.get("cadt.study.session.v1") ?? "{}");
+    const ready = exportReply(replies);
+    const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
+    expect(stored.exports).toHaveLength(1);
+    expect(file.session.exports).toEqual(stored.exports);
+    expect(file.exportedAt).toBe(stored.exports[0]);
+    expect(replies.at(-1)).toMatchObject({
+      type: "STUDY_STATE",
+      session: { exports: stored.exports }
+    });
+  });
+
+  it("can be taken mid block and has no final snapshot yet", async () => {
+    const m = await modules(true);
+    m.study.handleStudyMessage(START, () => undefined);
+    await m.scan.scanAndSync(new Set(["1:1"]), "test");
+    await m.emitter.flushStudyEvents();
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    const ready = exportReply(replies);
+    const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
+    expect(file.finalSnapshot).toBeNull();
+    expect(file.session.phase).toBe("designing");
+  });
+
+  it("can be taken again, each one noted", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, () => undefined);
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, () => undefined);
+
+    expect(JSON.parse(data.get("cadt.study.session.v1") ?? "{}").exports).toHaveLength(2);
+  });
+
+  it("is refused with no session, and sends no file", async () => {
+    const m = await modules(true);
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    expect(exportReply(replies)).toBeUndefined();
+    expect(replies[0]).toMatchObject({ type: "STUDY_STATE", refusal: { code: "no-session" } });
+  });
+
+  it("is refused after exit, and changes nothing", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    m.study.handleStudyMessage({ type: "STUDY_EXIT" }, () => undefined);
+    const before = data.get("cadt.study.session.v1");
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    expect(exportReply(replies)).toBeUndefined();
+    expect(data.get("cadt.study.session.v1")).toBe(before);
+  });
+
+  it("sends no file when the export cannot be noted on the session", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    failWrites = true;
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+    failWrites = false;
+
+    expect(exportReply(replies)).toBeUndefined();
+    expect(replies[0]).toMatchObject({ refusal: { code: "save-failed" } });
+  });
+
+  it("exits cleanly after an export, keeping every record", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, () => undefined);
+    m.study.handleStudyMessage({ type: "STUDY_EXIT" }, () => undefined);
+
+    const stored = JSON.parse(data.get("cadt.study.session.v1") ?? "{}");
+    expect(stored.exitedAt).not.toBeNull();
+    expect(stored.exports).toHaveLength(1);
+    expect(m.log.loadStudyEvents().length).toBeGreaterThan(0);
   });
 });

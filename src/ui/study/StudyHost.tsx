@@ -1,6 +1,5 @@
 import { useEffect, type ReactNode } from "react";
 
-import { exitStudyPlaceholder, exportBlockPlaceholder } from "./placeholders";
 import { ResearcherPanel } from "./ResearcherPanel";
 import { StudyStateContext } from "./StudyStateContext";
 import { useResearcherChord } from "./useResearcherChord";
@@ -12,7 +11,7 @@ interface StudyHostProps {
 
 /** Sits above every screen so the chord works from calibration, consent and the issue panel alike */
 export function StudyHost({ children }: StudyHostProps) {
-  const { state, send, refresh } = useStudyState();
+  const { state, exportFile, send, refresh } = useStudyState();
   const { open, close } = useResearcherChord();
 
   useEffect(() => {
@@ -25,13 +24,7 @@ export function StudyHost({ children }: StudyHostProps) {
     <StudyStateContext.Provider value={state}>
       {children}
       {open && (
-        <ResearcherPanel
-          state={state}
-          onSend={send}
-          onExport={exportBlockPlaceholder}
-          onExit={exitStudyPlaceholder}
-          onClose={close}
-        />
+        <ResearcherPanel state={state} exportFile={exportFile} onSend={send} onClose={close} />
       )}
     </StudyStateContext.Provider>
   );

@@ -18,6 +18,14 @@ export interface StudyStateMessage {
   refusal: StudyRefusal | null;
 }
 
+/** The file for one block as text, the UI saves or copies it because only it can reach the disk */
+export interface StudyExportReadyMessage {
+  type: "STUDY_EXPORT_READY";
+  fileName: string;
+  text: string;
+  eventCount: number;
+}
+
 /** The start form as typed, checked again in the sandbox */
 export interface StudyStartBlockMessage {
   type: "STUDY_START_BLOCK";
@@ -31,6 +39,11 @@ export interface StudyStartBlockMessage {
 /** Asks for the current state, answered with STUDY_STATE, so the UI never has to catch the startup push */
 export interface StudySubscribeMessage {
   type: "STUDY_SUBSCRIBE";
+}
+
+/** Asks for the block's file, answered with STUDY_EXPORT_READY */
+export interface StudyExportMessage {
+  type: "STUDY_EXPORT";
 }
 
 export interface StudyRevealMessage {
@@ -51,4 +64,5 @@ export type StudyMessage =
   | StudyStartBlockMessage
   | StudyRevealMessage
   | StudyEndBlockMessage
-  | StudyExitMessage;
+  | StudyExitMessage
+  | StudyExportMessage;

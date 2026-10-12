@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { participantVisibility } from "./participantVisibility";
-import { isStudyMessage, isStudyStateMessage } from "./studyMessageGuards";
+import {
+  isStudyExportReadyMessage,
+  isStudyMessage,
+  isStudyStateMessage
+} from "./studyMessageGuards";
 
 const START = {
   type: "STUDY_START_BLOCK",
@@ -13,7 +17,7 @@ const START = {
 };
 
 describe("isStudyMessage", () => {
-  it.each(["STUDY_SUBSCRIBE", "STUDY_REVEAL", "STUDY_END_BLOCK", "STUDY_EXIT"])(
+  it.each(["STUDY_SUBSCRIBE", "STUDY_EXPORT", "STUDY_REVEAL", "STUDY_END_BLOCK", "STUDY_EXIT"])(
     "accepts %s with no fields",
     (type) => {
       expect(isStudyMessage({ type })).toBe(true);
@@ -94,5 +98,27 @@ describe("isStudyStateMessage", () => {
     expect(isStudyStateMessage({ ...state, refusal: { code: 1 } })).toBe(false);
     expect(isStudyStateMessage({ ...state, type: "STUDY_START_BLOCK" })).toBe(false);
     expect(isStudyStateMessage(null)).toBe(false);
+  });
+});
+
+describe("isStudyExportReadyMessage", () => {
+  const ready = { type: "STUDY_EXPORT_READY", fileName: "a.json", text: "{}", eventCount: 3 };
+
+  it("accepts a complete message", () => {
+    expect(isStudyExportReadyMessage(ready)).toBe(true);
+  });
+
+  it.each([
+    ["fileName", 5],
+    ["text", null],
+    ["eventCount", "3"],
+    ["type", "STUDY_STATE"]
+  ])("refuses a bad %s", (field, value) => {
+    expect(isStudyExportReadyMessage({ ...ready, [field]: value })).toBe(false);
+  });
+
+  it("refuses a missing field and non objects", () => {
+    expect(isStudyExportReadyMessage({ type: "STUDY_EXPORT_READY" })).toBe(false);
+    expect(isStudyExportReadyMessage(null)).toBe(false);
   });
 });

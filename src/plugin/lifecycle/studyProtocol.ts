@@ -1,4 +1,3 @@
-import { participantVisibility } from "../../shared/study/participantVisibility";
 import { checkFreshFile } from "../../shared/study/freshFile";
 import {
   endBlock,
@@ -8,11 +7,7 @@ import {
   type Clock,
   type TransitionResult
 } from "../../shared/study/sessionTransitions";
-import type {
-  StudyMessage,
-  StudyRefusal,
-  StudyStateMessage
-} from "../../shared/study/studyMessageTypes";
+import type { StudyMessage } from "../../shared/study/studyMessageTypes";
 import type { StudySession } from "../../shared/study/studyTypes";
 import type { PluginToUiMessage } from "../../shared/messageTypes";
 import { STUDY_PROFILE_VERSION } from "../../shared/study/studyProfile";
@@ -25,19 +20,14 @@ import {
 import type { StudyEvent } from "../../shared/study/studyEvents";
 import { loadRawIssues } from "../accountability/issueStore";
 import { emitStudy } from "../study/adapter/studyEmitter";
+import { exportBlock } from "./studyExportProtocol";
+import { stateMessage } from "./studyStateMessage";
 import { gatherFreshFileInputs } from "../study/adapter/freshFileInputs";
 import { loadStudySession, saveStudySession } from "../study/adapter/studySessionStore";
 
 type Reply = (message: PluginToUiMessage) => void;
 
 const systemClock: Clock = () => new Date().toISOString();
-
-function stateMessage(
-  session: StudySession | null,
-  refusal: StudyRefusal | null
-): StudyStateMessage {
-  return { type: "STUDY_STATE", session, visibility: participantVisibility(session), refusal };
-}
 
 /** The current session and what the participant may see, always sent ahead of any issue list */
 export function sendStudyState(reply: Reply): void {
@@ -116,6 +106,10 @@ export function handleStudyMessage(
 ): void {
   if (message.type === "STUDY_SUBSCRIBE") {
     sendStudyState(reply);
+    return;
+  }
+  if (message.type === "STUDY_EXPORT") {
+    exportBlock(reply, clock);
     return;
   }
   if (message.type === "STUDY_START_BLOCK") {

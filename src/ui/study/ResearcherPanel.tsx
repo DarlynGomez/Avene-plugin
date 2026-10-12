@@ -1,8 +1,13 @@
 import { useRef } from "react";
 
 import { isStudyActive } from "../../shared/study/studyActive";
-import type { StudyMessage, StudyStateMessage } from "../../shared/study/studyMessageTypes";
+import type {
+  StudyExportReadyMessage,
+  StudyMessage,
+  StudyStateMessage
+} from "../../shared/study/studyMessageTypes";
 import { BlockControls } from "./BlockControls";
+import { ExportResult } from "./ExportResult";
 import { refusalText } from "./refusalText";
 import styles from "./ResearcherPanel.module.css";
 import { SessionLine } from "./SessionLine";
@@ -11,20 +16,13 @@ import { useFocusTrap } from "./useFocusTrap";
 
 interface ResearcherPanelProps {
   state: StudyStateMessage | null;
+  exportFile: StudyExportReadyMessage | null;
   onSend: (message: StudyMessage) => void;
-  onExport: () => void;
-  onExit: () => void;
   onClose: () => void;
 }
 
 /** Covers the whole panel while open and does not exist in the page while closed */
-export function ResearcherPanel({
-  state,
-  onSend,
-  onExport,
-  onExit,
-  onClose
-}: ResearcherPanelProps) {
+export function ResearcherPanel({ state, exportFile, onSend, onClose }: ResearcherPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   useFocusTrap(containerRef);
   const session = state?.session ?? null;
@@ -57,9 +55,8 @@ export function ResearcherPanel({
           </p>
         )}
         {session && <SessionLine session={session} />}
-        {state && isStudyActive(session) && (
-          <BlockControls session={session} onSend={onSend} onExport={onExport} onExit={onExit} />
-        )}
+        {state && isStudyActive(session) && <BlockControls session={session} onSend={onSend} />}
+        {exportFile && isStudyActive(session) && <ExportResult file={exportFile} />}
         {state && !isStudyActive(session) && <StartForm onSend={onSend} />}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { hasCurrentExport } from "../../shared/study/studyExport";
 import type { StudyMessage } from "../../shared/study/studyMessageTypes";
 import type { StudySession } from "../../shared/study/studyTypes";
 import styles from "./BlockControls.module.css";
@@ -10,16 +11,17 @@ type Pending = "reveal" | "end" | "exit";
 interface BlockControlsProps {
   session: StudySession;
   onSend: (message: StudyMessage) => void;
-  onExport: () => void;
-  onExit: () => void;
 }
 
 /** Each control appears only when it can be used, Reveal and End and Exit ask once first */
-export function BlockControls({ session, onSend, onExport, onExit }: BlockControlsProps) {
+export function BlockControls({ session, onSend }: BlockControlsProps) {
   const [pending, setPending] = useState<Pending | null>(null);
   const live = session.condition === "live";
   const canReveal = !live && session.phase === "designing";
   const canEnd = live ? session.phase === "designing" : session.phase === "reviewing";
+  const exportNote = hasCurrentExport(session)
+    ? ""
+    : "This block has no export taken after it ended. Export first, or exit without exporting. ";
   const exitNote = session.phase === "ended" ? "" : "This block has not ended. ";
 
   function confirm(action: () => void) {
@@ -50,9 +52,9 @@ export function BlockControls({ session, onSend, onExport, onExit }: BlockContro
   if (pending === "exit") {
     return (
       <ConfirmStep
-        message={`${exitNote}Exiting study mode keeps every recorded answer and returns the plugin to normal.`}
-        confirmLabel="Exit study mode"
-        onConfirm={() => confirm(onExit)}
+        message={`${exitNote}${exportNote}Exiting study mode keeps every recorded answer and returns the plugin to normal.`}
+        confirmLabel={hasCurrentExport(session) ? "Exit study mode" : "Exit without exporting"}
+        onConfirm={() => confirm(() => onSend({ type: "STUDY_EXIT" }))}
         onCancel={() => setPending(null)}
       />
     );
@@ -70,15 +72,16 @@ export function BlockControls({ session, onSend, onExport, onExit }: BlockContro
           End block
         </button>
       )}
-      <button type="button" className={styles.secondary} onClick={onExport}>
+      <button
+        type="button"
+        className={styles.secondary}
+        onClick={() => onSend({ type: "STUDY_EXPORT" })}
+      >
         Export block
       </button>
       <button type="button" className={styles.secondary} onClick={() => setPending("exit")}>
         Exit study mode
       </button>
-      <p className={styles.note}>
-        Export and Exit are not connected yet. They arrive in a later phase.
-      </p>
     </div>
   );
 }

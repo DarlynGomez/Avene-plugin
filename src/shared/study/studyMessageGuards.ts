@@ -1,6 +1,6 @@
 import type { ParticipantVisibility } from "./participantVisibility";
 import { studySessionProblem } from "./studySessionSchema";
-import type { StudyMessage, StudyStateMessage } from "./studyMessageTypes";
+import type { StudyExportReadyMessage, StudyMessage, StudyStateMessage } from "./studyMessageTypes";
 
 const VISIBILITY_FLAGS: readonly (keyof ParticipantVisibility)[] = [
   "wordmark",
@@ -32,6 +32,7 @@ export function isStudyMessage(value: unknown): value is StudyMessage {
   }
   switch (value.type) {
     case "STUDY_SUBSCRIBE":
+    case "STUDY_EXPORT":
     case "STUDY_REVEAL":
     case "STUDY_END_BLOCK":
     case "STUDY_EXIT":
@@ -47,6 +48,16 @@ export function isStudyMessage(value: unknown): value is StudyMessage {
     default:
       return false;
   }
+}
+
+export function isStudyExportReadyMessage(value: unknown): value is StudyExportReadyMessage {
+  return (
+    isRecord(value) &&
+    value.type === "STUDY_EXPORT_READY" &&
+    typeof value.fileName === "string" &&
+    typeof value.text === "string" &&
+    typeof value.eventCount === "number"
+  );
 }
 
 export function isStudyStateMessage(value: unknown): value is StudyStateMessage {

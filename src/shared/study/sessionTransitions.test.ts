@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { endBlock, exitStudy, reveal, startBlock, type Clock } from "./sessionTransitions";
+import {
+  endBlock,
+  exitStudy,
+  recordExport,
+  reveal,
+  startBlock,
+  type Clock
+} from "./sessionTransitions";
 import type { StudySession } from "./studyTypes";
 
 const FORM = {
@@ -217,5 +224,36 @@ describe("exitStudy", () => {
     const exited = session({ exitedAt: "2026-10-06T09:40:00.000Z" });
 
     expect(refusalOf(exitStudy(exited, clockAt("t")))?.code).toBe("exited");
+  });
+});
+
+describe("recordExport", () => {
+  it.each(["designing", "reviewing", "ended"] as const)(
+    "is allowed in %s and appends the time",
+    (phase) => {
+      const open = session({
+        phase,
+        revealedAt: phase === "designing" ? null : "2026-10-06T09:20:00.000Z",
+        endedAt: phase === "ended" ? "2026-10-06T09:30:00.000Z" : null,
+        exports: ["2026-10-06T09:25:00.000Z"]
+      });
+      const result = recordExport(open, clockAt("2026-10-06T09:40:00.000Z"));
+
+      expect(result).toEqual({
+        ok: true,
+        session: { ...open, exports: ["2026-10-06T09:25:00.000Z", "2026-10-06T09:40:00.000Z"] }
+      });
+    }
+  );
+
+  it("changes nothing but the list", () => {
+    const result = recordExport(session(), clockAt("t"));
+
+    expect(result.ok && result.session.phase).toBe("designing");
+    expect(result.ok && result.session.exitedAt).toBeNull();
+  });
+
+  it("is refused after study mode was exited", () => {
+    expect(refusalOf(recordExport(session({ exitedAt: "t" }), clockAt("t")))?.code).toBe("exited");
   });
 });
