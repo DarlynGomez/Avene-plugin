@@ -27,6 +27,7 @@
     }
   ],
   "documentAccess": "dynamic-page",
+  "permissions": ["currentuser"],
   "networkAccess": {
     "allowedDomains": ["none"]
   }
