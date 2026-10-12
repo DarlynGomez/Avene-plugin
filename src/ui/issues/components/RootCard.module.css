@@ -7,6 +7,11 @@
   list-style: none;
 }
 
+.card[data-marked="true"] {
+  outline: var(--size-selection-ring) solid var(--color-ink);
+  outline-offset: var(--size-focus-offset);
+}
+
 .card.deferred {
   background: var(--color-background);
   border-color: var(--color-line);

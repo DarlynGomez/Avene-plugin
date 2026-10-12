@@ -1,6 +1,7 @@
 import type {
   AdjustEventEvent,
   ExplanationOpenedEvent,
+  MarkerStateChange,
   MarkerStateEvent,
   RoleAnsweredEvent,
   StudyEventContext
@@ -17,9 +18,11 @@ export function buildAdjustEvent(
 export function buildMarkerState(
   ctx: StudyEventContext,
   at: string,
-  markersOn: boolean
+  markersOn: boolean,
+  change: MarkerStateChange = markersOn ? "shown" : "hidden",
+  markerCount = 0
 ): MarkerStateEvent {
-  return { type: "marker_state", at, ctx, markersOn };
+  return { type: "marker_state", at, ctx, markersOn, change, markerCount };
 }
 
 export function buildExplanationOpened(

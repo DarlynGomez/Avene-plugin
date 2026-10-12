@@ -3,6 +3,7 @@ import type { CalibrationProfile } from "./calibrationSchema";
 import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
+import type { MarkerMessage } from "./markers/markerMessageTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
 import type { SelectionMessage } from "./selectionMessageTypes";
 import type {
@@ -122,7 +123,8 @@ export type PluginToUiMessage =
   | RootActionFailedMessage
   | AdjustReplyMessage
   | StudyStateMessage
-  | StudyExportReadyMessage;
+  | StudyExportReadyMessage
+  | MarkerMessage;
 
 /** Every message that crosses the plugin boundary */
 export type PluginMessage = UiToPluginMessage | PluginToUiMessage;

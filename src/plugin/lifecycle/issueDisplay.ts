@@ -3,6 +3,7 @@ import { loadDecisions } from "../accountability/decisionStore";
 import { RULES } from "../detection/rules/registry";
 import type { Issue, IssueSummary } from "../../shared/issues/issueTypes";
 import type { IssuesUpdatedMessage } from "../../shared/messageTypes";
+import { markersOnIssues } from "./markerRuntime";
 import { resolveTextNodeSnapshot } from "./resolveSnapshot";
 
 async function enrichForDisplay(issue: Issue): Promise<IssueSummary> {
@@ -38,9 +39,8 @@ export async function buildDisplayList(record: IssueRecordMap): Promise<IssueSum
 export async function buildIssuesUpdatedMessage(
   record: IssueRecordMap
 ): Promise<IssuesUpdatedMessage> {
-  return {
-    type: "ISSUES_UPDATED",
-    issues: await buildDisplayList(record),
-    decisions: loadDecisions()
-  };
+  const issues = await buildDisplayList(record);
+  // Every list that reaches the panel also moves the markers
+  markersOnIssues(issues);
+  return { type: "ISSUES_UPDATED", issues, decisions: loadDecisions() };
 }

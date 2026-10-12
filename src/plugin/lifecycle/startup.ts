@@ -1,4 +1,5 @@
 import { registerDocumentChangeListener } from "./listeners";
+import { startMarkers } from "./markerRuntime";
 import { scanAndSync } from "./scanAndSync";
 import {
   initializeReEncounterFromCurrentSelection,
@@ -26,4 +27,5 @@ export async function startDetectionLifecycle(): Promise<void> {
   registerSelectionChangeListener();
   await initializeReEncounterFromCurrentSelection();
   await scanCurrentPage();
+  await startMarkers();
 }

@@ -3,6 +3,7 @@ import type { GroupBy, RootSection } from "../../../shared/grouping/sectionRoots
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
 import type { ActionError } from "../hooks/useIssues";
+import { useMarkerSignals } from "../hooks/useMarkerSignals";
 import { DecisionsView } from "./DecisionsView";
 import { FilterBar, type FilterCounts, type StateFilter } from "./FilterBar";
 import styles from "./LiveWatchBody.module.css";
@@ -42,8 +43,15 @@ interface LiveWatchBodyProps {
 
 /** Body of the Live Watch tab, error, filters and the active list */
 export function LiveWatchBody(props: LiveWatchBodyProps) {
+  const { notice } = useMarkerSignals();
+
   return (
     <>
+      {notice && (
+        <p role="status" className={styles.notice}>
+          {notice}
+        </p>
+      )}
       {props.actionError && (
         <p role="alert" className={styles.error}>
           {props.actionError.message}

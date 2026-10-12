@@ -94,7 +94,10 @@ describe("adjust variable protocol", () => {
   // The flag is off by default so these tests turn it on explicitly
   beforeEach(() => {
     vi.resetModules();
-    vi.doMock("../../shared/featureFlags", () => ({ FEATURE_VARIABLE_SCOPE: true }));
+    vi.doMock("../../shared/featureFlags", () => ({
+      FEATURE_VARIABLE_SCOPE: true,
+      FEATURE_MARKERS: false
+    }));
   });
 
   afterEach(() => {

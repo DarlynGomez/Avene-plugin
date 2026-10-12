@@ -338,8 +338,18 @@ describe("the remaining events", () => {
   it("builds the three types that nothing emits yet", () => {
     expect(buildMarkerState(LIVE_CTX, T, true)).toMatchObject({
       type: "marker_state",
-      markersOn: true
+      markersOn: true,
+      change: "shown",
+      markerCount: 0
     });
+    expect(buildMarkerState(LIVE_CTX, T, false)).toMatchObject({ change: "hidden" });
+    expect(buildMarkerState(LIVE_CTX, T, true, "screen_changed", 3)).toMatchObject({
+      change: "screen_changed",
+      markerCount: 3
+    });
+    expect(JSON.stringify(buildMarkerState(LIVE_CTX, T, true, "screen_changed", 3))).not.toMatch(
+      /screenId/
+    );
     expect(buildExplanationOpened(LIVE_CTX, T, "why_surfaced", "contrast:1:1")).toMatchObject({
       type: "explanation_opened",
       surface: "why_surfaced",

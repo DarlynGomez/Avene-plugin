@@ -12,6 +12,7 @@ import {
 } from "../accountability/adapter/canvasSelection";
 import { loadIssues, saveIssues, type IssueRecordMap } from "../accountability/issueStore";
 import { buildIssuesUpdatedMessage } from "./issueDisplay";
+import { markersOnSelection } from "./markerRuntime";
 
 let reEncounterState: ReEncounterState = { waitingForSelectionToLeave: new Set() };
 
@@ -61,6 +62,8 @@ export function markIssueDeferred(issueId: string): void {
  * Defaults to false so existing callers are unaffected, the real listener always passes it
  */
 export async function handleSelectionChange(isPluginOriginated: boolean = false): Promise<void> {
+  // The same flag, read once for this event, tells the markers whether the designer moved
+  markersOnSelection(isPluginOriginated);
   if (isPluginOriginated) {
     return;
   }

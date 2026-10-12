@@ -94,9 +94,14 @@ export interface AdjustEventEvent extends Base {
   loggedAt: string;
 }
 
+/** Shown or hidden, or the current screen changed while on, never which screen it was */
+export type MarkerStateChange = "shown" | "hidden" | "screen_changed";
+
 export interface MarkerStateEvent extends Base {
   type: "marker_state";
   markersOn: boolean;
+  change: MarkerStateChange;
+  markerCount: number;
 }
 
 export interface ExplanationOpenedEvent extends Base {

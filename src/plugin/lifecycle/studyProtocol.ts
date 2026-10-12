@@ -20,6 +20,7 @@ import {
 import type { StudyEvent } from "../../shared/study/studyEvents";
 import { loadRawIssues } from "../accountability/issueStore";
 import { emitStudy } from "../study/adapter/studyEmitter";
+import { markersOnStudyChange } from "./markerRuntime";
 import { exportBlock } from "./studyExportProtocol";
 import { stateMessage } from "./studyStateMessage";
 import { gatherFreshFileInputs } from "../study/adapter/freshFileInputs";
@@ -52,6 +53,7 @@ function commit(
     return null;
   }
   reply(stateMessage(result.session, null));
+  markersOnStudyChange();
   return result.session;
 }
 

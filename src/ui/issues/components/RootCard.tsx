@@ -51,7 +51,10 @@ export function RootCard({
   const isDeferred = root.displayState === "deferred";
 
   return (
-    <li className={`${styles.card} ${isDeferred ? styles.deferred : ""}`}>
+    <li
+      className={`${styles.card} ${isDeferred ? styles.deferred : ""}`}
+      data-root-signature={root.signature}
+    >
       {isDeferred && (
         <button
           type="button"

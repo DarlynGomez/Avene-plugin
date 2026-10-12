@@ -75,7 +75,10 @@ const CHECKS: Record<StudyEvent["type"], (e: Rec) => boolean> = {
     targetOk(e.target) &&
     oneOf(["ignore_sheet", "decision_offer"], e.source),
   adjust_event: (e) => typeof e.adjustLogIndex === "number" && str(e.issueId) && str(e.loggedAt),
-  marker_state: (e) => typeof e.markersOn === "boolean",
+  marker_state: (e) =>
+    typeof e.markersOn === "boolean" &&
+    oneOf(["shown", "hidden", "screen_changed"], e.change) &&
+    typeof e.markerCount === "number",
   explanation_opened: (e) =>
     oneOf(["why_surfaced", "teach_me_why"], e.surface) &&
     (e.issueId === undefined || str(e.issueId)),
