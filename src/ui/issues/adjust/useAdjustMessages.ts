@@ -56,6 +56,7 @@ export function useAdjustMessages(issueId: string) {
   // issueId matches replies to this popup, issueIds is what actually gets written
   const preview = useCallback(
     (color: RGBColor, issueIds: readonly string[]) => {
+      setActionError(null);
       sendMessage({ type: "ADJUST_PREVIEW", issueId, issueIds: [...issueIds], color });
     },
     [issueId]
@@ -73,6 +74,7 @@ export function useAdjustMessages(issueId: string) {
       wheelOpened: boolean,
       hexRejected: boolean
     ) => {
+      setActionError(null);
       sendMessage({
         type: "ADJUST_APPLY",
         issueId,

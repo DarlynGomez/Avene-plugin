@@ -29,3 +29,24 @@ describe("RatioBadge", () => {
     expect(screen.getByText(/5\.23:1/)).toBeInTheDocument();
   });
 });
+
+describe("RatioBadge for a ratio that does not reach what is needed", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("does not say AA, and says it is below what is needed", () => {
+    render(<RatioBadge achievedRatio={3.29} requiredRatio={4.5} />);
+
+    expect(screen.queryByText("AA")).not.toBeInTheDocument();
+    expect(screen.queryByText("AAA")).not.toBeInTheDocument();
+    expect(screen.getByText(/below 4\.5/)).toBeInTheDocument();
+    expect(screen.getByText(/3\.29:1/)).toBeInTheDocument();
+  });
+
+  it("still says AA at exactly the needed ratio", () => {
+    render(<RatioBadge achievedRatio={4.5} requiredRatio={4.5} />);
+
+    expect(screen.getByText("AA")).toBeInTheDocument();
+  });
+});

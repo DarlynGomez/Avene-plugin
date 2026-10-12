@@ -78,7 +78,8 @@ const CHECKS: Record<StudyEvent["type"], (e: Rec) => boolean> = {
   marker_state: (e) =>
     typeof e.markersOn === "boolean" &&
     oneOf(["shown", "hidden", "screen_changed"], e.change) &&
-    typeof e.markerCount === "number",
+    typeof e.markerCount === "number" &&
+    oneOf(["annotation", "dot", "ring"], e.style),
   explanation_opened: (e) =>
     oneOf(["why_surfaced", "teach_me_why"], e.surface) &&
     (e.issueId === undefined || str(e.issueId)),

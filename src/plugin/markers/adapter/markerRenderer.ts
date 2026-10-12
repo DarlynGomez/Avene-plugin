@@ -1,15 +1,9 @@
-import { diffMarkers } from "../../../shared/markers/markerDiff";
 import type { MarkerRenderer, ShowResult } from "../../../shared/markers/markerRenderer";
 import type { Marker } from "../../../shared/markers/markerSet";
-import {
-  addMarkerAnnotation,
-  isAnnotatable,
-  isTaggedByAnotherUser,
-  removeMarkerAnnotations,
-  type AnnotatableNode
-} from "./annotationWrites";
-import { ensureCategory, findCategory, removeCategoryIfUnused } from "./markerCategory";
+import type { MarkerStyle } from "../../../shared/markers/markerStyle";
+import { createAnnotationBackend, type BackendResult } from "./annotationBackend";
 import { sweepTaggedNodes } from "./markerSweep";
+import { createShapeBackend } from "./shapeBackend";
 
 export const READ_ONLY_NOTICE =
   "Markers are off because this file is view only for you. Everything else works as usual.";
@@ -21,21 +15,19 @@ function newSessionId(): string {
 }
 
 /**
- * The only place that writes annotations
- * Keeps live references to every layer it annotated, as the preview does, so a close can undo
- * its writes without awaiting anything
+ * The only place that writes markers, in whichever style is chosen
+ * Switching style removes the old style through its own path first, so two styles are never on the
+ * canvas together, and one undo step covers the whole swap
  */
 export function createMarkerRenderer(sessionId: string = newSessionId()): MarkerRenderer {
-  const live = new Map<string, AnnotatableNode>();
-  let shown: Marker[] = [];
+  const annotation = createAnnotationBackend(sessionId);
+  const shapes = createShapeBackend(sessionId);
   let swept = false;
   let readOnly = false;
   let noticeGiven = false;
-  let lastCategory: AnnotationCategory | null = null;
+  let current: MarkerStyle | null = null;
 
   const userId = (): string | null => figma.currentUser?.id ?? null;
-  const ours = (id: string) => (tag: { userId: string; sessionId: string }) =>
-    tag.userId === id && tag.sessionId === sessionId;
 
   function refuse(reason: "read_only" | "no_user", notice: string): ShowResult {
     const say = noticeGiven ? null : notice;
@@ -43,12 +35,12 @@ export function createMarkerRenderer(sessionId: string = newSessionId()): Marker
     return { written: false, reason, notice: say };
   }
 
-  function removeFromLive(nodeId: string, id: string, categoryId: string | null): void {
-    const node = live.get(nodeId);
-    if (node) {
-      removeMarkerAnnotations(node, categoryId, ours(id));
-      live.delete(nodeId);
-    }
+  function applyStyle(
+    id: string,
+    style: MarkerStyle,
+    wanted: readonly Marker[]
+  ): Promise<BackendResult> {
+    return style === "annotation" ? annotation.apply(id, wanted) : shapes.apply(id, wanted, style);
   }
 
   async function sweepOrphans() {
@@ -56,55 +48,49 @@ export function createMarkerRenderer(sessionId: string = newSessionId()): Marker
     swept = true;
     return id === null
       ? { cleaned: 0, left: 0 }
-      : sweepTaggedNodes(id, new Set(live.keys()), sessionId);
+      : sweepTaggedNodes(id, new Set(liveNodeIds()), sessionId);
   }
 
-  async function show(screenId: string, markers: readonly Marker[]): Promise<ShowResult> {
+  function liveNodeIds(): ReadonlySet<string> {
+    return new Set([...annotation.liveNodeIds(), ...shapes.liveNodeIds()]);
+  }
+
+  async function show(
+    screenId: string,
+    markers: readonly Marker[],
+    style: MarkerStyle = "annotation",
+    undoStep = true
+  ): Promise<ShowResult> {
     const id = userId();
     if (id === null) return refuse("no_user", NO_USER_NOTICE);
     if (readOnly) return { written: false, reason: "read_only", notice: null };
     if (!swept) await sweepOrphans();
 
     const wanted = markers.filter((marker) => marker.screenId === screenId);
-    const diff = diffMarkers(shown, wanted);
-    if (diff.added.length === 0 && diff.removed.length === 0) return { written: true };
-
-    const written: Marker[] = [];
+    const done: BackendResult[] = [];
     try {
-      const category = diff.added.length > 0 ? await ensureCategory() : await findCategory();
-      lastCategory = category ?? lastCategory;
-      for (const marker of diff.removed) removeFromLive(marker.nodeId, id, category?.id ?? null);
-      for (const marker of diff.added) {
-        const node = await figma.getNodeByIdAsync(marker.nodeId);
-        if (!category || !isAnnotatable(node) || isTaggedByAnotherUser(node, id)) continue;
-        addMarkerAnnotation(node, marker.label, category.id, { userId: id, sessionId });
-        live.set(node.id, node);
-        written.push(marker);
-      }
-      shown = [...diff.unchanged, ...written];
-      if (category && shown.length === 0) removeCategoryIfUnused(category);
-      figma.commitUndo();
+      if (current !== null && current !== style) done.push(await applyStyle(id, current, []));
+      current = style;
+      done.push(await applyStyle(id, style, wanted));
+      if (undoStep && done.some((result) => result.wrote)) figma.commitUndo();
       return { written: true };
     } catch {
       // A failed write means the file cannot be written to, so undo what this call did and stop
-      for (const marker of written) removeFromLive(marker.nodeId, id, lastCategory?.id ?? null);
-      shown = diff.unchanged;
+      for (const result of done) result.rollback();
       readOnly = true;
       return refuse("read_only", READ_ONLY_NOTICE);
     }
   }
 
   async function clear(): Promise<void> {
-    await show("", []);
+    await show("", [], current ?? "annotation");
   }
 
+  /** The close handler, everything of both styles goes, with nothing awaited */
   function clearSync(): void {
-    const id = userId();
-    if (id === null) return;
-    for (const nodeId of [...live.keys()]) removeFromLive(nodeId, id, lastCategory?.id ?? null);
-    shown = [];
-    if (lastCategory) removeCategoryIfUnused(lastCategory);
+    annotation.releaseAll();
+    shapes.releaseAll(userId());
   }
 
-  return { show, clear, clearSync, sweepOrphans };
+  return { show, clear, clearSync, sweepOrphans, liveNodeIds };
 }

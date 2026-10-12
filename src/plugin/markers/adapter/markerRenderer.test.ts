@@ -32,7 +32,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const labels = (id: string) => fake.nodes.get(id)?.annotations.map((a) => a.label);
+const labels = (id: string) => fake.nodes.get(id)?.annotations.map((a) => a.label ?? "");
 
 describe("the CADT category", () => {
   it("does not exist until the first marker is written, then is created once", async () => {
@@ -50,13 +50,15 @@ describe("the CADT category", () => {
     expect(fake.calls.filter((call) => call === "category:add")).toHaveLength(1);
   });
 
-  it("is removed when the last of this user's markers goes", async () => {
+  it("stays for the whole session when the last marker goes, and is removed at close", async () => {
     setup();
     fake.addNode("1:1");
     const renderer = createMarkerRenderer("s1");
     await renderer.show("A", [marker("r1", "A", "1:1")]);
     await renderer.show("A", []);
+    expect(fake.categories).toHaveLength(1);
 
+    renderer.clearSync();
     expect(fake.categories).toHaveLength(0);
   });
 
@@ -68,6 +70,7 @@ describe("the CADT category", () => {
     const renderer = createMarkerRenderer("s1");
     await renderer.show("A", [marker("r1", "A", "1:1")]);
     await renderer.show("A", []);
+    renderer.clearSync();
 
     expect(fake.categories).toHaveLength(1);
     expect(labels("9:9")).toEqual(["theirs"]);
@@ -102,9 +105,10 @@ describe("ownership", () => {
 
     expect(JSON.parse(node.getPluginData("cadt.marker.v1"))).toEqual({
       userId: "u7",
-      sessionId: "sess-9"
+      sessionId: "sess-9",
+      label: ""
     });
-    expect(labels("1:1")).toEqual(["Contrast 2.17"]);
+    expect(fake.nodes.get("1:1")?.annotations[0]?.label).toBeUndefined();
     expect(node.annotations[0]?.categoryId).toBe(fake.categories[0]?.id);
   });
 
@@ -147,11 +151,11 @@ describe("a designer's own annotations", () => {
     const renderer = createMarkerRenderer("s1");
 
     await renderer.show("A", [marker("r1", "A", "1:1")]);
-    expect(labels("1:1")).toEqual(["Spacing is intentional here", "L"]);
+    expect(labels("1:1")).toEqual(["Spacing is intentional here", ""]);
 
     await renderer.show("A", [marker("r1", "A", "1:2")]);
     expect(labels("1:1")).toEqual(["Spacing is intentional here"]);
-    expect(labels("1:2")).toEqual(["Check with Sam", "Second note", "L"]);
+    expect(labels("1:2")).toEqual(["Check with Sam", "Second note", ""]);
 
     await renderer.show("B", []);
     expect(labels("1:2")).toEqual(["Check with Sam", "Second note"]);
@@ -248,7 +252,7 @@ describe("the orphan sweep", () => {
     const result = await renderer.sweepOrphans();
 
     expect(copy.annotations).toEqual([]);
-    expect(labels("1:1")).toEqual(["L"]);
+    expect(labels("1:1")).toEqual([""]);
     expect(result.cleaned).toBe(1);
   });
 

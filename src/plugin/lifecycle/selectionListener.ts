@@ -12,7 +12,7 @@ import {
 } from "../accountability/adapter/canvasSelection";
 import { loadIssues, saveIssues, type IssueRecordMap } from "../accountability/issueStore";
 import { buildIssuesUpdatedMessage } from "./issueDisplay";
-import { markersOnSelection } from "./markerRuntime";
+import { markersOnSelection } from "./markerSelection";
 
 let reEncounterState: ReEncounterState = { waitingForSelectionToLeave: new Set() };
 

@@ -1,4 +1,5 @@
 import type { Root } from "../../../shared/grouping/groupingTypes";
+import { contrastRatio } from "../../../shared/colour/contrastRatio";
 import { keepHue } from "../../../shared/colour/keepHue";
 import { parseHex } from "../../../shared/colour/hexInput";
 import { paletteMatch } from "../../../shared/colour/paletteMatch";
@@ -51,7 +52,8 @@ export function AdjustPopup({
   const scopeIds =
     selectedInstanceIds.size > 0 ? [...selectedInstanceIds] : [root.representativeIssueId];
 
-  const { options, applied, preview, clearPreview, apply, abandon } = useAdjustMessages(issue.id);
+  const { options, actionError, applied, preview, clearPreview, apply, abandon } =
+    useAdjustMessages(issue.id);
   const { variableScope, variableConsequence, requestVariableConsequence, applyVariable } =
     useAdjustVariableScope(issue.id);
   const session = useAdjustSession({
@@ -121,8 +123,17 @@ export function AdjustPopup({
         />
       )}
 
+      {actionError && (
+        <p role="alert" className={styles.error}>
+          {actionError}
+        </p>
+      )}
+
       <AdjustActions
-        canApply={Boolean(session.activeColor)}
+        canApply={
+          session.activeColor !== null &&
+          contrastRatio(session.activeColor, background) >= evidence.requiredRatio
+        }
         onCancel={session.handleCancel}
         onApply={session.handleApply}
       />

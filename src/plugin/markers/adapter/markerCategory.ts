@@ -8,6 +8,12 @@ export async function findCategory(): Promise<AnnotationCategory | null> {
   return categories.find((category) => category.label === MARKER_CATEGORY_LABEL) ?? null;
 }
 
+/** Every category id in the file, for telling a category that is gone from one that exists */
+export async function listCategoryIds(): Promise<Set<string>> {
+  const categories = await figma.annotations.getAnnotationCategoriesAsync();
+  return new Set(categories.map((category) => category.id));
+}
+
 /** Created on first use, never twice */
 export async function ensureCategory(): Promise<AnnotationCategory> {
   return (

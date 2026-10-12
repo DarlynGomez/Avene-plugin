@@ -1,23 +1,9 @@
 import type { Root } from "../grouping/groupingTypes";
-import type { MarkerStateChange } from "../study/studyEvents";
 import { SCREEN_DWELL_MS, type SelectionEvent } from "./currentScreen";
-import type { MarkerRenderer } from "./markerRenderer";
+import { ANNOTATION_RECONCILE_MS, type MarkerControllerDeps } from "./markerControllerTypes";
 import { buildMarkerSet, type Marker } from "./markerSet";
-import { createScreenTracker, type Clock } from "./screenTracker";
-
-export interface MarkerControllerDeps {
-  renderer: MarkerRenderer;
-  clock: Clock;
-  schedule: (callback: () => void, ms: number) => unknown;
-  cancel: (handle: unknown) => void;
-  /** The feature is on and the study session, if any, shows feedback right now */
-  isVisible: () => boolean;
-  /** The screen under the viewport centre, read at launch and on a page change */
-  launchScreenId: () => string | null;
-  onNotice: (message: string) => void;
-  /** For the study log, never told which screen */
-  onStateChange: (change: MarkerStateChange, markerCount: number) => void;
-}
+import type { MarkerStyle } from "./markerStyle";
+import { createScreenTracker } from "./screenTracker";
 
 /**
  * Keeps the markers matching the issue list, the current screen and what the participant may see
@@ -30,35 +16,40 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   let markers: Marker[] = [];
   let active = false;
   let shownScreen: string | null = null;
+  let shownStyle: MarkerStyle = deps.style();
   let timer: unknown = null;
+  let reconcileTimer: unknown = null;
+  let zoomQueued = false;
   let queue: Promise<void> = Promise.resolve();
 
-  async function run(): Promise<void> {
+  async function run(undoStep = true): Promise<void> {
     if (!deps.isVisible()) {
       if (active) {
         await deps.renderer.clear();
         active = false;
         shownScreen = null;
         markers = [];
-        deps.onStateChange("hidden", 0);
+        deps.onStateChange("hidden", 0, shownStyle);
       }
       return;
     }
     const screen = tracker.currentScreenId();
     const next = buildMarkerSet(roots, screen, designerOrder);
-    const result = await deps.renderer.show(screen ?? "", next);
+    const style = deps.style();
+    const result = await deps.renderer.show(screen ?? "", next, style, undoStep);
     if (!result.written) {
       if (result.notice) deps.onNotice(result.notice);
       return;
     }
     markers = next;
+    shownStyle = style;
     if (!active) {
       active = true;
       shownScreen = screen;
-      deps.onStateChange("shown", next.length);
+      deps.onStateChange("shown", next.length, style);
     } else if (shownScreen !== screen) {
       shownScreen = screen;
-      deps.onStateChange("screen_changed", next.length);
+      deps.onStateChange("screen_changed", next.length, style);
     }
   }
 
@@ -102,8 +93,36 @@ export function createMarkerController(deps: MarkerControllerDeps) {
       roots = next;
       void refresh();
     },
+    /**
+     * An annotation on a layer CADT wrote to changed, an undo or an edit by hand
+     * After a quiet moment the canvas is read and only the difference is written, which settles
+     * on its own because a write that matches the canvas causes no change
+     */
+    onAnnotationsChanged(): void {
+      if (!deps.isVisible()) {
+        return;
+      }
+      if (reconcileTimer !== null) deps.cancel(reconcileTimer);
+      reconcileTimer = deps.schedule(() => {
+        reconcileTimer = null;
+        void refresh();
+      }, ANNOTATION_RECONCILE_MS);
+    },
     /** The session changed or the preference did, show or hide to match */
     refreshVisibility: (): Promise<void> => refresh(),
+    /** The zoom changed, dots and rings are resized without an undo step, an annotation needs nothing */
+    onZoomChange(): void {
+      if (zoomQueued || !deps.isVisible() || deps.style() === "annotation") {
+        return;
+      }
+      zoomQueued = true;
+      void enqueue(() => {
+        zoomQueued = false;
+        return run(false);
+      });
+    },
+    /** Another look was chosen, the old one is removed and the new one drawn in one pass */
+    onStyleChange: (): Promise<void> => refresh(),
     /** Page change clears every marker and chooses the screen again */
     onPageChange(): void {
       if (timer !== null) deps.cancel(timer);
@@ -124,3 +143,6 @@ export function createMarkerController(deps: MarkerControllerDeps) {
     dwellMs: SCREEN_DWELL_MS
   };
 }
+
+export { ANNOTATION_RECONCILE_MS };
+export type { MarkerControllerDeps };

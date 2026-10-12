@@ -17,7 +17,7 @@ describe("buildMarkerSet", () => {
         screenId: "A",
         issueId: "contrast:1:1",
         nodeId: "1:1",
-        label: "Contrast 2.17, needs 4.5. 2 layers here"
+        label: "2.2 x2"
       }
     ]);
   });
@@ -49,7 +49,7 @@ describe("buildMarkerSet", () => {
     );
 
     expect(markers).toHaveLength(1);
-    expect(markers[0]?.label).toContain("4 layers here");
+    expect(markers[0]?.label).toBe("2.2 x4");
   });
 
   it("never lands on an ignored layer, even when it is first in document order", () => {
@@ -101,7 +101,7 @@ describe("buildMarkerSet", () => {
       []
     );
 
-    expect(markers[0]?.label).toContain("3 layers here");
+    expect(markers[0]?.label).toBe("2.2 x3");
   });
 
   it("puts no marker on a screen where every layer of the root is deferred or ignored", () => {
@@ -157,7 +157,7 @@ describe("buildMarkerSet", () => {
       []
     );
 
-    expect(markers[0]?.label).toBe("Important. Contrast 2.17, needs 4.5");
+    expect(markers[0]?.label).toBe("! 2.2");
   });
 
   it("keeps the order of the roots it was given", () => {
@@ -173,6 +173,6 @@ describe("buildMarkerSet", () => {
     const large = root("r1", [instance("1:1", "A", "open", 0, { measuredRatio: 2.9 })]);
     const markers = buildMarkerSet([{ ...large, requiredRatio: 3 }], "A", []);
 
-    expect(markers[0]?.label).toBe("Contrast 2.90, needs 3");
+    expect(markers[0]?.label).toBe("2.9");
   });
 });

@@ -6,13 +6,16 @@ interface RatioBadgeProps {
   requiredRatio: number;
 }
 
-/** A neutral pill with ratio and pass level, inline beside the option title */
+/** A neutral pill with ratio and pass level, or how far short it falls, inline beside the title */
 export function RatioBadge({ achievedRatio, requiredRatio }: RatioBadgeProps) {
-  const level = passLevel(achievedRatio, requiredRatio);
+  const reaches = achievedRatio >= requiredRatio;
+  const verdict = reaches
+    ? passLevel(achievedRatio, requiredRatio)
+    : `below ${Number(requiredRatio.toFixed(2))}`;
 
   return (
     <span className={styles.badge}>
-      {achievedRatio.toFixed(2)}:1 (<span className={styles.level}>{level}</span>)
+      {achievedRatio.toFixed(2)}:1 (<span className={styles.level}>{verdict}</span>)
     </span>
   );
 }

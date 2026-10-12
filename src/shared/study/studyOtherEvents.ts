@@ -1,3 +1,4 @@
+import type { MarkerStyle } from "../markers/markerStyle";
 import type {
   AdjustEventEvent,
   ExplanationOpenedEvent,
@@ -20,9 +21,10 @@ export function buildMarkerState(
   at: string,
   markersOn: boolean,
   change: MarkerStateChange = markersOn ? "shown" : "hidden",
-  markerCount = 0
+  markerCount = 0,
+  style: MarkerStyle = "annotation"
 ): MarkerStateEvent {
-  return { type: "marker_state", at, ctx, markersOn, change, markerCount };
+  return { type: "marker_state", at, ctx, markersOn, change, markerCount, style };
 }
 
 export function buildExplanationOpened(

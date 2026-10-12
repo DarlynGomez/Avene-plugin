@@ -62,11 +62,20 @@ describe("studyEventProblem", () => {
     expect(isStudyEvent({ type: "marker_state", at: T, ctx: LIVE_CTX, markersOn: "on" })).toBe(
       false
     );
-    const marker = { type: "marker_state", at: T, ctx: LIVE_CTX, markersOn: true, markerCount: 2 };
+    const marker = {
+      type: "marker_state",
+      at: T,
+      ctx: LIVE_CTX,
+      markersOn: true,
+      markerCount: 2,
+      style: "ring"
+    };
     expect(isStudyEvent({ ...marker, change: "shown" })).toBe(true);
     expect(isStudyEvent({ ...marker, change: "screen_changed" })).toBe(true);
     expect(isStudyEvent({ ...marker, change: "moved" })).toBe(false);
     expect(isStudyEvent({ ...marker, change: "shown", markerCount: "2" })).toBe(false);
+    expect(isStudyEvent({ ...marker, change: "shown", style: "square" })).toBe(false);
+    expect(isStudyEvent({ ...marker, change: "shown", style: undefined })).toBe(false);
     expect(isStudyEvent({ type: "feedback_revealed", at: T, ctx: LIVE_CTX })).toBe(true);
     expect(
       isStudyEvent({

@@ -1,3 +1,4 @@
+import { isCadtMarker, type MarkerScope } from "./isCadtMarker";
 import { MARKER_TAG_KEY, parseTag, serializeTag, type MarkerTag } from "./markerTags";
 
 export type AnnotatableNode = SceneNode & { annotations: ReadonlyArray<Annotation> };
@@ -12,35 +13,57 @@ export function isTaggedByAnotherUser(node: AnnotatableNode, userId: string): bo
   return tag !== null && tag.userId !== userId;
 }
 
-/** Appends to what is already there, a designer's annotation is never replaced */
-export function addMarkerAnnotation(
-  node: AnnotatableNode,
-  label: string,
-  categoryId: string,
-  tag: MarkerTag
-): void {
-  node.annotations = [...node.annotations, { label, categoryId }];
-  node.setPluginData(MARKER_TAG_KEY, serializeTag(tag));
+/** The markers on a layer as they are on the canvas right now */
+export function markersOn(node: AnnotatableNode, scope: MarkerScope): Annotation[] {
+  return node.annotations.filter((annotation) => isCadtMarker(annotation, node, scope));
 }
 
 /**
- * Removes the CADT category annotations on a layer that carries the given tag, nothing else
- * Anything in another category, which is everything a designer wrote, survives
+ * Makes the layer carry exactly this one marker with no text, whatever is there now
+ * An empty label is tried first, and a single dot is the fallback if Figma refuses it
+ * Returns the label that was written so it can be recorded on the layer's tag
+ * Everything that is not a marker, which is everything a designer wrote, is kept in place
  */
-export function removeMarkerAnnotations(
+export function setMarker(
   node: AnnotatableNode,
-  categoryId: string | null,
-  matches: (tag: MarkerTag) => boolean
-): boolean {
-  const tag = parseTag(node.getPluginData(MARKER_TAG_KEY));
-  if (!tag || !matches(tag)) {
+  categoryId: string,
+  tag: MarkerTag,
+  scope: MarkerScope,
+  preferredLabel: string
+): string {
+  const others = node.annotations.filter((annotation) => !isCadtMarker(annotation, node, scope));
+  const write = (label: string) => {
+    node.annotations = [...others, label === "" ? { categoryId } : { label, categoryId }];
+    return label;
+  };
+  let written: string;
+  try {
+    written = write(preferredLabel);
+  } catch (error) {
+    if (preferredLabel !== "") throw error;
+    written = write(".");
+  }
+  const next = serializeTag({ ...tag, label: written });
+  if (node.getPluginData(MARKER_TAG_KEY) !== next) {
+    node.setPluginData(MARKER_TAG_KEY, next);
+  }
+  return written;
+}
+
+/** Removes the markers and keeps the tag, which stays until close or the sweep */
+export function removeMarkers(node: AnnotatableNode, scope: MarkerScope): boolean {
+  const remaining = node.annotations.filter((annotation) => !isCadtMarker(annotation, node, scope));
+  if (remaining.length === node.annotations.length) {
     return false;
   }
-  if (categoryId !== null) {
-    node.annotations = node.annotations.filter(
-      (annotation) => annotation.categoryId !== categoryId
-    );
-  }
-  node.setPluginData(MARKER_TAG_KEY, "");
+  node.annotations = remaining;
   return true;
+}
+
+/** The end of the layer's involvement, markers and tag together */
+export function releaseNode(node: AnnotatableNode, scope: MarkerScope): void {
+  removeMarkers(node, scope);
+  if (parseTag(node.getPluginData(MARKER_TAG_KEY))?.userId === scope.userId) {
+    node.setPluginData(MARKER_TAG_KEY, "");
+  }
 }

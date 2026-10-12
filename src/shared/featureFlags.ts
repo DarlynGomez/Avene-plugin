@@ -2,4 +2,4 @@
 export const FEATURE_VARIABLE_SCOPE = false;
 
 /** Off until the marker preference question exists, markers write into the designer's file */
-export const FEATURE_MARKERS = false;
+export const FEATURE_MARKERS = true;

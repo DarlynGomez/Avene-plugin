@@ -340,8 +340,10 @@ describe("the remaining events", () => {
       type: "marker_state",
       markersOn: true,
       change: "shown",
-      markerCount: 0
+      markerCount: 0,
+      style: "annotation"
     });
+    expect(buildMarkerState(LIVE_CTX, T, true, "shown", 2, "dot")).toMatchObject({ style: "dot" });
     expect(buildMarkerState(LIVE_CTX, T, false)).toMatchObject({ change: "hidden" });
     expect(buildMarkerState(LIVE_CTX, T, true, "screen_changed", 3)).toMatchObject({
       change: "screen_changed",

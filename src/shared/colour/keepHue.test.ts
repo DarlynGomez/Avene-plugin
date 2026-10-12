@@ -44,3 +44,33 @@ describe("keepHue", () => {
     expect(contrastRatio(result, midGrey)).toBeLessThan(20 + CONTRAST_ADJUST_HEADROOM);
   });
 });
+
+describe("keepHue when the side that usually helps cannot pass", () => {
+  const ORANGE = { r: 0xcd / 255, g: 0x79 / 255, b: 0x30 / 255 };
+
+  it("goes the other way for white text on a mid orange, where lighter is impossible", () => {
+    const result = keepHue(WHITE, ORANGE, 4.5);
+
+    expect(contrastRatio(result, ORANGE)).toBeGreaterThanOrEqual(4.5 + CONTRAST_ADJUST_HEADROOM);
+    expect(result).not.toEqual(WHITE);
+  });
+
+  it("still moves only the lightness, so a grey stays a grey", () => {
+    const after = rgbToHsl(keepHue(WHITE, ORANGE, 4.5));
+
+    expect(after.s).toBeCloseTo(0, 5);
+  });
+
+  it("uses the smallest change on the other side, not simply black", () => {
+    const result = keepHue(WHITE, ORANGE, 4.5);
+
+    expect(rgbToHsl(result).l).toBeGreaterThan(0);
+  });
+
+  it("returns the better extreme when neither side can reach the ratio", () => {
+    const grey = { r: 0.5, g: 0.5, b: 0.5 };
+    const result = keepHue(grey, grey, 22);
+
+    expect([0, 1]).toContain(Math.round(rgbToHsl(result).l));
+  });
+});

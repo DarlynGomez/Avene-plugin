@@ -1,4 +1,5 @@
 import type { IssueState, Severity } from "../issues/issueTypes";
+import type { MarkerStyle } from "../markers/markerStyle";
 import type { BlockNumber, StudyCondition, StudyPhase, TaskId } from "./studyTypes";
 
 /** Who and where an event happened, copied from the session so each event stands alone */
@@ -102,6 +103,8 @@ export interface MarkerStateEvent extends Base {
   markersOn: boolean;
   change: MarkerStateChange;
   markerCount: number;
+  /** Which look was on the canvas, so the comparison can be told apart in the data */
+  style: MarkerStyle;
 }
 
 export interface ExplanationOpenedEvent extends Base {

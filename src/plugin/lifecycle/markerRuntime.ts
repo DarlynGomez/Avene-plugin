@@ -1,11 +1,12 @@
 import { FEATURE_MARKERS } from "../../shared/featureFlags";
+import { MARKER_STYLE } from "../../shared/markers/markerStyle";
 import { assembleGroupableFindings } from "../../shared/grouping/assembleFinding";
 import { deriveRoots } from "../../shared/grouping/deriveRoots";
 import type { IssueSummary } from "../../shared/issues/issueTypes";
 import { createMarkerController } from "../../shared/markers/markerController";
+import { ZOOM_POLL_MS, zoomChanged } from "../../shared/markers/markerShape";
 import { participantVisibility } from "../../shared/study/participantVisibility";
 import { buildMarkerState } from "../../shared/study/studyEventBuilders";
-import { resolveScreen } from "../detection/adapter/resolveScreen";
 import { createMarkerRenderer } from "../markers/adapter/markerRenderer";
 import { screenUnderViewportCenter } from "../markers/adapter/viewportScreen";
 import { emitStudy } from "../study/adapter/studyEmitter";
@@ -37,42 +38,17 @@ function controller(): ReturnType<typeof createMarkerController> {
     schedule: (callback, ms) => setTimeout(callback, ms),
     cancel: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
     isVisible: markersVisible,
+    style: () => MARKER_STYLE,
     launchScreenId: launchScreen,
     onNotice: (message) => figma.ui.postMessage({ type: "MARKER_NOTICE", message }),
-    onStateChange: (change, markerCount) => {
+    onStateChange: (change, markerCount, style) => {
       const at = new Date().toISOString();
-      emitStudy((ctx) => [buildMarkerState(ctx, at, change !== "hidden", change, markerCount)]);
+      emitStudy((ctx) => [
+        buildMarkerState(ctx, at, change !== "hidden", change, markerCount, style)
+      ]);
     }
   });
   return instance;
-}
-
-/**
- * Fed by the selection listener with the plugin originated flag it already read for this event
- * Selecting a marked layer tells the panel to scroll to its root, the selection itself is never set
- */
-export function markersOnSelection(isPluginOriginated: boolean): void {
-  if (!FEATURE_MARKERS) {
-    return;
-  }
-  const selected = figma.currentPage.selection;
-  controller().onSelection(
-    {
-      origin: isPluginOriginated ? "plugin" : "designer",
-      screenIds: selected.map((node) => resolveScreen(node).screenId)
-    },
-    selected.map((node) => node.id)
-  );
-  if (isPluginOriginated) {
-    return;
-  }
-  for (const node of selected) {
-    const marker = controller().markerForNode(node.id);
-    if (marker) {
-      figma.ui.postMessage({ type: "MARKER_SELECTED", signature: marker.signature });
-      return;
-    }
-  }
 }
 
 /** Every time the issue list is built, the markers follow it */
@@ -96,8 +72,34 @@ export async function startMarkers(): Promise<void> {
   }
   registerMarkerCloseClear(renderer);
   figma.on("currentpagechange", () => controller().onPageChange());
+  // The typings list no property for annotations, so any change to a layer CADT marked counts
+  // An undo or an edit by hand is then read back and repaired after a pause
+  figma.on("documentchange", (event) => {
+    const live = renderer.liveNodeIds();
+    const touched = event.documentChanges.some(
+      (change) => change.type === "PROPERTY_CHANGE" && live.has(change.id)
+    );
+    if (touched) controller().onAnnotationsChanged();
+  });
+  watchZoom();
   await renderer.sweepOrphans();
   await controller().refreshVisibility();
+}
+
+/**
+ * Figma has no zoom event in a design file, so the zoom is looked at on a short timer
+ * A change of a few percent redraws the dots and rings, a timer that finds nothing writes nothing
+ */
+function watchZoom(): void {
+  let lastZoom = figma.viewport.zoom;
+  const timer = setInterval(() => {
+    const zoom = figma.viewport.zoom;
+    if (zoomChanged(lastZoom, zoom)) {
+      lastZoom = zoom;
+      controller().onZoomChange();
+    }
+  }, ZOOM_POLL_MS);
+  figma.on("close", () => clearInterval(timer));
 }
 
 export const markerController = controller;
