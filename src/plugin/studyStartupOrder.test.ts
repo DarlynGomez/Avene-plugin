@@ -107,7 +107,7 @@ describe("study state ordering at startup", () => {
   it("routes a study message from the UI and replies with STUDY_STATE", async () => {
     stubFigma();
     await import("./main");
-    await vi.waitFor(() => expect(posted.length).toBeGreaterThan(0));
+    await vi.waitFor(() => expect(posted.some((m) => m.type === "ISSUES_UPDATED")).toBe(true));
     posted.length = 0;
 
     await ui.onmessage?.({ type: "STUDY_REVEAL" });

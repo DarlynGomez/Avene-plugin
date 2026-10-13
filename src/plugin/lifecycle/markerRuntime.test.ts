@@ -306,14 +306,14 @@ describe("markers in a study session", () => {
     await settle();
     expect(labels(t1)).toHaveLength(1);
 
-    m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
     await settle();
     expect(t1.annotations).toEqual([]);
   });
 
   it("go when the block ends in the live condition too", async () => {
     const m = await started("live");
-    m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
     await settle();
 
     expect(t1.annotations).toEqual([]);
@@ -324,7 +324,7 @@ describe("markers in a study session", () => {
     selection = [t2];
     await m.listener.handleSelectionChange(false);
     await settle(600);
-    m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
     await settle();
     await m.emitter.flushStudyEvents();
 
@@ -344,7 +344,7 @@ describe("markers in a study session", () => {
     const m = await started("post-task");
     m.study.handleStudyMessage({ type: "STUDY_REVEAL" }, () => undefined);
     await settle();
-    m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
     await settle();
 
     expect(t1.annotations).toEqual([note]);
@@ -480,7 +480,7 @@ describe("the marker style in use", () => {
     m.study.handleStudyMessage(START, () => undefined);
     m.runtime.markersOnIssues(ISSUES);
     await settle();
-    m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
     await settle();
     await m.emitter.flushStudyEvents();
 
@@ -696,5 +696,225 @@ describe("dots and rings holding their size on screen", () => {
     await settle(1000);
 
     expect(shapes()[0]?.width).toBe(size);
+  });
+});
+
+describe("markers in a study session with the flag off", () => {
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const frames = () => [...fake.nodes.values()].filter((node) => node.type === "FRAME");
+  const onCanvas = () => shapes().length + frames().length;
+
+  async function sessionWith(condition: "live" | "post-task") {
+    const m = await load(false, "default");
+    await m.runtime.startMarkers();
+    await m.study.handleStudyMessage({ ...START, condition } as StudyMessage, () => undefined);
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+    return m;
+  }
+
+  it("shows them in the live condition although the flag is false", async () => {
+    await sessionWith("live");
+
+    expect(shapes()).toHaveLength(1);
+    expect(frames()).toHaveLength(1);
+  });
+
+  it("never shows them in post-task designing, writing nothing at all", async () => {
+    const m = await sessionWith("post-task");
+    selection = [t2];
+    await m.listener.handleSelectionChange(false);
+    await settle(5000);
+
+    expect(onCanvas()).toBe(0);
+    expect(fake.calls.filter((call) => /^(create|annotations|tag):/.test(call))).toEqual([]);
+  });
+
+  it("shows them once feedback is revealed and removes them when the block ends", async () => {
+    const m = await sessionWith("post-task");
+    await m.study.handleStudyMessage({ type: "STUDY_REVEAL" }, () => undefined);
+    await settle();
+    expect(shapes()).toHaveLength(1);
+
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    await settle();
+    expect(onCanvas()).toBe(0);
+  });
+
+  it("hides them again when a live block ends, and they stay hidden whatever happens next", async () => {
+    const m = await sessionWith("live");
+    await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, () => undefined);
+    m.runtime.markersOnIssues(ISSUES);
+    selection = [t2];
+    await m.listener.handleSelectionChange(false);
+    await settle(5000);
+
+    expect(onCanvas()).toBe(0);
+  });
+
+  it("go back to the flag when the researcher exits, so with the flag false there are none", async () => {
+    const m = await sessionWith("live");
+    expect(shapes()).toHaveLength(1);
+    await m.study.handleStudyMessage({ type: "STUDY_EXIT" }, () => undefined);
+    await settle();
+
+    expect(onCanvas()).toBe(0);
+  });
+
+  it("start up when a session begins after the plugin did, with no restart", async () => {
+    const m = await load(false, "default");
+    await m.runtime.startMarkers();
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+    expect(onCanvas()).toBe(0);
+
+    await m.study.handleStudyMessage(START, () => undefined);
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+
+    expect(shapes()).toHaveLength(1);
+  });
+
+  it("show straight away when the plugin opens on a file already in a live block", async () => {
+    data.set(
+      "cadt.study.session.v1",
+      JSON.stringify({
+        schemaVersion: 1,
+        participantId: "P01",
+        block: 1,
+        task: "A",
+        condition: "live",
+        consentConfirmedAt: "t",
+        phase: "designing",
+        startedAt: "t",
+        revealedAt: null,
+        endedAt: null,
+        exports: [],
+        exitedAt: null
+      })
+    );
+    const m = await load(false, "default");
+    await m.runtime.startMarkers();
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+
+    expect(shapes()).toHaveLength(1);
+  });
+
+  it("stay off outside a session with the flag false, and on with the flag true", async () => {
+    const off = await load(false, "default");
+    await off.runtime.startMarkers();
+    off.runtime.markersOnIssues(ISSUES);
+    await settle();
+    expect(onCanvas()).toBe(0);
+
+    const on = await load(true, "default");
+    await on.runtime.startMarkers();
+    on.runtime.markersOnIssues(ISSUES);
+    await settle();
+    expect(shapes()).toHaveLength(1);
+  });
+});
+
+describe("ending a block removes every dot and the frame before it says the block ended", () => {
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const frames = () => [...fake.nodes.values()].filter((node) => node.type === "FRAME");
+
+  /** What is on the canvas at the moment the reply that says the block ended is sent */
+  function watchEnd(m: Awaited<ReturnType<typeof load>>) {
+    const seen: { dots: number; frames: number }[] = [];
+    const reply = (message: unknown) => {
+      const state = message as { type?: string; session?: { phase?: string } | null };
+      if (state.type === "STUDY_STATE" && state.session?.phase === "ended") {
+        seen.push({ dots: shapes().length, frames: frames().length });
+      }
+    };
+    return { seen, end: () => m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply) };
+  }
+
+  async function liveBlock() {
+    const m = await load(false, "default");
+    await m.runtime.startMarkers();
+    await m.study.handleStudyMessage(START, () => undefined);
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+    expect(shapes()).toHaveLength(1);
+    return m;
+  }
+
+  it("has none left at the moment the researcher is told", async () => {
+    const m = await liveBlock();
+    const { seen, end } = watchEnd(m);
+    await end();
+
+    expect(seen).toEqual([{ dots: 0, frames: 0 }]);
+  });
+
+  it("has none left when an undo has brought a dot and the frame back", async () => {
+    const m = await liveBlock();
+    const [dot] = shapes();
+    const [frame] = frames();
+    // The undo of a removal puts both back, which nothing in the plugin asked for
+    selection = [t2];
+    await m.listener.handleSelectionChange(false);
+    await settle(600);
+    fake.resurrect(frame);
+    fake.resurrect(dot, frame);
+    dot.parent = frame;
+    expect(shapes().length).toBeGreaterThanOrEqual(1);
+
+    const { seen, end } = watchEnd(m);
+    await end();
+
+    expect(seen).toEqual([{ dots: 0, frames: 0 }]);
+    expect(
+      fake.page.children.filter((child) => child.name === "Avene markers (temporary)")
+    ).toEqual([]);
+  });
+
+  it("has none left when a dot from an earlier session is still in the file", async () => {
+    const m = await liveBlock();
+    const stray = fake.addNode(
+      "S:1",
+      [],
+      JSON.stringify({ userId: "u1", sessionId: "old", kind: "shape", target: "T1" })
+    );
+    stray.type = "ELLIPSE";
+    fake.page.children.push(stray);
+
+    const { seen, end } = watchEnd(m);
+    await end();
+
+    expect(seen).toEqual([{ dots: 0, frames: 0 }]);
+  });
+
+  it("does not leave the file with the frame after End, for either condition", async () => {
+    for (const condition of ["live", "post-task"] as const) {
+      const m = await load(false, "default");
+      await m.runtime.startMarkers();
+      await m.study.handleStudyMessage(
+        { ...START, condition, participantId: `P-${condition}` } as StudyMessage,
+        () => undefined
+      );
+      if (condition === "post-task")
+        await m.study.handleStudyMessage({ type: "STUDY_REVEAL" }, () => undefined);
+      m.runtime.markersOnIssues(ISSUES);
+      await settle();
+      const { end } = watchEnd(m);
+      await end();
+      await settle();
+
+      expect(frames()).toEqual([]);
+      data.delete("cadt.study.session.v1");
+    }
+  });
+
+  it("reports the block as ended even when markers were never in play", async () => {
+    const m = await load(false, "default");
+    await m.study.handleStudyMessage(START, () => undefined);
+    const { seen, end } = watchEnd(m);
+    await end();
+
+    expect(seen).toEqual([{ dots: 0, frames: 0 }]);
   });
 });

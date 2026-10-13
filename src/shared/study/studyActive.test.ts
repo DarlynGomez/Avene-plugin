@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isStudyActive, variableScopeAllowed } from "./studyActive";
+import { isStudyActive, markersAllowed, variableScopeAllowed } from "./studyActive";
 import type { StudySession } from "./studyTypes";
 
 const SESSION: StudySession = {
@@ -40,5 +40,35 @@ describe("variableScopeAllowed", () => {
     [false, true, false]
   ])("flag %s with study active %s gives %s", (flag, active, expected) => {
     expect(variableScopeAllowed(flag, active)).toBe(expected);
+  });
+});
+
+describe("markersAllowed", () => {
+  const session = (patch: Partial<StudySession>): StudySession => ({ ...SESSION, ...patch });
+
+  it("follows the flag when there is no session", () => {
+    expect(markersAllowed(false, null)).toBe(false);
+    expect(markersAllowed(true, null)).toBe(true);
+  });
+
+  it.each([
+    ["live designing", { condition: "live", phase: "designing" }, true],
+    ["post-task designing", { condition: "post-task", phase: "designing" }, false],
+    ["post-task reviewing", { condition: "post-task", phase: "reviewing" }, true],
+    ["live ended", { condition: "live", phase: "ended" }, false],
+    ["post-task ended", { condition: "post-task", phase: "ended" }, false]
+  ] as const)(
+    "in a session at %s the phase decides, whatever the flag says",
+    (_name, patch, shown) => {
+      expect(markersAllowed(false, session(patch))).toBe(shown);
+      expect(markersAllowed(true, session(patch))).toBe(shown);
+    }
+  );
+
+  it("goes back to the flag once the researcher has exited", () => {
+    const exited = session({ exitedAt: "t" });
+
+    expect(markersAllowed(false, exited)).toBe(false);
+    expect(markersAllowed(true, exited)).toBe(true);
   });
 });

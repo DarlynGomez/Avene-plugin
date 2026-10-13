@@ -1,25 +1,20 @@
-import { FEATURE_MARKERS } from "../../shared/featureFlags";
 import { MARKER_STYLE } from "../../shared/markers/markerStyle";
 import { assembleGroupableFindings } from "../../shared/grouping/assembleFinding";
 import { deriveRoots } from "../../shared/grouping/deriveRoots";
 import type { IssueSummary } from "../../shared/issues/issueTypes";
 import { createMarkerController } from "../../shared/markers/markerController";
 import { ZOOM_POLL_MS, zoomChanged } from "../../shared/markers/markerShape";
-import { participantVisibility } from "../../shared/study/participantVisibility";
 import { buildMarkerState } from "../../shared/study/studyEventBuilders";
 import { createMarkerRenderer } from "../markers/adapter/markerRenderer";
 import { screenUnderViewportCenter } from "../markers/adapter/viewportScreen";
 import { emitStudy } from "../study/adapter/studyEmitter";
-import { activeStudySession } from "../study/adapter/studySessionStore";
+import { markersInPlay, markersVisibleNow } from "./markerGate";
 import { registerMarkerCloseClear } from "./markerLifecycle";
 
 const renderer = createMarkerRenderer();
+/** Listeners and the sweep are set up once, the first time markers are in play */
+let started = false;
 let instance: ReturnType<typeof createMarkerController> | null = null;
-
-/** On only with the feature, and while the participant is allowed to see feedback if in a session */
-function markersVisible(): boolean {
-  return FEATURE_MARKERS && participantVisibility(activeStudySession()).canvasMarkers;
-}
 
 function launchScreen(): string | null {
   try {
@@ -37,7 +32,7 @@ function controller(): ReturnType<typeof createMarkerController> {
     clock: () => Date.now(),
     schedule: (callback, ms) => setTimeout(callback, ms),
     cancel: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
-    isVisible: markersVisible,
+    isVisible: markersVisibleNow,
     style: () => MARKER_STYLE,
     launchScreenId: launchScreen,
     onNotice: (message) => figma.ui.postMessage({ type: "MARKER_NOTICE", message }),
@@ -53,23 +48,39 @@ function controller(): ReturnType<typeof createMarkerController> {
 
 /** Every time the issue list is built, the markers follow it */
 export function markersOnIssues(issues: readonly IssueSummary[]): void {
-  if (FEATURE_MARKERS) {
+  if (markersInPlay()) {
     controller().onRoots(deriveRoots(assembleGroupableFindings(issues)));
   }
 }
 
-/** A session started, was revealed, ended or exited */
+/** A session started, was revealed, ended or exited, markers start up with it if need be */
 export function markersOnStudyChange(): void {
-  if (FEATURE_MARKERS) {
+  if (markersInPlay()) {
+    startMarkers().catch((error: unknown) => {
+      console.error("markers: could not start", error);
+    });
+  }
+  if (started) {
     void controller().refreshVisibility();
   }
 }
 
-/** At launch, clean up after earlier sessions first, then draw, and clear on close and page change */
-export async function startMarkers(): Promise<void> {
-  if (!FEATURE_MARKERS) {
+/** Ending a block removes every dot and the frame first, so nobody is told it ended while any remain */
+export async function markersOnBlockEnd(): Promise<void> {
+  if (!started) {
     return;
   }
+  await controller().refreshVisibility();
+  // An undo can bring a dot back that nothing here holds, the tag finds it
+  await renderer.sweepOrphans();
+}
+
+/** At launch, clean up after earlier sessions first, then draw, and clear on close and page change */
+export async function startMarkers(): Promise<void> {
+  if (started || !markersInPlay()) {
+    return;
+  }
+  started = true;
   registerMarkerCloseClear(renderer);
   figma.on("currentpagechange", () => controller().onPageChange());
   // The typings list no property for annotations, so any change to a layer CADT marked counts

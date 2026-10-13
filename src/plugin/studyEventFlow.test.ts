@@ -122,7 +122,7 @@ async function runBlock(m: Awaited<ReturnType<typeof modules>>) {
     noReply
   );
   m.study.handleStudyMessage({ type: "STUDY_REVEAL" }, reply);
-  m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply);
+  await m.study.handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply);
   await m.emitter.flushStudyEvents();
   return replies;
 }

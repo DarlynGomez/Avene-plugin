@@ -39,7 +39,7 @@ async function handleUiMessage(rawMessage: unknown): Promise<void> {
   }
 
   if (isStudyMessage(message)) {
-    handleStudyMessage(message, (reply) => figma.ui.postMessage(reply));
+    await handleStudyMessage(message, (reply) => figma.ui.postMessage(reply));
     return;
   }
 

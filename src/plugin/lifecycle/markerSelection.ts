@@ -1,6 +1,6 @@
-import { FEATURE_MARKERS } from "../../shared/featureFlags";
 import { resolveScreen } from "../detection/adapter/resolveScreen";
 import { shapeTargetOf } from "../markers/adapter/shapeTarget";
+import { markersInPlay } from "./markerGate";
 import { markerController } from "./markerRuntime";
 
 /**
@@ -8,7 +8,7 @@ import { markerController } from "./markerRuntime";
  * Selecting a marked layer tells the panel to scroll to its root, the selection itself is never set
  */
 export function markersOnSelection(isPluginOriginated: boolean): void {
-  if (!FEATURE_MARKERS) {
+  if (!markersInPlay()) {
     return;
   }
   const userId = figma.currentUser?.id ?? null;

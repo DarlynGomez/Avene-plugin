@@ -238,17 +238,17 @@ describe("STUDY_REVEAL, STUDY_END_BLOCK and STUDY_EXIT", () => {
     expectNothingSaved();
   });
 
-  it("ends a live block and shows the ended message", () => {
+  it("ends a live block and shows the ended message", async () => {
     started("live");
-    handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply, clock(LATER));
+    await handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply, clock(LATER));
 
     expect(storedSession()).toMatchObject({ phase: "ended", endedAt: LATER });
     expect(replies[0]?.visibility.message).toBe("This task has ended.");
   });
 
-  it("refuses to end a post-task block before the review", () => {
+  it("refuses to end a post-task block before the review", async () => {
     started("post-task");
-    handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply, clock(LATER));
+    await handleStudyMessage({ type: "STUDY_END_BLOCK" }, reply, clock(LATER));
 
     expect(replies[0]?.refusal?.code).toBe("review-required");
     expectNothingSaved();

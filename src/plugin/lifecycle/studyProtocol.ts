@@ -10,17 +10,10 @@ import {
 import type { StudyMessage } from "../../shared/study/studyMessageTypes";
 import type { StudySession } from "../../shared/study/studyTypes";
 import type { PluginToUiMessage } from "../../shared/messageTypes";
-import { STUDY_PROFILE_VERSION } from "../../shared/study/studyProfile";
-import {
-  buildBlockEnded,
-  buildBlockStarted,
-  buildFeedbackRevealed,
-  buildIssueFirstDetected
-} from "../../shared/study/studyEventBuilders";
-import type { StudyEvent } from "../../shared/study/studyEvents";
-import { loadRawIssues } from "../accountability/issueStore";
+import { buildFeedbackRevealed } from "../../shared/study/studyEventBuilders";
 import { emitStudy } from "../study/adapter/studyEmitter";
-import { markersOnStudyChange } from "./markerRuntime";
+import { markersOnBlockEnd, markersOnStudyChange } from "./markerRuntime";
+import { emitBlockEnded, emitBlockStarted } from "./studyBlockEmit";
 import { exportBlock } from "./studyExportProtocol";
 import { stateMessage } from "./studyStateMessage";
 import { gatherFreshFileInputs } from "../study/adapter/freshFileInputs";
@@ -57,35 +50,6 @@ function commit(
   return result.session;
 }
 
-/** The first events of a block, the issues already in the file become its starting issues */
-function emitBlockStarted(session: StudySession): void {
-  const startingIssues = Object.values(loadRawIssues());
-  emitStudy((ctx, seen) => {
-    const events: StudyEvent[] = [buildBlockStarted(ctx, session.startedAt, STUDY_PROFILE_VERSION)];
-    for (const issue of startingIssues) {
-      const detected = buildIssueFirstDetected(
-        ctx,
-        session.startedAt,
-        { id: issue.id, severity: issue.severityAtLastDetection },
-        seen.detected,
-        true
-      );
-      if (detected) events.push(detected);
-    }
-    return events;
-  });
-}
-
-function emitBlockEnded(session: StudySession): void {
-  const rows = Object.values(loadRawIssues()).map((issue) => ({
-    id: issue.id,
-    state: issue.state,
-    severity: issue.severityAtLastDetection
-  }));
-  const at = session.endedAt ?? new Date().toISOString();
-  emitStudy((ctx) => buildBlockEnded(ctx, at, rows));
-}
-
 function start(message: StudyMessage & { type: "STUDY_START_BLOCK" }, reply: Reply, clock: Clock) {
   const existing = loadStudySession();
   const result = startBlock(message, existing, clock);
@@ -100,12 +64,37 @@ function start(message: StudyMessage & { type: "STUDY_START_BLOCK" }, reply: Rep
   if (started) emitBlockStarted(started);
 }
 
-/** Handles the four inbound study messages through the pure transitions */
-export function handleStudyMessage(
+/**
+ * Ends the block, and every dot and the frame are gone before the panel is told it has ended
+ * The session is saved first so the markers see the block as over, then they are removed, then the reply
+ */
+async function endAndClearMarkers(
+  session: StudySession,
+  reply: Reply,
+  clock: Clock
+): Promise<void> {
+  const result = endBlock(session, clock);
+  if (!result.ok) {
+    reply(stateMessage(session, result.refusal));
+    return;
+  }
+  const saved = saveStudySession(result.session);
+  if (!saved.saved) {
+    const reason = saved.error ?? "The session could not be saved.";
+    reply(stateMessage(session, { code: "save-failed", reason }));
+    return;
+  }
+  await markersOnBlockEnd();
+  reply(stateMessage(result.session, null));
+  emitBlockEnded(result.session);
+}
+
+/** Handles the inbound study messages through the pure transitions, only ending a block waits */
+export async function handleStudyMessage(
   message: StudyMessage,
   reply: Reply,
   clock: Clock = systemClock
-): void {
+): Promise<void> {
   if (message.type === "STUDY_SUBSCRIBE") {
     sendStudyState(reply);
     return;
@@ -124,16 +113,14 @@ export function handleStudyMessage(
     reply(stateMessage(null, { code: "no-session", reason }));
     return;
   }
-  const transition =
-    message.type === "STUDY_REVEAL"
-      ? reveal
-      : message.type === "STUDY_END_BLOCK"
-        ? endBlock
-        : exitStudy;
+  if (message.type === "STUDY_END_BLOCK") {
+    await endAndClearMarkers(session, reply, clock);
+    return;
+  }
+  const transition = message.type === "STUDY_REVEAL" ? reveal : exitStudy;
   const next = commit(transition(session, clock), session, reply);
   if (next && message.type === "STUDY_REVEAL") {
     const at = next.revealedAt ?? new Date().toISOString();
     emitStudy((ctx) => [buildFeedbackRevealed(ctx, at)]);
   }
-  if (next && message.type === "STUDY_END_BLOCK") emitBlockEnded(next);
 }
