@@ -1,16 +1,11 @@
 import type { Root } from "../../../shared/grouping/groupingTypes";
 import type { ContrastEvidenceView } from "../../../shared/issues/contrastEvidenceView";
+import { rootName } from "../rootName";
 import { RootMetadataGrid } from "./RootMetadataGrid";
 import styles from "./RootCardSummary.module.css";
 import { RootStatusDot } from "./RootStatusDot";
 import { SeverityTag } from "./SeverityTag";
 import { WhySurfacedPopover } from "./WhySurfacedPopover";
-
-function rootName(root: Root, representativeBackgroundBinding: string | null): string {
-  const fg = root.foregroundBinding ?? root.foregroundHex;
-  const bg = representativeBackgroundBinding ?? root.backgroundHex;
-  return `${fg} on ${bg}`;
-}
 
 function typographyLine(evidence: ContrastEvidenceView | null): string | null {
   if (evidence?.fontSizePx === undefined || evidence.isBold === undefined) {
@@ -47,6 +42,7 @@ export function RootCardSummary({
           <RootStatusDot displayState={root.displayState} />
           <SeverityTag severity={representative?.severity ?? "low"} />
           <WhySurfacedPopover
+            signature={root.signature}
             measuredRatio={representative?.measuredRatio ?? 0}
             requiredRatio={root.requiredRatio}
             severity={representative?.severity ?? "low"}

@@ -1,5 +1,5 @@
 import { parseKeyString } from "../../src/shared/teachMeWhy/explanationKey";
-import { sourceNamesFor } from "./sources";
+import { sourceNamesFor } from "../../src/shared/teachMeWhy/sourceNames";
 import { parseCsv, toCsv } from "./csv";
 import type { Progress } from "./types";
 

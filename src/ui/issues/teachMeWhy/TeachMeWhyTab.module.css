@@ -1,0 +1,31 @@
+.outer {
+  padding: var(--space-3);
+}
+
+/* The one highlighted box, the heavier border marks it as what the tab is about */
+.highlight {
+  border: var(--size-selection-ring) solid var(--color-ink);
+  border-radius: var(--radius-tile);
+  background: var(--color-card);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5) var(--space-3);
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+}

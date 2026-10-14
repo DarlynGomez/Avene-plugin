@@ -136,8 +136,10 @@ describe("participantVisibility, Teach Me Why", () => {
     ["ended", { condition: "live", phase: "ended" }]
   ];
 
-  it.each(columns)("is hidden in %s while it is not built", (_name, patch) => {
-    expect(participantVisibility(session(patch)).teachMeWhyTab).toBe(false);
+  it.each(columns)("is hidden in %s when it is not built", (_name, patch) => {
+    expect(participantVisibility(session(patch), { teachMeWhyBuilt: false }).teachMeWhyTab).toBe(
+      false
+    );
   });
 
   it.each([
@@ -146,11 +148,9 @@ describe("participantVisibility, Teach Me Why", () => {
     ["post-task reviewing", { condition: "post-task", phase: "reviewing" }, true],
     ["ended", { condition: "post-task", phase: "ended" }, false]
   ] as [string, Partial<StudySession>, boolean][])(
-    "follows where feedback appears in %s once it is built",
+    "follows where feedback appears in %s",
     (_name, patch, expected) => {
-      expect(participantVisibility(session(patch), { teachMeWhyBuilt: true }).teachMeWhyTab).toBe(
-        expected
-      );
+      expect(participantVisibility(session(patch)).teachMeWhyTab).toBe(expected);
     }
   );
 });

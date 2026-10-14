@@ -22,6 +22,7 @@ export const TOKEN_VALUES = {
   "--color-success-icon": "#059669",
   "--font-headline": "Georgia, serif",
   "--font-body": "-apple-system, BlinkMacSystemFont, " + '"Segoe UI", sans-serif',
+  "--font-mono": "ui-monospace, SFMono-Regular, Menlo, monospace",
   "--font-size-question": "26px",
   "--font-size-welcome": "32px",
   "--font-size-option-label": "15px",

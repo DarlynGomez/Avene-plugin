@@ -1,14 +1,14 @@
-import { useState } from "react";
-
-import { Header, type MainTab } from "./components/Header";
+import { Header } from "./components/Header";
 import { LiveWatchBody } from "./components/LiveWatchBody";
 import { RootSheetHost } from "./components/RootSheetHost";
 import { SelectionBanner } from "./components/SelectionBanner";
-import { TeachMeWhyPlaceholder } from "./components/TeachMeWhyPlaceholder";
 import { useEscapePrecedence } from "./hooks/useEscapePrecedence";
 import { useInstanceSelection } from "./hooks/useInstanceSelection";
 import { useIssues } from "./hooks/useIssues";
+import { useMainTabs } from "./hooks/useMainTabs";
 import { useSheetGating } from "./hooks/useSheetGating";
+import { ExplanationLinkContext } from "./teachMeWhy/ExplanationLinkContext";
+import { TeachMeWhyTab } from "./teachMeWhy/TeachMeWhyTab";
 import { StudyMessagePanel } from "../study/StudyMessagePanel";
 import { useParticipantVisibility } from "../study/useParticipantVisibility";
 import { usePanelView } from "./hooks/usePanelView";
@@ -47,7 +47,6 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   } = useIssues();
 
   const visibility = useParticipantVisibility();
-  const [mainTab, setMainTab] = useState<MainTab>("live-watch");
   const { selectedInstances, toggleInstanceSelected, selectAllInstances } = useInstanceSelection();
   const { sheet, openAdjust, openIgnore, closeSheet } = useRootSheet();
   const {
@@ -59,7 +58,7 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   const view = usePanelView(issues, decisions);
   const canAdjust = (aiAssistanceLevel ?? 1) >= 2 && visibility.adjustSheet;
   const { endAdjustRequested } = useSheetGating(visibility, sheet, closeSheet);
-  const activeTab = visibility.teachMeWhyTab ? mainTab : "live-watch";
+  const tabs = useMainTabs(visibility, view.reviewRoots, view.decisionRoots);
 
   useEscapePrecedence(sheet, closeSheet, showingCount, restoreShownSelection);
   const { handleToggleImportant, handleApplyDecisionOffer, handleRecordIgnore } = useRootHandlers({
@@ -98,49 +97,51 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   }
 
   return (
-    <main className={styles.panel} aria-label="Accessibility issues">
-      <Header
-        visibility={visibility}
-        headline={view.headline}
-        activeMainTab={activeTab}
-        onMainTabChange={setMainTab}
-      />
-      {showingCount !== null && visibility.showOnCanvas && (
-        <SelectionBanner count={showingCount} onRestore={restoreShownSelection} />
-      )}
-      <div className={styles.scrollRegion}>
-        {activeTab === "teach-me-why" ? (
-          <TeachMeWhyPlaceholder />
-        ) : (
-          <LiveWatchBody
-            visibility={visibility}
-            actionError={actionError}
-            stateFilter={view.stateFilter}
-            onStateFilterChange={view.setStateFilter}
-            counts={view.counts}
-            filteredSections={view.filteredSections}
-            decisionRoots={view.decisionRoots}
-            groupBy={view.groupBy}
-            onGroupByChange={view.setGroupBy}
-            issuesById={view.issuesById}
-            decisions={decisions}
-            canAdjust={canAdjust}
-            selectedInstances={selectedInstances}
-            onToggleInstanceSelected={toggleInstanceSelected}
-            onSelectAllInstances={selectAllInstances}
-            onShowOnCanvas={showRootOnCanvas}
-            onLocate={focusIssue}
-            onAdjust={openAdjust}
-            onIgnore={openIgnore}
-            onDefer={(root) => deferRoot(instanceIds(root), root.signature)}
-            onToggleImportant={handleToggleImportant}
-            onApplyDecisionOffer={handleApplyDecisionOffer}
-            onRestoreDeferred={(root) => restoreDeferredRoot(instanceIds(root), root.signature)}
-            onReopen={reopenRoot}
-          />
+    <ExplanationLinkContext.Provider value={tabs.openExplanation}>
+      <main className={styles.panel} aria-label="Accessibility issues">
+        <Header
+          visibility={visibility}
+          headline={view.headline}
+          activeMainTab={tabs.activeTab}
+          onMainTabChange={tabs.onMainTabChange}
+        />
+        {showingCount !== null && visibility.showOnCanvas && (
+          <SelectionBanner count={showingCount} onRestore={restoreShownSelection} />
         )}
-      </div>
-      {sheets}
-    </main>
+        <div className={styles.scrollRegion}>
+          {tabs.activeTab === "teach-me-why" ? (
+            <TeachMeWhyTab state={tabs.teachMeWhy} />
+          ) : (
+            <LiveWatchBody
+              visibility={visibility}
+              actionError={actionError}
+              stateFilter={view.stateFilter}
+              onStateFilterChange={view.setStateFilter}
+              counts={view.counts}
+              filteredSections={view.filteredSections}
+              decisionRoots={view.decisionRoots}
+              groupBy={view.groupBy}
+              onGroupByChange={view.setGroupBy}
+              issuesById={view.issuesById}
+              decisions={decisions}
+              canAdjust={canAdjust}
+              selectedInstances={selectedInstances}
+              onToggleInstanceSelected={toggleInstanceSelected}
+              onSelectAllInstances={selectAllInstances}
+              onShowOnCanvas={showRootOnCanvas}
+              onLocate={focusIssue}
+              onAdjust={openAdjust}
+              onIgnore={openIgnore}
+              onDefer={(root) => deferRoot(instanceIds(root), root.signature)}
+              onToggleImportant={handleToggleImportant}
+              onApplyDecisionOffer={handleApplyDecisionOffer}
+              onRestoreDeferred={(root) => restoreDeferredRoot(instanceIds(root), root.signature)}
+              onReopen={reopenRoot}
+            />
+          )}
+        </div>
+        {sheets}
+      </main>
+    </ExplanationLinkContext.Provider>
   );
 }

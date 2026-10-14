@@ -3,6 +3,7 @@ import type { CalibrationProfile } from "./calibrationSchema";
 import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
+import type { ExplanationEventMessage } from "./study/explanationMessageTypes";
 import type { MarkerMessage } from "./markers/markerMessageTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
 import type { SelectionMessage } from "./selectionMessageTypes";
@@ -111,7 +112,8 @@ export type UiToPluginMessage =
   | RootMessage
   | SelectionMessage
   | AdjustMessage
-  | StudyMessage;
+  | StudyMessage
+  | ExplanationEventMessage;
 
 /** Sandbox to UI messages */
 export type PluginToUiMessage =

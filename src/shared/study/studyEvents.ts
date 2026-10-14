@@ -1,4 +1,9 @@
 import type { IssueState, Severity } from "../issues/issueTypes";
+import type {
+  DepthChangedEvent,
+  ExplanationDismissedEvent,
+  ExplanationOpenedEvent
+} from "./explanationStudyEvents";
 import type { MarkerStyle } from "../markers/markerStyle";
 import type { BlockNumber, StudyCondition, StudyPhase, TaskId } from "./studyTypes";
 
@@ -107,12 +112,6 @@ export interface MarkerStateEvent extends Base {
   style: MarkerStyle;
 }
 
-export interface ExplanationOpenedEvent extends Base {
-  type: "explanation_opened";
-  surface: "why_surfaced" | "teach_me_why";
-  issueId?: string;
-}
-
 export interface RoleAnsweredEvent extends Base {
   type: "role_answered";
   nodeId: string;
@@ -130,6 +129,14 @@ export type StudyEvent =
   | AdjustEventEvent
   | MarkerStateEvent
   | ExplanationOpenedEvent
+  | DepthChangedEvent
+  | ExplanationDismissedEvent
   | RoleAnsweredEvent;
+
+export type {
+  DepthChangedEvent,
+  ExplanationDismissedEvent,
+  ExplanationOpenedEvent
+} from "./explanationStudyEvents";
 
 export type StudyEventType = StudyEvent["type"];

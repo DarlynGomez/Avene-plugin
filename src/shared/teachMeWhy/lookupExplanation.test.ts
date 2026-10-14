@@ -37,8 +37,11 @@ describe("lookupExplanation", () => {
       table.fallbacks["2"]
     );
   });
-  it("ships the table empty with a person written template for every depth", () => {
-    expect(table.entries).toEqual({});
+  it("ships a person written template for every depth, and only approved entries", () => {
+    for (const entry of Object.values(table.entries)) {
+      expect(entry.status).toBe("approved");
+      expect(entry.reviewer).toBeTruthy();
+    }
     for (const depth of ["1", "2", "3"] as const) {
       expect(table.fallbacks[depth].status).toBe("fallback");
       expect(table.fallbacks[depth].factIds).toEqual([]);

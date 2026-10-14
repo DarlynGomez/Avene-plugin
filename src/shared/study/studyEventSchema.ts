@@ -1,3 +1,4 @@
+import { depthOk, explanationKeyOk, sourceOk } from "./explanationEventSchema";
 import { participantIdError } from "./participantIdSchema";
 import type { StudyEvent } from "./studyEvents";
 
@@ -82,7 +83,10 @@ const CHECKS: Record<StudyEvent["type"], (e: Rec) => boolean> = {
     oneOf(["annotation", "dot", "ring"], e.style),
   explanation_opened: (e) =>
     oneOf(["why_surfaced", "teach_me_why"], e.surface) &&
-    (e.issueId === undefined || str(e.issueId)),
+    (e.issueId === undefined || str(e.issueId)) &&
+    (e.surface !== "teach_me_why" || (explanationKeyOk(e.key) && sourceOk(e.source))),
+  depth_changed: (e) => explanationKeyOk(e.key) && depthOk(e.toDepth),
+  explanation_dismissed: (e) => explanationKeyOk(e.key),
   role_answered: (e) => str(e.nodeId) && str(e.role)
 };
 

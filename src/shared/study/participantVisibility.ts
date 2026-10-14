@@ -27,12 +27,12 @@ export interface ParticipantVisibility {
   message: string | null;
 }
 
-/** Things that are not built yet and so cannot be shown, passed in so the rule can be tested */
+/** Things that may not be built and so cannot be shown, passed in so the rule can be tested */
 export interface VisibilityFeatures {
   teachMeWhyBuilt: boolean;
 }
 
-const NOT_BUILT: VisibilityFeatures = { teachMeWhyBuilt: false };
+const BUILT: VisibilityFeatures = { teachMeWhyBuilt: true };
 
 const UNRESTRICTED: ParticipantVisibility = {
   wordmark: true,
@@ -57,7 +57,7 @@ const UNRESTRICTED: ParticipantVisibility = {
 /** No session, or one the researcher has exited, means normal and unrestricted behaviour */
 export function participantVisibility(
   session: StudySession | null,
-  features: VisibilityFeatures = NOT_BUILT
+  features: VisibilityFeatures = BUILT
 ): ParticipantVisibility {
   if (!isStudyActive(session)) {
     return UNRESTRICTED;

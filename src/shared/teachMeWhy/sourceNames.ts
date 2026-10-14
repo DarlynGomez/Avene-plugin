@@ -1,4 +1,4 @@
-import { FACT_LIBRARY } from "../../src/shared/teachMeWhy/facts";
+import { FACT_LIBRARY } from "./facts";
 
 /** The names of the sources behind a set of facts, each once, in the order they first appear */
 export function sourceNamesFor(factIds: readonly string[]): string[] {

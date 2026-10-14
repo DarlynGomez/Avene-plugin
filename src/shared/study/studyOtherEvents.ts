@@ -1,6 +1,9 @@
+import type { Depth, ExplanationKey } from "../teachMeWhy/explanationTypes";
 import type { MarkerStyle } from "../markers/markerStyle";
 import type {
   AdjustEventEvent,
+  DepthChangedEvent,
+  ExplanationDismissedEvent,
   ExplanationOpenedEvent,
   MarkerStateChange,
   MarkerStateEvent,
@@ -45,4 +48,30 @@ export function buildRoleAnswered(
   role: string
 ): RoleAnsweredEvent {
   return { type: "role_answered", at, ctx, nodeId, role };
+}
+
+export function buildTeachMeWhyOpened(
+  ctx: StudyEventContext,
+  at: string,
+  key: ExplanationKey,
+  source: "tab" | "card"
+): ExplanationOpenedEvent {
+  return { type: "explanation_opened", at, ctx, surface: "teach_me_why", key, source };
+}
+
+export function buildDepthChanged(
+  ctx: StudyEventContext,
+  at: string,
+  key: ExplanationKey,
+  toDepth: Depth
+): DepthChangedEvent {
+  return { type: "depth_changed", at, ctx, key, toDepth };
+}
+
+export function buildExplanationDismissed(
+  ctx: StudyEventContext,
+  at: string,
+  key: ExplanationKey
+): ExplanationDismissedEvent {
+  return { type: "explanation_dismissed", at, ctx, key };
 }

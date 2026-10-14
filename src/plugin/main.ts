@@ -1,3 +1,5 @@
+import { handleExplanationMessage } from "./lifecycle/explanationProtocol";
+import { isExplanationMessage } from "../shared/study/explanationMessageTypes";
 import { handleAdjustMessage } from "./lifecycle/adjustProtocol";
 import { isAdjustMessage } from "./lifecycle/isAdjustMessage";
 import {
@@ -40,6 +42,11 @@ async function handleUiMessage(rawMessage: unknown): Promise<void> {
 
   if (isStudyMessage(message)) {
     await handleStudyMessage(message, (reply) => figma.ui.postMessage(reply));
+    return;
+  }
+
+  if (isExplanationMessage(message)) {
+    handleExplanationMessage(message);
     return;
   }
 

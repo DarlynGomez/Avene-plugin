@@ -119,7 +119,7 @@ function expectFeedbackSurfaces() {
   expect(screen.getByRole("button", { name: /Adjust/ })).toBeInTheDocument();
   expect(screen.queryByText(WAITING_MESSAGE)).not.toBeInTheDocument();
   expect(screen.queryByText(ENDED_MESSAGE)).not.toBeInTheDocument();
-  expect(screen.queryByRole("tab", { name: /Teach Me Why/ })).not.toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: /Teach Me Why/ })).toBeInTheDocument();
 }
 
 function expectNoFeedbackSurfaces(message: string) {
@@ -135,7 +135,7 @@ function expectNoFeedbackSurfaces(message: string) {
 }
 
 describe("participant interface, per phase", () => {
-  it("live designing shows every feedback surface and no Teach Me Why", () => {
+  it("live designing shows every feedback surface and the Teach Me Why tab", () => {
     renderPanel();
     studyState(LIVE_DESIGNING);
     issuesUpdated([issue(), IGNORED]);
@@ -151,7 +151,7 @@ describe("participant interface, per phase", () => {
     expectNoFeedbackSurfaces(WAITING_MESSAGE);
   });
 
-  it("post-task reviewing shows every feedback surface and no Teach Me Why", () => {
+  it("post-task reviewing shows every feedback surface and the Teach Me Why tab", () => {
     renderPanel();
     studyState(POST_REVIEWING);
     issuesUpdated([issue(), IGNORED]);
