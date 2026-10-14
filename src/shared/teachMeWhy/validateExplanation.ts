@@ -5,6 +5,7 @@ export type RejectionCode =
   | "fact-not-allowed"
   | "number-not-allowed"
   | "banned-term"
+  | "dash"
   | "unknown-slot"
   | "too-short"
   | "too-long";
@@ -40,6 +41,8 @@ const BANNED_PATTERNS = BANNED_TERMS.map(
 const CRITERION_NUMBER = /(?<![\d.])\d+\.\d+\.\d+(?![\d.])/;
 // Ratios first so 4.5:1 is one number, then percentages, then plain numbers
 const NUMBER = /\d+(?:\.\d+)?:\d+(?:\.\d+)?|\d+(?:\.\d+)?%|\d+(?:\.\d+)?/g;
+// En dash and em dash only, a hyphen inside a word is fine and curly quotes are fine
+const DASH = /[\u2013\u2014]/;
 const SLOT = /\{([^{}]*)\}/g;
 
 function numbersIn(text: string): string[] {
@@ -80,6 +83,8 @@ export function validateExplanation(input: ValidationInput): Validation {
   if (CRITERION_NUMBER.test(input.text)) {
     reasons.push({ code: "banned-term", detail: "criterion number" });
   }
+
+  if (DASH.test(input.text)) reasons.push({ code: "dash", detail: "en dash or em dash" });
 
   const words = input.text.split(/\s+/).filter((word) => word !== "").length;
   const limits = DEPTH_WORD_LIMITS[input.key.depth];

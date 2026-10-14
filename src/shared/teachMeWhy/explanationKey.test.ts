@@ -3,6 +3,7 @@ import type { GroupableFinding, Root } from "../grouping/groupingTypes";
 import {
   buildExplanationKey,
   keyToString,
+  parseKeyString,
   selectRole,
   sizeClassFromRequired
 } from "./explanationKey";
@@ -106,5 +107,23 @@ describe("keyToString", () => {
           for (const depth of [1, 2, 3] as const)
             seen.add(keyToString({ role, severity, size, depth }));
     expect(seen.size).toBe(126);
+  });
+});
+
+describe("parseKeyString", () => {
+  it("reads back every key it writes", () => {
+    const key = { role: "button text", severity: "low", size: "large", depth: 3 } as const;
+    expect(parseKeyString(keyToString(key))).toEqual(key);
+  });
+  it("refuses anything that is not a key", () => {
+    for (const bad of [
+      "",
+      "body:low:large",
+      "nope:low:large:1",
+      "body:low:large:4",
+      "body:low:large:1:x"
+    ]) {
+      expect(parseKeyString(bad)).toBeNull();
+    }
   });
 });

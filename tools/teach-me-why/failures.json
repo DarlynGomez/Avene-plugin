@@ -1,0 +1,10 @@
+{
+  "attemptsByReason": {
+    "dash": 47,
+    "too-short": 1,
+    "number-not-allowed": 1
+  },
+  "failedItems": 15,
+  "completedItems": 111,
+  "mostFailed": "dash"
+}

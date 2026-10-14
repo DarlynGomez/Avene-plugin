@@ -1,4 +1,14 @@
 {
+  "generation": {
+    "model": "gpt-oss:120b-gwtics-figma-frozen",
+    "digest": null,
+    "promptVersion": "2",
+    "promptVersions": [
+      "1",
+      "2"
+    ],
+    "generatedAt": "2026-10-13T16:35:57.514Z"
+  },
   "fallbacks": {
     "1": {
       "text": "This text measures {measured}, and it needs {required} to be comfortable for more people to read. One option is to darken the text a little, keeping the same colour family, until it reaches that mark.",
@@ -19,5 +29,185 @@
       "factIds": []
     }
   },
-  "entries": {}
+  "entries": {
+    "button text:medium:normal:1": {
+      "text": "The button label fails the contrast check, showing {measured} versus the required {required}. This can make the button hard to spot, especially for users with reduced vision. You could try darkening the text colour slightly.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "button text:medium:normal:2": {
+      "text": "Button text that falls short of the {required} contrast (currently {measured}) can be hard to tap when users are struggling to see it. This matters especially for people with slightly older eyes or when they are reading on a phone in bright sunlight, because low contrast reduces legibility and slows down interaction. You could try increasing the text contrast or using a darker shade for the button label to keep it readable in those conditions.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "button text:medium:normal:3": {
+      "text": "The contrast rule exists to keep text readable for everyone, so the bar is set at {required} to ensure enough difference between text and background. Your button text currently measures {measured}, which falls short of that target. One option is to keep the same hue but darken it a bit, or pick a passing colour already in your palette that meets the ratio. You could also change the button’s fill colour so the gap between text and fill widens. Buttons are things people must find and press, so being easy to read matters more here. This helps users with tired eyes or older vision read the button easily.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F13"
+      ]
+    },
+    "caption:high:normal:1": {
+      "text": "The caption fails the contrast check: measured ratio {measured} is below the required {required}. This can make the text hard to read, especially at a normal size. You could try darkening the text colour quite a bit.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "caption:high:normal:2": {
+      "text": "The caption may be hard to read for people with slightly older eyes, especially when reading on a phone in bright sunlight. Because the contrast is only {measured} while the standard calls for {required}, the text can blend into the background and cause strain. Small text like captions is the hardest to read when contrast is low. You could improve readability by choosing a noticeably darker shade for the caption colour.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F12"
+      ]
+    },
+    "caption:high:normal:3": {
+      "text": "The contrast of your caption is {measured}, below the needed {required}, so it may be hard to read. The idea behind the rule is that enough difference in lightness lets the eye separate text from its background, which is why a minimum ratio is set. Small text needs a bigger difference because thin, small letters are harder to pick out. You could keep the same hue and darken it quite a bit, or pick a darker shade that already exists in your palette for the caption. This matters most when reading on a phone in bright sunlight, where low contrast fades quickly.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01"
+      ]
+    },
+    "decorative:high:large:1": {
+      "text": "This text may be hard to read: its contrast is {measured}, but it would need {required}. If it is purely decorative and carries no information, it has no minimum. If it does carry meaning, darken the colour.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "decorative:high:large:2": {
+      "text": "Because this text is decorative, it isn’t required to meet a contrast minimum, but if it does carry information it could become hard to read, especially for eyes that are a little older. The current contrast is {measured} while the standard asks for {required}. If the words matter, use a darker shade for them, and keep the lighter colour only for pure decoration.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F04"
+      ]
+    },
+    "decorative:high:large:3": {
+      "text": "Because decorative text isn’t required to meet a contrast minimum, the current {measured} ratio and the {required} ratio don’t pose a formal problem as long as the words carry no information. The idea behind contrast is that it measures how light the text is compared with its background, on a scale from 1:1 to 21:1, to ensure readability when needed. If the lettering does convey meaning, you could keep the colour by darkening it a little, swapping to a passing colour already in the palette, using it for larger or bolder text, placing it on a darker surface, or treating it as an accent while rendering the main words in a darker shade. This lets the design stay vibrant without sacrificing legibility.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F04",
+        "F01"
+      ]
+    },
+    "heading:low:large:1": {
+      "text": "The heading’s contrast is {measured}, and it needs to reach {required}. That is close, but it can still be harder to scan quickly. A slightly darker text colour should get it there.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "heading:low:large:2": {
+      "text": "A heading that falls short of the needed contrast can be hard to read for people with slightly older eyes, especially when they are reading on a phone in bright sunlight. The current contrast is {measured} but should be at least {required}. Large text needs less contrast than small text, so you are close. A slightly darker text colour should be enough to get there.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "heading:low:large:3": {
+      "text": "The contrast of your heading is {measured}, which is below the {required} level. This matters because a minimum difference between text and background keeps text legible for everyone, and large text only needs a lower bar than small text. Your heading is close, so a small change should be enough. You could keep the same hue and darken it a little, or choose a passing colour that is already in your palette. Another option is to change the surface behind the heading so the difference grows. This respects the idea behind the rule, which is clear communication, while keeping your design intent.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F03"
+      ]
+    },
+    "unknown:high:large:1": {
+      "text": "The contrast is too low: {measured} versus the {required} needed. This can make large text hard to read, especially for people with visual challenges. You could darken the text colour quite a bit to fix it.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "unknown:high:large:2": {
+      "text": "When large text doesn’t meet the contrast needed ({measured} vs {required}), it can strain readers, especially older eyes or when reading on a phone in bright sunlight. Low contrast makes letters blend into the background, so people may miss important information or have to squint. One option is to boost the contrast by darkening the text colour quite a bit, keeping the visual style while improving readability.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F15"
+      ]
+    },
+    "unknown:high:large:3": {
+      "text": "The contrast between your text and its background is {measured}, but it needs to be at least {required}. That is too low, which can make reading difficult for people with older eyes or tired eyes after a long day. The idea behind the contrast rule is that a clear difference in lightness keeps text legible for everyone, and the bar is set to protect readability across conditions. You could keep the same hue but darken it quite a bit, or choose a passing colour already in your palette. Using the colour for larger text, or changing the surface behind it, are also good options.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F03"
+      ]
+    },
+    "unknown:high:normal:1": {
+      "text": "The contrast is too low: {measured} versus the {required} needed. This can make reading difficult, especially at normal size. You could try darkening the text colour quite a bit to boost the contrast.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "unknown:high:normal:2": {
+      "text": "The contrast is too low ({measured} vs {required}), which can make the text hard to read for people with slightly older eyes, especially when they’re reading on a phone in bright sunlight. In those conditions the eyes work harder and fatigue sets in faster, so the message may be missed or cause strain. You could try darkening the text colour quite a bit to boost the contrast.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F15"
+      ]
+    },
+    "unknown:high:normal:3": {
+      "text": "The contrast rule exists to keep text readable for everyone, so the bar is set at {required} to separate text from its background clearly. With a measured ratio of {measured}, the text falls short, meaning the colour difference is not strong enough for comfortable reading. You could keep the same hue but darken it quite a bit, or pick a passing colour already in your palette that offers more contrast. Using the colour for larger text also helps, as larger text needs a lower ratio. Another option is to change the surface behind the text so the gap widens, which keeps your design intent.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F03"
+      ]
+    },
+    "unknown:low:large:1": {
+      "text": "The contrast is {measured}, and it needs to reach {required}. Large text is allowed a lower minimum, so you may be close. Try darkening the text colour a little and check the number again.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "unknown:low:large:2": {
+      "text": "The low contrast makes the text harder to read, especially for eyes that are a little older. With a measured ratio of {measured} versus the required {required}, the text may blend into the background, causing strain and missed information. Large text is easier to read than small text, but it still needs enough contrast. You could try darkening the text colour a bit while keeping the overall look.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F15"
+      ]
+    },
+    "unknown:low:large:3": {
+      "text": "The idea behind contrast is that it measures how light your text is compared to its background, from no difference at all up to black on white. Your text measures {measured}, and the minimum for large text is {required}. Larger letters have thicker strokes, which is why they need a lower minimum than small text. You are not far off, so a small change should be enough. You could darken the colour a little, swap it for a passing colour already in the file, or change the surface behind it. These tweaks help you meet the contrast goal without losing your design intent.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F03"
+      ]
+    },
+    "unknown:medium:normal:1": {
+      "text": "The text contrast is insufficient, showing {measured} versus the required {required}. This can make reading harder, especially at normal size. You could try darkening the text colour slightly to improve readability.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": []
+    },
+    "unknown:medium:normal:2": {
+      "text": "The contrast is too low ({measured} vs {required}), which can make the text hard to read for people with slightly older eyes, especially when reading on a phone in bright sunlight. In those conditions the eyes struggle to pick out the letters, increasing effort and reducing comprehension. One option is to boost the contrast by darkening the text colour a bit, keeping the overall design intent.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F15"
+      ]
+    },
+    "unknown:medium:normal:3": {
+      "text": "The contrast ratio of {measured} falls short of the required {required}, which matters because the visual system relies on a clear difference between light and dark to keep text legible, especially for readers with slightly older eyes. The rule sets a minimum to ensure enough contrast for most viewing conditions. You could keep the same hue but darken it a bit, swap to a passing colour already in your palette, or apply the colour to larger text where the required ratio is lower. Another option is to change the surface behind the text, or use the colour only as an accent while rendering the main words in a darker shade. This helps maintain the intended look without sacrificing readability.",
+      "status": "approved",
+      "reviewer": "DG",
+      "factIds": [
+        "F01",
+        "F03"
+      ]
+    }
+  }
 }

@@ -1,0 +1,12 @@
+caption:high:normal:1
+caption:high:normal:2
+caption:high:normal:3
+decorative:high:large:1
+decorative:high:large:2
+decorative:high:large:3
+heading:low:large:1
+heading:low:large:2
+heading:low:large:3
+button text:medium:normal:1
+button text:medium:normal:2
+button text:medium:normal:3

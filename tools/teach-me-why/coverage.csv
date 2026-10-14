@@ -1,0 +1,9 @@
+task,root,instances,representative,measured,required,role,rule_role,size,severity,key,notes
+A,R1,6,A1.subtitle,2.21,4.5,caption,none,normal,high,caption:high:normal,csv role caption but the plugin decides none
+A,R4,1,A1.watermark,1.25,3,decorative,none,large,high,decorative:high:large,csv role decorative but the plugin decides none
+A,R3,2,A1.section,2.50,3,heading,none,large,low,heading:low:large,csv role heading but the plugin decides none
+A,R2,3,A1.card1.button.label,3.29,4.5,button text,none,normal,medium,button text:medium:normal,csv role button text but the plugin decides none
+B,R1,6,B1.subtitle,2.20,4.5,caption,none,normal,high,caption:high:normal,csv role caption but the plugin decides none
+B,R4,1,B1.watermark,1.24,3,decorative,none,large,high,decorative:high:large,csv role decorative but the plugin decides none
+B,R3,2,B1.section,2.50,3,heading,none,large,low,heading:low:large,csv role heading but the plugin decides none
+B,R2,3,B1.card1.button.label,3.31,4.5,button text,none,normal,medium,button text:medium:normal,csv role button text but the plugin decides none

@@ -104,6 +104,19 @@ describe("validateExplanation, banned terms", () => {
   });
 });
 
+describe("validateExplanation, dashes", () => {
+  it("rejects an en dash and an em dash with their own reason", () => {
+    expect(codes(check(1, "It is low \u2013 very low."))).toEqual(["dash"]);
+    expect(codes(check(1, "It is low \u2014 very low."))).toEqual(["dash"]);
+  });
+  it("allows a hyphen inside a word and a spaced hyphen", () => {
+    expect(check(1, "A low-contrast, semi-opaque, well-known case - fine.").ok).toBe(true);
+  });
+  it("allows curly apostrophes and quotes", () => {
+    expect(check(1, "The heading\u2019s \u201Ccolour\u201D is low.").ok).toBe(true);
+  });
+});
+
 describe("validateExplanation, length", () => {
   const limits: Array<[Depth, number, number]> = [
     [1, 25, 45],

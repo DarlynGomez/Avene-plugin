@@ -8,7 +8,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"*.{js,json,ts,html}\" .prettierrc",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"*.{js,json,ts,html}\" .prettierrc"
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"*.{js,json,ts,html}\" .prettierrc",
+    "teach:generate": "vite-node tools/teach-me-why/generate.ts",
+    "teach:import": "vite-node tools/teach-me-why/importCli.ts",
+    "teach:coverage": "vite-node tools/teach-me-why/coverage.ts",
+    "teach:flags": "vite-node tools/teach-me-why/flags.ts",
+    "teach:revalidate": "vite-node tools/teach-me-why/revalidateCli.ts"
   },
   "dependencies": {
     "lucide-react": "^1.48.0",
@@ -27,6 +32,7 @@
     "@vitejs/plugin-react": "^5.0.2",
     "eslint": "^9.35.0",
     "jsdom": "^26.1.0",
+    "openai": "^6.49.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.42.0",

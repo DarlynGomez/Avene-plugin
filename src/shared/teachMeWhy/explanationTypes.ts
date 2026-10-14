@@ -52,7 +52,19 @@ export interface ExplanationEntry {
   factIds: readonly string[];
 }
 
+/** Recorded once in the table, where its explanations came from */
+export interface GenerationRecord {
+  model: string;
+  digest: string | null;
+  promptVersion: string;
+  /** Set when items came from more than one prompt version */
+  promptVersions?: string[];
+  generatedAt: string;
+}
+
 export interface ExplanationTable {
+  /** Set when the entries were imported from a reviewed generation run */
+  generation?: GenerationRecord;
   /** One fixed template for every depth */
   fallbacks: Record<`${Depth}`, ExplanationEntry>;
   /** Approved entries by key string */
