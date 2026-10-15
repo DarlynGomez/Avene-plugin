@@ -38,7 +38,10 @@ function main(): void {
   if (!existsSync(newPath))
     throw new Error(`There is no generated${suffix}.json yet, run the generation first.`);
   const fresh = JSON.parse(readFileSync(newPath, "utf8")) as Progress;
-  const [header, ...rows] = parseCsv(readFileSync(join(TOOL_DIR, "review.csv"), "utf8"));
+  const against = process.argv.includes("--against")
+    ? `_${process.argv[process.argv.indexOf("--against") + 1]}`
+    : "";
+  const [header, ...rows] = parseCsv(readFileSync(join(TOOL_DIR, `review${against}.csv`), "utf8"));
   const old = new Map(rows.map((row) => [row[header.indexOf("key")], row]));
   const rowsGt = readRows();
 
@@ -47,7 +50,8 @@ function main(): void {
     const item = fresh.items[name];
     if (!key) continue;
     const oldRow = old.get(name);
-    const oldText = oldRow?.[header.indexOf("text")] ?? "(no old row)";
+    const edited = oldRow?.[header.indexOf("edited_text")] ?? "";
+    const oldText = edited || (oldRow?.[header.indexOf("text")] ?? "(no old row)");
     const decision = oldRow?.[header.indexOf("decision")] || "undecided";
     const sample = sampleFor(rowsGt, key.severity, key.size);
     const fill = (text: string, withDetails: boolean) =>
@@ -68,9 +72,10 @@ function main(): void {
         : text;
     console.log(`\n=== ${keyToString(key)}  (${DEPTH_NAMES[key.depth]}) ===`);
     console.log(
-      `${`OLD (v2, review: ${decision})`.padEnd(52)} | NEW (v3, ${item.status}${item.reasons.length ? `: ${item.reasons.join(", ")}` : ""}, facts: ${item.factIds.join(" ") || "none"})`
+      `${`OLD (${against ? against.slice(1) : "v2"}, review: ${decision})`.padEnd(52)} | NEW (${suffix.slice(1)}, ${item.status}${item.reasons.length ? `: ${item.reasons.join(", ")}` : ""}, facts: ${item.factIds.join(" ") || "none"})`
     );
-    for (const line of sideBySide(fill(oldText, false), fill(item.text, true))) console.log(line);
+    for (const line of sideBySide(fill(oldText, against !== ""), fill(item.text, true)))
+      console.log(line);
   }
   console.log(
     `\nFilled with the first task root of the same severity and size${rowsGt.length ? "" : ""}. Nothing was written.`

@@ -1,0 +1,111 @@
+{
+  "header": {
+    "model": "gpt-oss:120b-gwtics-figma-frozen",
+    "digest": null,
+    "promptVersion": "8",
+    "inputsHash": "4814ae33f24b2489",
+    "generatedAt": "2026-10-15T16:30:09.004Z",
+    "promptVersions": [
+      "7",
+      "8"
+    ]
+  },
+  "items": {
+    "unknown:high:normal:2": {
+      "key": "unknown:high:normal:2",
+      "status": "completed",
+      "text": "The {measured} contrast between {foreground} and {background} at {fontsize} is below the {required} level. In bright sunlight, with sunglasses, or screen glare, many users struggle to read mobile content, so the insufficient contrast can make text hard to perceive and increase eye strain. Considering these everyday conditions, you could choose a higher contrast color or adjust the background to improve readability.",
+      "factIds": [
+        "F16"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "too-short"
+        ],
+        [
+          "too-short"
+        ]
+      ],
+      "attempts": 3,
+      "promptVersion": "7"
+    },
+    "unknown:high:large:2": {
+      "key": "unknown:high:large:2",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} at {fontsize} falls short of {required} with a measured value of {measured}. This matters because a study found that the group who perceived colors least accurately were older on average and more likely to be outdoors during the test, so they may struggle to read your large text in similar conditions. Considering their experience can help you create more inclusive designs.",
+      "factIds": [
+        "F20"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "7"
+    },
+    "unknown:low:large:2": {
+      "key": "unknown:low:large:2",
+      "status": "failed",
+      "text": "With {measured} below {required}, the low‑contrast {foreground} on {background} can hinder readability for many visitors. WebAIM's 2026 analysis showed that low‑contrast text was the most common accessibility issue, appearing on 83.9% of home pages, with an average of 34 instances per page. This means a large portion of users may struggle to read important information, especially on larger {fontsize} elements.",
+      "factIds": [
+        "F15"
+      ],
+      "reasons": [
+        "size-fix",
+        "odd-character"
+      ],
+      "messages": [
+        "you wrote \"This means a large portion of users may struggle to read important information, especially on larger {fontsize} elements.\", but a change of text size or font weight is not the fix, the fix is the color",
+        "you used a non-breaking hyphen, use plain straight quotes, apostrophes and hyphens only"
+      ],
+      "attemptReasons": [
+        [
+          "size-fix",
+          "odd-character"
+        ],
+        [
+          "odd-character"
+        ],
+        [
+          "size-fix",
+          "odd-character"
+        ]
+      ],
+      "attempts": 3,
+      "promptVersion": "8"
+    },
+    "unknown:medium:normal:3": {
+      "key": "unknown:medium:normal:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} for {fontsize} text falls short of the {required} level, which matters because the minimum for small text was set to make up for the contrast sensitivity that typically declines with age, using the vision commonly reported as typical at about age 80 as its reference point. One option is to keep the hue but darken it slightly so it meets the required contrast, or you could apply the same color to larger or bolder text where the ratio is easier to achieve. Another route is to place the text on a darker surface or add a subtle overlay, blur, shadow, or outline, which lets the original color stay as an accent while still being readable.",
+      "factIds": [
+        "F02"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "7"
+    },
+    "unknown:low:large:3": {
+      "key": "unknown:low:large:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} falls short of {required} for {fontsize} text, which can make reading harder for users with visual challenges. This matters because accessibility concerns are often addressed later in the design process, and fixing them early saves effort and resources. The principle is to maintain legibility while preserving the visual language. You could keep the existing hue and simply choose a passing color from the palette that meets the contrast target, or apply the same color to larger or bolder text where it already passes. Another route is to place the text on a darker surface or add a subtle overlay, blur, shadow, or outline to boost contrast without altering the core colors.",
+      "factIds": [
+        "F24"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "direction-word",
+          "size-fix",
+          "adverb"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "7"
+    }
+  }
+}
