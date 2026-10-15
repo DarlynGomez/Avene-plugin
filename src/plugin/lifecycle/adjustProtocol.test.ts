@@ -49,7 +49,7 @@ describe("isAdjustMessage", () => {
     expect(isAdjustMessage({ type: "ADJUST_OPTIONS_REQUEST" })).toBe(false);
   });
 
-  it("requires issueId, issueIds, and a colour for ADJUST_PREVIEW", async () => {
+  it("requires issueId, issueIds, and a color for ADJUST_PREVIEW", async () => {
     const { isAdjustMessage } = await import("./isAdjustMessage");
     expect(
       isAdjustMessage({
@@ -65,7 +65,7 @@ describe("isAdjustMessage", () => {
     expect(isAdjustMessage({ type: "ADJUST_PREVIEW", issueId: ISSUE_ID })).toBe(false);
   });
 
-  it("requires issueId, issueIds, a colour, option, and both session flags for ADJUST_APPLY", async () => {
+  it("requires issueId, issueIds, a color, option, and both session flags for ADJUST_APPLY", async () => {
     const { isAdjustMessage } = await import("./isAdjustMessage");
     const full = {
       type: "ADJUST_APPLY",
@@ -169,7 +169,7 @@ describe("handleAdjustMessage", () => {
     );
   });
 
-  it("previews a passing colour on the node and replies ADJUST_PREVIEWED", async () => {
+  it("previews a passing color on the node and replies ADJUST_PREVIEWED", async () => {
     const node = textNode();
     stubFigma(node);
     const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -210,7 +210,7 @@ describe("handleAdjustMessage", () => {
     expect(reply).toHaveBeenCalledWith({ type: "ADJUST_CLEARED" });
   });
 
-  it("applies a passing colour for real, writes nothing else, and commits one undo step", async () => {
+  it("applies a passing color for real, writes nothing else, and commits one undo step", async () => {
     const node = textNode({ opacity: 1, visible: true });
     const { commitUndo } = stubFigma(node);
     const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -228,7 +228,7 @@ describe("handleAdjustMessage", () => {
     expect(reply).toHaveBeenCalledWith({ type: "ADJUST_APPLIED", issueId: ISSUE_ID });
   });
 
-  it("refuses to apply a colour that no longer meets the required ratio, and does not commit undo", async () => {
+  it("refuses to apply a color that no longer meets the required ratio, and does not commit undo", async () => {
     const node = textNode();
     const { commitUndo } = stubFigma(node);
     const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -268,7 +268,7 @@ describe("handleAdjustMessage", () => {
   });
 
   describe("logging, per ADJUST_SPEC.md section 9", () => {
-    it("records an apply with before and after colours and ratios when consent is true", async () => {
+    it("records an apply with before and after colors and ratios when consent is true", async () => {
       const node = textNode();
       const { pluginData } = stubFigma(node, true);
       const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -317,7 +317,7 @@ describe("handleAdjustMessage", () => {
       expect(pluginData["cadt.adjustLog.v1"]).toBeUndefined();
     });
 
-    it("records an abandonment with no after colour, wheelOpened, and hexRejected", async () => {
+    it("records an abandonment with no after color, wheelOpened, and hexRejected", async () => {
       const node = textNode();
       const { pluginData } = stubFigma(node, true);
       const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -347,7 +347,7 @@ describe("handleAdjustMessage", () => {
       });
     });
 
-    it("logs the original colour as before when an abandon arrives mid preview", async () => {
+    it("logs the original color as before when an abandon arrives mid preview", async () => {
       const node = textNode();
       const { pluginData } = stubFigma(node, true);
       const { handleAdjustMessage } = await import("./adjustProtocol");
@@ -377,7 +377,7 @@ describe("handleAdjustMessage", () => {
       expect(log[0].beforeHex).toBe("#000000");
     });
 
-    it("logs the original colour as before when apply follows a different preview", async () => {
+    it("logs the original color as before when apply follows a different preview", async () => {
       const node = textNode();
       const { pluginData } = stubFigma(node, true);
       const { handleAdjustMessage } = await import("./adjustProtocol");

@@ -23,7 +23,7 @@ describe("validateHexInput", () => {
     }
   });
 
-  it("offers the nearest passing colour on the same hue when one exists", () => {
+  it("offers the nearest passing color on the same hue when one exists", () => {
     const result = validateHexInput("#dddddd", WHITE, 4.5);
     expect(result.kind).toBe("fails-contrast");
     if (result.kind === "fails-contrast") {

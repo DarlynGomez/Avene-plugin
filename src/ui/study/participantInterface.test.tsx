@@ -60,7 +60,7 @@ const IGNORED = issue({
   nodeId: "2:2",
   nodeName: "Caption",
   state: "ignored",
-  ignoredReason: "Brand colour",
+  ignoredReason: "Brand color",
   evidence: {
     measuredRatio: 3.1,
     requiredRatio: 4.5,
@@ -112,7 +112,7 @@ afterEach(() => {
 function expectFeedbackSurfaces() {
   const liveWatch = screen.getByRole("tab", { name: /Live Watch/ });
   expect(within(liveWatch).getByText("1")).toBeInTheDocument();
-  expect(screen.getByText(/colours? causes? 1 of/)).toBeInTheDocument();
+  expect(screen.getByText(/colors? causes? 1 of/)).toBeInTheDocument();
   expect(screen.getByRole("combobox", { name: "Filter issues" })).toBeInTheDocument();
   expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
   expect(screen.getByText(/Ignored issues/)).toBeInTheDocument();
@@ -130,7 +130,7 @@ function expectNoFeedbackSurfaces(message: string) {
   expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   expect(screen.queryByText("sage/muted on #FFFFFF")).not.toBeInTheDocument();
   expect(screen.queryByText(/Ignored issues/)).not.toBeInTheDocument();
-  expect(screen.queryByText(/colour causes/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/color causes/)).not.toBeInTheDocument();
   expect(screen.queryAllByRole("button")).toEqual([]);
 }
 
@@ -248,7 +248,7 @@ describe("ending with a sheet open", () => {
       binding: null,
       variableScope: null
     });
-    fireEvent.click(screen.getByRole("button", { name: /Keep your colour/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Keep your color/ }));
   }
 
   it("restores the preview and logs exactly one abandonment, then shows the ended message", () => {

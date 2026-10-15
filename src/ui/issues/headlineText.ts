@@ -15,9 +15,9 @@ export function formatHeadline(headline: Headline): string {
   }
 
   const coveredCount = headline.bindings.reduce((sum, entry) => sum + entry.openCount, 0);
-  const colourCount = headline.bindings.length;
-  const verb = colourCount === 1 ? "causes" : "cause";
-  return `${colourCount} ${plural(colourCount, "colour")} ${verb} ${coveredCount} of ${headline.totalOpenCount} issues.`;
+  const colorCount = headline.bindings.length;
+  const verb = colorCount === 1 ? "causes" : "cause";
+  return `${colorCount} ${plural(colorCount, "color")} ${verb} ${coveredCount} of ${headline.totalOpenCount} issues.`;
 }
 
 /** Count pill on the Live Watch tab, open findings only */

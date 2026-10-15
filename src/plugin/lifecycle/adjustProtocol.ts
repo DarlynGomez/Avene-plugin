@@ -129,7 +129,7 @@ export async function handleAdjustMessage(message: AdjustMessage, reply: Reply):
     message.hexRejected
   );
   if (!result.ok) {
-    reply(failed(message.issueId, result.reason ?? "That colour could not be applied."));
+    reply(failed(message.issueId, result.reason ?? "That color could not be applied."));
     return;
   }
   // Rescans and pushes the new issue list now instead of waiting on the debounced listener

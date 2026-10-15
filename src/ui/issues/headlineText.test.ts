@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { formatHeadline, openCountFromHeadline } from "./headlineText";
 
 describe("formatHeadline", () => {
-  it("formats a concentrated headline with more than one colour", () => {
+  it("formats a concentrated headline with more than one color", () => {
     const text = formatHeadline({
       kind: "concentrated",
       totalOpenCount: 159,
@@ -11,16 +11,16 @@ describe("formatHeadline", () => {
         { binding: "#334455", openCount: 41 }
       ]
     });
-    expect(text).toBe("2 colours cause 131 of 159 issues.");
+    expect(text).toBe("2 colors cause 131 of 159 issues.");
   });
 
-  it("uses singular colour and causes for a single dominant binding", () => {
+  it("uses singular color and causes for a single dominant binding", () => {
     const text = formatHeadline({
       kind: "concentrated",
       totalOpenCount: 100,
       bindings: [{ binding: "sage/muted", openCount: 90 }]
     });
-    expect(text).toBe("1 colour causes 90 of 100 issues.");
+    expect(text).toBe("1 color causes 90 of 100 issues.");
   });
 
   it("formats an unconcentrated headline", () => {

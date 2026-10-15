@@ -69,7 +69,7 @@ describe("IssuePanel", () => {
     });
 
     expect(screen.getByRole("main", { name: "Accessibility issues" })).toBeInTheDocument();
-    expect(screen.getByText("1 colour causes 1 of 1 issues.")).toBeInTheDocument();
+    expect(screen.getByText("1 color causes 1 of 1 issues.")).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "View All (1)" })).toBeInTheDocument();
     expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
   });
@@ -79,7 +79,7 @@ describe("IssuePanel", () => {
     await act(async () => {
       emit({
         type: "ISSUES_UPDATED",
-        issues: [openIssue({ state: "ignored", ignoredReason: "Brand colour" })],
+        issues: [openIssue({ state: "ignored", ignoredReason: "Brand color" })],
         decisions: {}
       });
     });
@@ -141,13 +141,13 @@ describe("IssuePanel", () => {
     expect(recordButton).toBeDisabled();
 
     fireEvent.change(screen.getByPlaceholderText("Type your reason"), {
-      target: { value: "Brand colour required by guidelines" }
+      target: { value: "Brand color required by guidelines" }
     });
     expect(recordButton).toBeEnabled();
 
     fireEvent.click(recordButton);
     const ignore = postedMessages(posted).find((m) => m.type === "ROOT_IGNORE");
-    expect(ignore?.reason).toBe("Brand colour required by guidelines");
+    expect(ignore?.reason).toBe("Brand color required by guidelines");
     expect(ignore?.fromDecisionOffer).toBe(false);
   });
 

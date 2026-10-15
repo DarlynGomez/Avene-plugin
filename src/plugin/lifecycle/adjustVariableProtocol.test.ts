@@ -42,7 +42,7 @@ function stubVariable(remote: boolean) {
   };
   const collection = {
     id: COLLECTION_ID,
-    name: "Brand colours",
+    name: "Brand colors",
     defaultModeId: MODE_ID,
     modes: [{ modeId: MODE_ID, name: "Default" }]
   };
@@ -105,7 +105,7 @@ describe("adjust variable protocol", () => {
     vi.unstubAllGlobals();
   });
 
-  it("reports total consumers and newly failing count for a candidate colour", async () => {
+  it("reports total consumers and newly failing count for a candidate color", async () => {
     const node = textNode();
     const second = textNode({ id: "1:2", name: "Second consumer" });
     const variableStub = stubVariable(false);
@@ -185,7 +185,7 @@ describe("adjust variable protocol", () => {
     );
   });
 
-  it("refuses a colour that no longer meets the required ratio", async () => {
+  it("refuses a color that no longer meets the required ratio", async () => {
     const node = textNode();
     const variableStub = stubVariable(false);
     const { commitUndo } = stubFigma(node, [], variableStub);

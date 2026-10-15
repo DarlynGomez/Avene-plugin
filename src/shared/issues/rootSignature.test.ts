@@ -25,7 +25,7 @@ describe("buildRootSignature", () => {
     ).toBe("#888888|#EEEEEE|unbound|3");
   });
 
-  it("produces different signatures for the same colours at different required ratios", () => {
+  it("produces different signatures for the same colors at different required ratios", () => {
     const normal = buildRootSignature({
       foregroundHex: "#E8644A",
       backgroundHex: "#FDF0ED",

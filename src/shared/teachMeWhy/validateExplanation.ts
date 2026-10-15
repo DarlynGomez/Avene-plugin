@@ -12,7 +12,7 @@ export type RejectionCode =
   | "dash"
   | "unknown-slot"
   | "slot-not-allowed"
-  | "literal-colour"
+  | "literal-color"
   | "literal-size"
   | "too-short"
   | "too-long"
@@ -93,7 +93,7 @@ export function validateExplanation(input: ValidationInput): Validation {
   }
   const body = input.text.replace(SLOT, " ");
   const hex = HEX_COLOUR.exec(body);
-  if (hex) reasons.push({ code: "literal-colour", detail: hex[0] });
+  if (hex) reasons.push({ code: "literal-color", detail: hex[0] });
   const length = LENGTH.exec(body);
   if (length) reasons.push({ code: "literal-size", detail: length[0] });
 

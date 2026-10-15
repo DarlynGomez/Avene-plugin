@@ -50,7 +50,7 @@ export function HexField({ background, requiredRatio, onColorChange, onRejected 
   return (
     <div className={styles.field}>
       <label className={styles.label} htmlFor={fieldId}>
-        Type a hex colour
+        Type a hex color
       </label>
       <input
         id={fieldId}
@@ -64,7 +64,7 @@ export function HexField({ background, requiredRatio, onColorChange, onRejected 
       />
       {result?.kind === "malformed" && (
         <p id={errorId} className={styles.error} role="alert">
-          That is not a valid hex colour.
+          That is not a valid hex color.
         </p>
       )}
       {result?.kind === "fails-contrast" && (
@@ -76,7 +76,7 @@ export function HexField({ background, requiredRatio, onColorChange, onRejected 
               className={styles.alternative}
               onClick={() => result.nearestOnHue && useAlternative(result.nearestOnHue)}
             >
-              Use the nearest passing colour on this hue
+              Use the nearest passing color on this hue
             </button>
           ) : (
             "This hue cannot pass at any lightness."

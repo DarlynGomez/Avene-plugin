@@ -15,13 +15,13 @@ const tokens = Object.fromEntries(
 );
 
 /** The colour a rule sets for a selector, read from the css module as written */
-function colourOf(css: string, selector: string): string {
+function colorOf(css: string, selector: string): string {
   for (const [, names, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     if (!names.split(",").some((name) => name.trim() === selector)) continue;
     const match = body.match(/(?:^|[\s;])color:\s*var\((--color-[\w-]+)\)/);
     if (match) return match[1];
   }
-  throw new Error(`no colour for ${selector}`);
+  throw new Error(`no color for ${selector}`);
 }
 
 function ratio(foreground: string, background: string): number {
@@ -50,14 +50,14 @@ const SECONDARY: [string, string, string, string][] = [
 
 describe("secondary text in the explanation card", () => {
   it.each(SECONDARY)("%s reaches 4.5:1 against its background", (_name, file, selector, bg) => {
-    const foreground = colourOf(read(file), selector);
+    const foreground = colorOf(read(file), selector);
     expect(ratio(foreground, bg)).toBeGreaterThanOrEqual(4.5);
   });
 
   it("holds for the selected label and the Why this matters button", () => {
     expect(ratio("--color-ink", "--color-card")).toBeGreaterThanOrEqual(4.5);
     expect(
-      ratio(colourOf(read("../components/WhySurfacedPopover.module.css"), ".why"), "--color-accent")
+      ratio(colorOf(read("../components/WhySurfacedPopover.module.css"), ".why"), "--color-accent")
     ).toBeGreaterThanOrEqual(4.5);
   });
 

@@ -25,7 +25,7 @@ function stubFigma(nodes: unknown[], overrides: Record<string, unknown> = {}) {
 }
 
 describe("collectFilePalette", () => {
-  it("collects a distinct colour once even when several nodes share it", async () => {
+  it("collects a distinct color once even when several nodes share it", async () => {
     const red = { r: 1, g: 0, b: 0 };
     stubFigma([
       { id: "1:1", fills: [solidFill(red)] },
@@ -38,7 +38,7 @@ describe("collectFilePalette", () => {
     expect(palette).toEqual([{ color: red, name: null }]);
   });
 
-  it("collects distinct colours from different nodes", async () => {
+  it("collects distinct colors from different nodes", async () => {
     stubFigma([
       { id: "1:1", fills: [solidFill({ r: 1, g: 0, b: 0 })] },
       { id: "1:2", fills: [solidFill({ r: 0, g: 1, b: 0 })] }
@@ -50,7 +50,7 @@ describe("collectFilePalette", () => {
     expect(palette).toHaveLength(2);
   });
 
-  it("names a colour bound to a variable", async () => {
+  it("names a color bound to a variable", async () => {
     const green = { r: 0, g: 1, b: 0 };
     stubFigma(
       [{ id: "1:1", fills: [solidFill(green, { boundVariables: { color: { id: "var:1" } } })] }],

@@ -41,10 +41,10 @@ describe("fillSlots with issue details", () => {
 });
 
 describe("sameHueFix", () => {
-  it("is the colour the Keep your colour option offers, and it reaches the ratio", () => {
+  it("is the color the Keep your color option offers, and it reaches the ratio", () => {
     expect(sameHueFix("#B6ADA5", "#FFFFFF", 4.5)).toBe("#7F7267");
   });
-  it("is null when nothing of the same hue can reach the ratio, or a colour is unreadable", () => {
+  it("is null when nothing of the same hue can reach the ratio, or a color is unreadable", () => {
     expect(sameHueFix("#808080", "#7F7F7F", 21)).toBeNull();
     expect(sameHueFix("nope", "#FFFFFF", 4.5)).toBeNull();
   });
@@ -97,7 +97,7 @@ const table: ExplanationTable = {
 };
 
 describe("buildExplanationView with the new slots", () => {
-  it("fills the colours, the size and the fix", () => {
+  it("fills the colors, the size and the fix", () => {
     const view = buildExplanationView(root, 1, table, () => undefined, 14);
     expect(view.text).toBe("#B6ADA5 on #FFFFFF at 14px, fix #7F7267.");
     expect(view.isAi).toBe(true);
@@ -107,7 +107,7 @@ describe("buildExplanationView with the new slots", () => {
     expect(view.text).toBe("Fallback quick.");
     expect(view.isAi).toBe(false);
   });
-  it("shows the fixed template when no fix colour can exist", () => {
+  it("shows the fixed template when no fix color can exist", () => {
     const hard = {
       ...root,
       foregroundHex: "#808080",
@@ -151,9 +151,9 @@ describe("validator, slots and literal values", () => {
     ]);
     expect(check(2, `{foreground} {background} {fontsize} ${filler(70)}`, ["F20"]).ok).toBe(true);
   });
-  it("rejects a colour or a size typed outside a slot", () => {
-    expect(codes(check(1, `Use #AAAAAA here ${filler(30)}`))).toContain("literal-colour");
-    expect(codes(check(1, `Use #7f7267 here ${filler(30)}`))).toContain("literal-colour");
+  it("rejects a color or a size typed outside a slot", () => {
+    expect(codes(check(1, `Use #AAAAAA here ${filler(30)}`))).toContain("literal-color");
+    expect(codes(check(1, `Use #7f7267 here ${filler(30)}`))).toContain("literal-color");
     expect(codes(check(1, `At 14px it fails ${filler(30)}`))).toContain("literal-size");
     expect(codes(check(1, `At 14 px it fails ${filler(30)}`))).toContain("literal-size");
   });

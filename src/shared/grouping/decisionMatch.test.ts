@@ -18,7 +18,7 @@ function decisionFor(
 ): RootDecision {
   return {
     signature: buildRootSignature(finding),
-    reason: "Brand colour required by guidelines; tracked for the next brand review",
+    reason: "Brand color required by guidelines; tracked for the next brand review",
     recordedAt: "2026-09-01T00:00:00.000Z",
     severityAtDecision
   };

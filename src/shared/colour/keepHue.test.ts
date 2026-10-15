@@ -38,7 +38,7 @@ describe("keepHue", () => {
     expect(keepHue(current, WHITE, 4.5)).toEqual(current);
   });
 
-  it("holds the closest extreme rather than a still-failing colour when the hue cannot pass at any lightness", () => {
+  it("holds the closest extreme rather than a still-failing color when the hue cannot pass at any lightness", () => {
     const midGrey = { r: 0.5, g: 0.5, b: 0.5 };
     const result = keepHue(midGrey, midGrey, 20);
     expect(contrastRatio(result, midGrey)).toBeLessThan(20 + CONTRAST_ADJUST_HEADROOM);

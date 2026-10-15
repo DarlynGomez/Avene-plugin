@@ -146,8 +146,8 @@ describe("AdjustPopup", () => {
       />
     );
 
-    expect(screen.queryByText("Keep your colour")).not.toBeInTheDocument();
-    expect(screen.getByRole("slider", { name: /colour wheel/i })).toBeInTheDocument();
+    expect(screen.queryByText("Keep your color")).not.toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: /color wheel/i })).toBeInTheDocument();
   });
 
   it("shows all three option entry points at level 3", () => {
@@ -161,7 +161,7 @@ describe("AdjustPopup", () => {
       />
     );
 
-    expect(screen.getByText("Keep your colour")).toBeInTheDocument();
+    expect(screen.getByText("Keep your color")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /choose your own/i })).toBeInTheDocument();
   });
 
@@ -177,7 +177,7 @@ describe("AdjustPopup", () => {
     );
 
     expect(
-      screen.getByText(/^Colours too faint to read against ".+" \(#[0-9A-F]{6}\) are faded\.$/)
+      screen.getByText(/^Colors too faint to read against ".+" \(#[0-9A-F]{6}\) are faded\.$/)
     ).toBeInTheDocument();
     expect(screen.queryByText(/guarantee|compliance/i)).not.toBeInTheDocument();
   });
@@ -216,7 +216,7 @@ describe("AdjustPopup", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("restores the original colour, logs the abandonment, and closes on Cancel", () => {
+  it("restores the original color, logs the abandonment, and closes on Cancel", () => {
     const onClose = vi.fn();
     render(
       <AdjustPopup
@@ -288,7 +288,7 @@ describe("AdjustPopup", () => {
       });
     });
 
-    const keepTile = screen.getByText("Keep your colour").closest("button");
+    const keepTile = screen.getByText("Keep your color").closest("button");
     const fileTile = screen.getByText("From your file").closest("button");
     const wheelTile = screen.getByRole("button", { name: /choose your own/i });
     expect(keepTile).not.toBeNull();
@@ -317,12 +317,12 @@ describe("AdjustPopup", () => {
       />
     );
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex colour" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex color" }), {
       target: { value: "#eeeeee" }
     });
     expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: /nearest passing colour/i }));
+    fireEvent.click(screen.getByRole("button", { name: /nearest passing color/i }));
     expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
   });
 
@@ -339,7 +339,7 @@ describe("AdjustPopup", () => {
     );
 
     expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
-    fireEvent.keyDown(screen.getByText("Keep your colour"), { key: "Escape" });
+    fireEvent.keyDown(screen.getByText("Keep your color"), { key: "Escape" });
 
     expect(postedMessages(posted).filter((m) => m.type === "ADJUST_CLEAR_PREVIEW")).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
@@ -358,12 +358,12 @@ describe("AdjustPopup", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /choose your own/i }));
-    expect(screen.getByRole("slider", { name: /colour wheel/i })).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: /color wheel/i })).toBeInTheDocument();
 
-    fireEvent.keyDown(screen.getByRole("slider", { name: /colour wheel/i }), { key: "Escape" });
+    fireEvent.keyDown(screen.getByRole("slider", { name: /color wheel/i }), { key: "Escape" });
 
-    expect(screen.queryByRole("slider", { name: /colour wheel/i })).not.toBeInTheDocument();
-    expect(screen.getByText("Keep your colour")).toBeInTheDocument();
+    expect(screen.queryByRole("slider", { name: /color wheel/i })).not.toBeInTheDocument();
+    expect(screen.getByText("Keep your color")).toBeInTheDocument();
   });
 
   it("labels the scope row by count when several instances are checked", () => {
@@ -483,7 +483,7 @@ describe("AdjustPopup", () => {
           variableScope: {
             variableId: "VariableID:1:1",
             name: "sage/muted",
-            collectionName: "Brand colours",
+            collectionName: "Brand colors",
             modeName: "Default",
             remote: false
           }
@@ -492,7 +492,7 @@ describe("AdjustPopup", () => {
 
       expect(screen.getByText(/Update variable/)).toBeInTheDocument();
 
-      fireEvent.click(screen.getByText("Keep your colour"));
+      fireEvent.click(screen.getByText("Keep your color"));
       fireEvent.click(screen.getByRole("button", { name: /Update variable/ }));
 
       const request = postedMessages(posted).find(
@@ -539,7 +539,7 @@ describe("AdjustPopup", () => {
           variableScope: {
             variableId: "VariableID:1:1",
             name: "sage/muted",
-            collectionName: "Brand colours",
+            collectionName: "Brand colors",
             modeName: "Default",
             remote: false
           }
@@ -573,14 +573,14 @@ describe("AdjustPopup", () => {
           variableScope: {
             variableId: "VariableID:1:1",
             name: "sage/muted",
-            collectionName: "Brand colours",
+            collectionName: "Brand colors",
             modeName: "Default",
             remote: true
           }
         });
       });
 
-      expect(screen.getByText("Library colour. Edit it in its source file.")).toBeInTheDocument();
+      expect(screen.getByText("Library color. Edit it in its source file.")).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /Update variable/ })).toBeDisabled();
     });
   });

@@ -12,7 +12,7 @@ describe("ColorWheel", () => {
     cleanup();
   });
 
-  it("is a focusable slider announcing the colour and ratio", () => {
+  it("is a focusable slider announcing the color and ratio", () => {
     const onColorChange = vi.fn();
     render(
       <ColorWheel
@@ -23,7 +23,7 @@ describe("ColorWheel", () => {
       />
     );
 
-    const wheel = screen.getByRole("slider", { name: /colour wheel/i });
+    const wheel = screen.getByRole("slider", { name: /color wheel/i });
     expect(wheel).toHaveAttribute("tabindex", "0");
   });
 
@@ -38,7 +38,7 @@ describe("ColorWheel", () => {
       />
     );
 
-    const wheel = screen.getByRole("slider", { name: /colour wheel/i });
+    const wheel = screen.getByRole("slider", { name: /color wheel/i });
     const before = wheel.getAttribute("aria-valuetext");
     fireEvent.keyDown(wheel, { key: "ArrowRight" });
 
@@ -58,7 +58,7 @@ describe("ColorWheel", () => {
       />
     );
 
-    const wheel = screen.getByRole("slider", { name: /colour wheel/i });
+    const wheel = screen.getByRole("slider", { name: /color wheel/i });
     fireEvent.keyDown(wheel, { key: "ArrowUp" });
     expect(onColorChange).toHaveBeenCalledTimes(1);
     fireEvent.keyDown(wheel, { key: "ArrowDown" });
@@ -76,7 +76,7 @@ describe("ColorWheel", () => {
       />
     );
 
-    const wheel = screen.getByRole("slider", { name: /colour wheel/i });
+    const wheel = screen.getByRole("slider", { name: /color wheel/i });
     fireEvent.keyDown(wheel, { key: "Enter" });
     expect(onColorChange).not.toHaveBeenCalled();
   });
