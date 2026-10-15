@@ -4,7 +4,8 @@ import type {
   ExplanationTable,
   GenerationRecord
 } from "../../src/shared/teachMeWhy/explanationTypes";
-import { shippableFacts } from "../../src/shared/teachMeWhy/facts";
+import { eligibleFacts } from "../../src/shared/teachMeWhy/factEligibility";
+import { generatedTextProblems } from "../../src/shared/teachMeWhy/issueTextChecks";
 import { validateExplanation } from "../../src/shared/teachMeWhy/validateExplanation";
 import { parseCsv } from "./csv";
 import { REVIEW_COLUMNS } from "./reviewCsv";
@@ -64,11 +65,12 @@ export function buildTable(
       text,
       key,
       usedFactIds: factIds,
-      allowedFacts: shippableFacts(key),
+      allowedFacts: eligibleFacts(key),
       slots: SLOT_TOKENS
     });
     const reasons = [
       ...(verdict.ok ? [] : verdict.reasons.map((r) => `${r.code} (${r.detail})`)),
+      ...generatedTextProblems(text).map((r) => `${r.code} (${r.detail})`),
       ...slotsMissing(key, text)
     ];
     if (reasons.length > 0)

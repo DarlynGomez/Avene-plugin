@@ -21,6 +21,12 @@ export function retryMessage(key: ExplanationKey, rejection: Rejection): string 
       return `you wrote ${quoted}, but a change of text size or font weight is not the fix, the fix is the colour`;
     case "adverb":
       return `you wrote ${quoted}, but never put an -ly adverb next to {measured}, {required}, {foreground}, {background} or {fix}`;
+    case "odd-character":
+      return `you used a ${rejection.detail}, use plain straight quotes, apostrophes and hyphens only`;
+    case "us-spelling":
+      return `you wrote "${rejection.detail}", use US spelling, for example color`;
+    case "meta-phrase":
+      return `you wrote "${rejection.detail}", which points at something the text never said, say it in full instead`;
     case "depth3-opening":
       return `your first sentence was ${quoted}, but the first sentence of depth 3 must contain one of {measured}, {required}, {foreground}, {background} or {fontsize}`;
     case "unknown-slot":

@@ -6,7 +6,7 @@ import {
 } from "../../src/shared/teachMeWhy/validateExplanation";
 import type { CompletionReply, GenAiClient } from "./client";
 import { buildUserMessage, SYSTEM_PROMPT } from "./prompt";
-import { depth3Opening } from "../../src/shared/teachMeWhy/issueTextChecks";
+import { depth3Opening, generatedTextProblems } from "../../src/shared/teachMeWhy/issueTextChecks";
 import { MISSING_SLOTS, retryMessage } from "./retryMessage";
 import { fixMissing, slotsMissing } from "./slotCheck";
 import type { ItemResult } from "./types";
@@ -58,7 +58,7 @@ export function textProblems(
     slots: SLOT_TOKENS
   });
   const opening = key.depth === 3 ? depth3Opening(text) : [];
-  return [...(verdict.ok ? [] : verdict.reasons), ...opening];
+  return [...(verdict.ok ? [] : verdict.reasons), ...opening, ...generatedTextProblems(text)];
 }
 
 export function textReasons(

@@ -147,7 +147,7 @@ export const FACTS_TWO: readonly Fact[] = [
   {
     id: "F23",
     plain:
-      'One creator in that study described accessibility as a "guard rail" rather than a constraint, explaining that it adds to the creative problems designers need to solve.',
+      'In a study of creators, one creator described accessibility as a "guard rail" rather than a constraint, explaining that it adds to the creative problems designers need to solve.',
     reviewerNote:
       'Participant P6, verbatim: "Though not a constraint, its still a guard rail to follow. That adds to creative problems to solve." One person\'s account: present it as a story, never as a statistic. Opening shortened from the earlier version so it does not repeat F22. Do not offer together with F22',
     source: "Reframing Accessibility from Constraint to Creative Catalyst (ASSETS 2025)",

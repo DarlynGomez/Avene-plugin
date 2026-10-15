@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { depth3Opening, issueTextProblems } from "./issueTextChecks";
+import { depth3Opening, generatedTextProblems, issueTextProblems } from "./issueTextChecks";
 
 const codes = (text: string) => issueTextProblems(text).map((problem) => problem.code);
 
@@ -96,5 +96,33 @@ describe("weight change as the fix", () => {
   });
   it("still allows larger or bolder text as a route for large text", () => {
     expect(codes("You could keep the colour for larger or bolder text.")).toEqual([]);
+  });
+});
+
+describe("generatedTextProblems", () => {
+  const found = (text: string) => generatedTextProblems(text).map((p) => `${p.code}:${p.detail}`);
+  it("rejects the non-breaking hyphen and curly quotes and apostrophes", () => {
+    expect(found("problem‑solving")).toEqual(["odd-character:non-breaking hyphen"]);
+    expect(found("it’s")).toEqual(["odd-character:curly apostrophe"]);
+    expect(found("a “guard rail”")).toEqual([
+      "odd-character:curly opening quote",
+      "odd-character:curly closing quote"
+    ]);
+    expect(found('it\'s a "guard rail" for problem-solving')).toEqual([]);
+  });
+  it("rejects colour and its forms, and accepts color", () => {
+    expect(found("Keep the colour.")).toEqual(["us-spelling:colour"]);
+    expect(found("Two colours and colourful")).toEqual([
+      "us-spelling:colours",
+      "us-spelling:colourful"
+    ]);
+    expect(found("Keep the color and the colors.")).toEqual([]);
+  });
+  it("rejects size class", () => {
+    expect(found("when the size class is large")).toEqual(["meta-phrase:size class"]);
+  });
+  it("rejects that study unless a study came first", () => {
+    expect(found("One creator in that study said so.")).toEqual(["meta-phrase:that study"]);
+    expect(found("In a study of creators, one said so. That study was small.")).toEqual([]);
   });
 });

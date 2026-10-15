@@ -1,5 +1,12 @@
 export type IssueTextCode =
-  "fix-wording" | "direction-word" | "size-fix" | "adverb" | "depth3-opening";
+  | "fix-wording"
+  | "direction-word"
+  | "size-fix"
+  | "adverb"
+  | "depth3-opening"
+  | "odd-character"
+  | "us-spelling"
+  | "meta-phrase";
 
 export interface IssueTextProblem {
   code: IssueTextCode;
@@ -119,4 +126,32 @@ export function depth3Opening(text: string): IssueTextProblem[] {
 /** Rules for any text, the opening rule is for generated text only and is checked by the tool */
 export function issueTextProblems(text: string): IssueTextProblem[] {
   return [...fixWording(text), ...directionWords(text), ...sizeFix(text), ...adverbs(text)];
+}
+
+const ODD_CHARACTERS: readonly [string, string][] = [
+  ["\u2011", "non-breaking hyphen"],
+  ["\u2019", "curly apostrophe"],
+  ["\u201C", "curly opening quote"],
+  ["\u201D", "curly closing quote"]
+];
+const A_STUDY = /\b(?:a|one|the|in a)\s+study\b/i;
+
+/**
+ * Extra rules for text a model wrote or a reviewer edited, the fixed templates are written by a person
+ * Plain characters only, US spelling, and no phrase that points at something the text never said
+ */
+export function generatedTextProblems(text: string): IssueTextProblem[] {
+  const found: IssueTextProblem[] = [];
+  for (const [character, name] of ODD_CHARACTERS) {
+    if (text.includes(character)) found.push({ code: "odd-character", detail: name });
+  }
+  for (const word of text.match(/\bcolour\w*/gi) ?? []) {
+    found.push({ code: "us-spelling", detail: word });
+  }
+  if (/\bsize class\b/i.test(text)) found.push({ code: "meta-phrase", detail: "size class" });
+  const that = /\bthat study\b/i.exec(text);
+  if (that && !A_STUDY.test(text.slice(0, that.index))) {
+    found.push({ code: "meta-phrase", detail: "that study" });
+  }
+  return found;
 }
