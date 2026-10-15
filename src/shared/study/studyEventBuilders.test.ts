@@ -278,7 +278,7 @@ describe("reason_written", () => {
       buildReasonWritten(
         LIVE_CTX,
         T,
-        "Brand colour",
+        "Brand color",
         { kind: "root", signature: "sig" },
         "ignore_sheet"
       )
@@ -286,7 +286,7 @@ describe("reason_written", () => {
       type: "reason_written",
       at: T,
       ctx: LIVE_CTX,
-      text: "Brand colour",
+      text: "Brand color",
       truncated: false,
       target: { kind: "root", signature: "sig" },
       source: "ignore_sheet"

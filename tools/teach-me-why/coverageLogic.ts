@@ -51,7 +51,7 @@ export const noRuleRole = (): ElementRole | null => null;
 function toFinding(row: GroundTruthRow, order: number): GroundTruthFindingResult {
   const fg = parseHex(row.fg);
   const bg = parseHex(row.bg);
-  if (!fg || !bg) return { error: `${row.task} ${row.id}: fg or bg is not a hex colour` };
+  if (!fg || !bg) return { error: `${row.task} ${row.id}: fg or bg is not a hex color` };
   const isBold = row.weight >= BOLD_MIN_FONT_WEIGHT;
   const required =
     classifyTextSize(row.sizePx, isBold) === "large"

@@ -160,7 +160,7 @@ describe("handleRootMessage", () => {
       {
         type: "ROOT_IGNORE",
         issueIds: ["contrast:1:1", "contrast:1:2"],
-        reason: "Brand colour required by guidelines; tracked for the next brand review",
+        reason: "Brand color required by guidelines; tracked for the next brand review",
         signature: SIGNATURE,
         fromDecisionOffer: false
       },
@@ -177,7 +177,7 @@ describe("handleRootMessage", () => {
     }
     const persistedDecisions = JSON.parse(decisionCall[1]);
     expect(persistedDecisions[SIGNATURE]).toMatchObject({
-      reason: "Brand colour required by guidelines; tracked for the next brand review",
+      reason: "Brand color required by guidelines; tracked for the next brand review",
       severityAtDecision: "high"
     });
   });

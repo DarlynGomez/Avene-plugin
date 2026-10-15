@@ -101,11 +101,11 @@ describe("unmarkRootImportant", () => {
 describe("ignoreRoot", () => {
   it("applies one reason to every included instance", () => {
     const record = recordOf(issueIn("a", "open"), issueIn("b", "deferred"));
-    const result = ignoreRoot(record, ["a", "b"], "Brand colour, tracked for review", NOW);
+    const result = ignoreRoot(record, ["a", "b"], "Brand color, tracked for review", NOW);
 
     expect(result.record.a).toMatchObject({
       state: "ignored",
-      ignoredReason: "Brand colour, tracked for review",
+      ignoredReason: "Brand color, tracked for review",
       severityAtIgnore: "high"
     });
     expect(result.record.b.state).toBe("ignored");

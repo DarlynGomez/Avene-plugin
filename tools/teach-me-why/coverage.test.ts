@@ -83,12 +83,12 @@ describe("analyzeTask", () => {
     expect(new Set(root.anyRoleKeys.map((k) => k.severity)).size).toBe(1);
   });
 
-  it("reports an unreadable colour", () => {
+  it("reports an unreadable color", () => {
     const { errors } = analyzeTask(
       "A",
       parseGroundTruth(`${header}\nA,s,a,t,nope,#FFFFFF,16,400,body,R1`).rows
     );
-    expect(errors[0]).toContain("not a hex colour");
+    expect(errors[0]).toContain("not a hex color");
   });
 });
 

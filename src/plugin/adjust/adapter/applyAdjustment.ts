@@ -27,7 +27,7 @@ export async function applyAdjustment(
   }
   if (contrastRatio(color, before.background) < before.requiredRatio) {
     await restorePreview();
-    return { ok: false, reason: "That colour no longer meets the required contrast ratio." };
+    return { ok: false, reason: "That color no longer meets the required contrast ratio." };
   }
 
   await Promise.all(nodes.map((node) => applyFill(node, solidFill(color))));

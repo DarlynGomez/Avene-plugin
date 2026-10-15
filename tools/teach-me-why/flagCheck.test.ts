@@ -58,7 +58,7 @@ describe("flagRows, size warning", () => {
       "warning: larger or bigger on a normal size key"
     ]);
     expect(flagRows(csv("body:high:large:3", "Try larger text."), [])).toEqual([]);
-    expect(flagRows(csv("body:high:normal:3", "Try a deeper colour."), [])).toEqual([]);
+    expect(flagRows(csv("body:high:normal:3", "Try a deeper color."), [])).toEqual([]);
   });
 });
 

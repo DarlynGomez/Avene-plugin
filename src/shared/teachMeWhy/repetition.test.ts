@@ -3,7 +3,7 @@ import { findRepeats } from "./repetition";
 
 const clean = {
   1: "{foreground} on {background} measures {measured}, below the {required} this {fontsize} text needs. Darkening it to about {fix} keeps the hue.",
-  2: "Where a screen is read matters. In one study the group that saw colours least accurately was older and more likely to be outdoors.",
+  2: "Where a screen is read matters. In one study the group that saw colors least accurately was older and more likely to be outdoors.",
   3: "Contrast is a limit on how close two lightnesses can be, and a limit is something you design inside, not around."
 } as const;
 

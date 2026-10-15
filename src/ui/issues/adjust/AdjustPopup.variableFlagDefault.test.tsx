@@ -68,7 +68,7 @@ describe("AdjustPopup with the shipped default", () => {
               variableScope: {
                 variableId: "VariableID:1:1",
                 name: "sage/muted",
-                collectionName: "Brand colours",
+                collectionName: "Brand colors",
                 modeName: "Default",
                 remote: false
               }

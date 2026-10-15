@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { isPersistedDecisionFields } from "./decisionSchema";
 
 const VALID = {
-  reason: "Brand colour, tracked for review",
+  reason: "Brand color, tracked for review",
   recordedAt: "2026-09-08T00:00:00.000Z",
   severityAtDecision: "high"
 };

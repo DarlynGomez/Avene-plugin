@@ -68,7 +68,7 @@ describe("AdjustPopup with the variable scope flag off", () => {
               variableScope: {
                 variableId: "VariableID:1:1",
                 name: "sage/muted",
-                collectionName: "Brand colours",
+                collectionName: "Brand colors",
                 modeName: "Default",
                 remote: false
               }

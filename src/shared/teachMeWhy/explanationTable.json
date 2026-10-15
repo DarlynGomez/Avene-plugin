@@ -11,19 +11,19 @@
   },
   "fallbacks": {
     "1": {
-      "text": "This text measures {measured}, and it needs {required} to be comfortable for more people to read. One option is to darken the text a little, keeping the same colour family, until it reaches that mark.",
+      "text": "This text measures {measured}, and it needs {required} to be comfortable for more people to read. One option is to darken the text a little, keeping the same color family, until it reaches that mark.",
       "status": "fallback",
       "reviewer": null,
       "factIds": []
     },
     "2": {
-      "text": "Text this faint can be hard to read for some people, and not only people with low vision. Glare, a dim screen, or tired eyes can make it harder for anyone. Right now this text measures {measured}, and it needs {required}. Closing that gap does not mean giving up your colour. One option is to darken the text slightly. Another is to change the surface behind it, or to keep this colour for larger or bolder words. Which way fits the design is your call.",
+      "text": "Text this faint can be hard to read for some people, and not only people with low vision. Glare, a dim screen, or tired eyes can make it harder for anyone. Right now this text measures {measured}, and it needs {required}. Closing that gap does not mean giving up your color. One option is to darken the text slightly. Another is to change the surface behind it, or to keep this color for larger or bolder words. Which way fits the design is your call.",
       "status": "fallback",
       "reviewer": null,
       "factIds": []
     },
     "3": {
-      "text": "Contrast is a measure of how different two colours are in lightness. The more different they are, the easier the words are to pick out, and a bar is set so that ordinary text stays readable for as many people as possible. Right now this text measures {measured}, and it needs {required}. The gap is a constraint, and there is more than one way through it. You could darken the same colour a little. You could take a colour that already passes from elsewhere in your file. You could keep the colour but use it for larger or bolder text, where the bar is lower. You could put it on a darker surface. Or you could keep it as an accent and set the words themselves in a darker shade. Each of these keeps your intent, so you choose the one that suits the design.",
+      "text": "Contrast is a measure of how different two colors are in lightness. The more different they are, the easier the words are to pick out, and a bar is set so that ordinary text stays readable for as many people as possible. Right now this text measures {measured}, and it needs {required}. The gap is a constraint, and there is more than one way through it. You could darken the same color a little. You could take a color that already passes from elsewhere in your file. You could keep the color but use it for larger or bolder text, where the bar is lower. You could put it on a darker surface. Or you could keep it as an accent and set the words themselves in a darker shade. Each of these keeps your intent, so you choose the one that suits the design.",
       "status": "fallback",
       "reviewer": null,
       "factIds": []

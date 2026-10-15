@@ -39,7 +39,7 @@ export async function applyVariableAdjustment(
     return { ok: false, reason: "That node's contrast can no longer be evaluated." };
   }
   if (contrastRatio(color, before.background) < before.requiredRatio) {
-    return { ok: false, reason: "That colour no longer meets the required contrast ratio." };
+    return { ok: false, reason: "That color no longer meets the required contrast ratio." };
   }
 
   await restorePreview();

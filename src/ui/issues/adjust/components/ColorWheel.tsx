@@ -118,7 +118,7 @@ export function ColorWheel({
         className={styles.canvas}
         tabIndex={0}
         role="slider"
-        aria-label="Colour wheel: left and right change hue, up and down change saturation"
+        aria-label="Color wheel: left and right change hue, up and down change saturation"
         aria-valuetext={announcement}
         onPointerDown={handlePointer}
         onPointerMove={(event) => event.buttons === 1 && handlePointer(event)}

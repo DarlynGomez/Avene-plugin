@@ -41,7 +41,7 @@ export function OptionsList({
   return (
     <div className={styles.list}>
       <OptionTile
-        label="Keep your colour"
+        label="Keep your color"
         reason="Same hue and saturation, the least change that passes"
         sampleText={sampleText}
         color={optionA}
@@ -55,7 +55,7 @@ export function OptionsList({
       {optionB && (
         <OptionTile
           label="From your file"
-          reason={`Already in use as ${optionB.name ?? "an unnamed colour"}`}
+          reason={`Already in use as ${optionB.name ?? "an unnamed color"}`}
           sampleText={sampleText}
           color={optionB.color}
           hex={rgbToHex(optionB.color)}
@@ -69,7 +69,7 @@ export function OptionsList({
       <div className={styles.wheelCard}>
         <OptionTile
           label="Choose your own"
-          reason={`Colours too faint to read against "${backgroundAncestorName}" (${rgbToHex(background)}) are faded.`}
+          reason={`Colors too faint to read against "${backgroundAncestorName}" (${rgbToHex(background)}) are faded.`}
           sampleText={sampleText}
           color={wheelColor ?? optionA}
           hex={rgbToHex(wheelColor ?? optionA)}

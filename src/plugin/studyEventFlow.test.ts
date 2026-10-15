@@ -103,7 +103,7 @@ async function runBlock(m: Awaited<ReturnType<typeof modules>>) {
     {
       type: "ROOT_IGNORE",
       issueIds: ["contrast:1:2", "contrast:1:3"],
-      reason: "Brand colour",
+      reason: "Brand color",
       signature: SIGNATURE,
       fromDecisionOffer: false
     },
@@ -204,7 +204,7 @@ describe("a full mock block through the real handlers", () => {
     expect(byType("issue_action")[0]?.target).toEqual({ kind: "issue", issueId: "contrast:1:1" });
     expect(byType("issue_action")[1]?.target).toEqual({ kind: "root", signature: SIGNATURE });
     expect(byType("reason_written")[0]).toMatchObject({
-      text: "Brand colour",
+      text: "Brand color",
       truncated: false,
       source: "ignore_sheet",
       target: { kind: "root", signature: SIGNATURE }

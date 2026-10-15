@@ -3,7 +3,7 @@ import styles from "./IgnoreSheet.module.css";
 
 const STARTING_POINTS = [
   "Decorative text; the same information appears elsewhere at full contrast",
-  "Brand colour required by guidelines; tracked for the next brand review",
+  "Brand color required by guidelines; tracked for the next brand review",
   "Placeholder copy that will not ship"
 ];
 

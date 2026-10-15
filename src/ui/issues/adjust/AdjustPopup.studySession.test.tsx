@@ -77,7 +77,7 @@ describe("AdjustPopup during a study session", () => {
     // The sandbox sends no variable scope while a session is active
     await act(async () => reply(null));
 
-    expect(screen.getByText("Keep your colour")).toBeInTheDocument();
+    expect(screen.getByText("Keep your color")).toBeInTheDocument();
     expect(screen.getByText("From your file")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /choose your own/i })).toBeInTheDocument();
     expect(screen.queryByText(/Update variable/)).not.toBeInTheDocument();

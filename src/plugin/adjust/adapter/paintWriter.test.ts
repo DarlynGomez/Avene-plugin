@@ -22,7 +22,7 @@ function textNode(overrides: Record<string, unknown> = {}) {
 }
 
 describe("solidFill", () => {
-  it("is a single opaque solid paint carrying exactly the given colour", () => {
+  it("is a single opaque solid paint carrying exactly the given color", () => {
     expect(solidFill({ r: 0.1, g: 0.2, b: 0.3 })).toEqual([
       { type: "SOLID", color: { r: 0.1, g: 0.2, b: 0.3 }, opacity: 1 }
     ]);

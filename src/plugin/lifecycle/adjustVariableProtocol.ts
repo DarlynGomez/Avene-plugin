@@ -61,7 +61,7 @@ export async function handleApplyVariable(
     consumers.length
   );
   if (!result.ok) {
-    reply(failed(message.issueId, result.reason ?? "That colour could not be applied."));
+    reply(failed(message.issueId, result.reason ?? "That color could not be applied."));
     return;
   }
 

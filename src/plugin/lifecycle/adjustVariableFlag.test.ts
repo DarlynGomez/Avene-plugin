@@ -10,7 +10,7 @@ beforeEach(() => {
     resolveVariableScope: vi.fn().mockResolvedValue({
       variableId: "VariableID:1:1",
       name: "sage/muted",
-      collectionName: "Brand colours",
+      collectionName: "Brand colors",
       modeName: "Default",
       remote: false
     })

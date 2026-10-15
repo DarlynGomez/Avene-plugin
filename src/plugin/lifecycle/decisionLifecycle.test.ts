@@ -70,7 +70,7 @@ describe("a root decision, recorded then matched by a later finding", () => {
       {
         type: "ROOT_IGNORE",
         issueIds: ["contrast:1:1"],
-        reason: "Brand colour required by guidelines; tracked for the next brand review",
+        reason: "Brand color required by guidelines; tracked for the next brand review",
         signature: SIGNATURE,
         fromDecisionOffer: false
       },
@@ -79,7 +79,7 @@ describe("a root decision, recorded then matched by a later finding", () => {
 
     const decisions = loadDecisions();
     expect(decisions[SIGNATURE]).toMatchObject({
-      reason: "Brand colour required by guidelines; tracked for the next brand review",
+      reason: "Brand color required by guidelines; tracked for the next brand review",
       severityAtDecision: "high"
     });
 

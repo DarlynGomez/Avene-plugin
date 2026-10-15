@@ -15,7 +15,7 @@ describe("HexField", () => {
     const onColorChange = vi.fn();
     render(<HexField background={WHITE} requiredRatio={4.5} onColorChange={onColorChange} />);
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex colour" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex color" }), {
       target: { value: "#000000" }
     });
 
@@ -27,12 +27,12 @@ describe("HexField", () => {
     const onColorChange = vi.fn();
     render(<HexField background={WHITE} requiredRatio={4.5} onColorChange={onColorChange} />);
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex colour" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex color" }), {
       target: { value: "not-a-hex" }
     });
 
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByRole("alert")).toHaveTextContent("not a valid hex colour");
+    expect(screen.getByRole("alert")).toHaveTextContent("not a valid hex color");
     expect(onColorChange).toHaveBeenLastCalledWith(null);
   });
 
@@ -40,7 +40,7 @@ describe("HexField", () => {
     const onColorChange = vi.fn();
     render(<HexField background={WHITE} requiredRatio={4.5} onColorChange={onColorChange} />);
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex colour" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex color" }), {
       target: { value: "#eeeeee" }
     });
 
@@ -53,11 +53,11 @@ describe("HexField", () => {
     const onColorChange = vi.fn();
     render(<HexField background={WHITE} requiredRatio={4.5} onColorChange={onColorChange} />);
 
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex colour" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a hex color" }), {
       target: { value: "#dddddd" }
     });
 
-    const alternative = screen.getByRole("button", { name: /nearest passing colour/i });
+    const alternative = screen.getByRole("button", { name: /nearest passing color/i });
     fireEvent.click(alternative);
 
     expect(onColorChange).toHaveBeenLastCalledWith(expect.objectContaining({ r: expect.any(Number) }));

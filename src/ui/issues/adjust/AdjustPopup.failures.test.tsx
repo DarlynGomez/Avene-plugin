@@ -81,7 +81,7 @@ afterEach(() => {
 describe("white text on a mid orange, the case that did nothing", () => {
   it("offers a first option that really passes, and Apply sends it", () => {
     show(4.5);
-    fireEvent.click(screen.getByRole("button", { name: /Keep your colour/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Keep your color/ }));
 
     expect(screen.queryByText(/below 4\.5/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply" })).toBeEnabled();
@@ -93,7 +93,7 @@ describe("white text on a mid orange, the case that did nothing", () => {
 describe("an option that cannot pass", () => {
   it("is labelled as below what is needed, and Apply stays disabled", () => {
     show(22);
-    fireEvent.click(screen.getByRole("button", { name: /Keep your colour/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Keep your color/ }));
 
     expect(screen.getByText(/below 22/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
@@ -106,7 +106,7 @@ describe("a refusal from the plugin", () => {
     reply({
       type: "ADJUST_ACTION_FAILED",
       issueId: "contrast:1:1",
-      message: "That colour no longer meets the required contrast ratio."
+      message: "That color no longer meets the required contrast ratio."
     });
 
     expect(screen.getByRole("alert")).toHaveTextContent(
@@ -124,7 +124,7 @@ describe("a refusal from the plugin", () => {
   it("clears when the designer picks another option", () => {
     show(4.5);
     reply({ type: "ADJUST_ACTION_FAILED", issueId: "contrast:1:1", message: "Nope" });
-    fireEvent.click(screen.getByRole("button", { name: /Keep your colour/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Keep your color/ }));
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });

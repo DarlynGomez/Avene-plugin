@@ -33,7 +33,7 @@ describe("deriveRoots", () => {
     expect(roots[0].instances).toHaveLength(2);
   });
 
-  it("keeps equal colours with different required ratios as separate roots", () => {
+  it("keeps equal colors with different required ratios as separate roots", () => {
     const roots = deriveRoots([
       finding({ issueId: "contrast:1:1", nodeId: "1:1", requiredRatio: 4.5 }),
       finding({ issueId: "contrast:1:2", nodeId: "1:2", requiredRatio: 3 })
@@ -49,7 +49,7 @@ describe("deriveRoots", () => {
     expect(roots).toHaveLength(2);
   });
 
-  it("merges instances with the same colours bound to different background variables", () => {
+  it("merges instances with the same colors bound to different background variables", () => {
     const roots = deriveRoots([
       finding({ issueId: "contrast:1:1", nodeId: "1:1", backgroundBinding: "surface/card" }),
       finding({ issueId: "contrast:1:2", nodeId: "1:2", backgroundBinding: "surface/panel" })

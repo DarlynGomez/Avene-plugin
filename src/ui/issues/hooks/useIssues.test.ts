@@ -29,7 +29,7 @@ describe("useIssues", () => {
 
     const decision = {
       signature: "sig-1",
-      reason: "Brand colour",
+      reason: "Brand color",
       recordedAt: "2026-09-08T00:00:00.000Z",
       severityAtDecision: "high" as const
     };

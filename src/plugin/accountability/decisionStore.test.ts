@@ -7,7 +7,7 @@ import { loadDecisions, recordDecision, saveDecisions } from "./decisionStore";
 const SIGNATURE = "#9CB5B1|#FFFFFF|sage/muted|4.5";
 const DECISION: RootDecision = {
   signature: SIGNATURE,
-  reason: "Brand colour required by guidelines; tracked for the next brand review",
+  reason: "Brand color required by guidelines; tracked for the next brand review",
   recordedAt: "2026-09-08T00:00:00.000Z",
   severityAtDecision: "high"
 };

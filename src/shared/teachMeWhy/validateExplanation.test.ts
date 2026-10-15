@@ -113,7 +113,7 @@ describe("validateExplanation, dashes", () => {
     expect(check(1, "A low-contrast, semi-opaque, well-known case - fine.").ok).toBe(true);
   });
   it("allows curly apostrophes and quotes", () => {
-    expect(check(1, "The heading\u2019s \u201Ccolour\u201D is low.").ok).toBe(true);
+    expect(check(1, "The heading\u2019s \u201Ccolor\u201D is low.").ok).toBe(true);
   });
 });
 

@@ -102,7 +102,7 @@ export function ScopeSection({
             </span>
             <span className={styles.optionDetail}>
               {variableScope.remote
-                ? "Library colour. Edit it in its source file."
+                ? "Library color. Edit it in its source file."
                 : variableDetail(variableConsequence)}
             </span>
           </span>
