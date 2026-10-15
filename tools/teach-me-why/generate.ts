@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { createClient } from "./client";
 import { loadEnvFile, readConfig, TOOL_DIR } from "./env";
 import { generateAll } from "./generateAll";
+import { parseKeyString } from "../../src/shared/teachMeWhy/explanationKey";
+import { ROTATION } from "./rotation";
 import { taskKeys } from "./taskKeys";
 import { fileStore, writeAtomic } from "./progressStore";
 import { realClock, TokenWindow } from "./rateLimit";
@@ -16,15 +18,21 @@ async function main(): Promise<void> {
   const outAt = args.indexOf("--out");
   const out = outAt >= 0 ? args[outAt + 1] : undefined;
   const onlyTask = args.includes("--task-keys");
+  const rotation = args.includes("--rotation");
   // A run for the task keys never touches the reviewed files, it writes its own set
-  if (onlyTask && !out)
-    throw new Error("--task-keys needs --out <name>, so review.csv is never overwritten");
+  if ((onlyTask || rotation) && !out)
+    throw new Error(
+      "--task-keys and --rotation need --out <name>, so review.csv is never overwritten"
+    );
+  if (rotation && out === "v3") throw new Error("v3 holds reviewed rows, use another name");
   if (out !== undefined && !/^[a-z0-9_]+$/.test(out))
     throw new Error("--out takes letters, digits and underscores");
   const suffix = out ? `_${out}` : "";
-  const keys = onlyTask
-    ? taskKeys(readFileSync(join(TOOL_DIR, "review_first.txt"), "utf8"))
-    : undefined;
+  const keys = rotation
+    ? Object.keys(ROTATION).flatMap((name) => parseKeyString(name) ?? [])
+    : onlyTask
+      ? taskKeys(readFileSync(join(TOOL_DIR, "review_first.txt"), "utf8"))
+      : undefined;
   const deps = {
     client: createClient(config),
     model: config.model,
@@ -33,6 +41,7 @@ async function main(): Promise<void> {
     random: Math.random,
     store: fileStore(join(TOOL_DIR, `generated${suffix}.json`)),
     keys,
+    forced: rotation ? ROTATION : undefined,
     log: (line: string) => console.log(line),
     retryFailed: process.argv.includes("--retry-failed")
   };

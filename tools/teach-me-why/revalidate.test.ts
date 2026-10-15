@@ -24,7 +24,7 @@ const progress: Progress = {
 describe("the prompt", () => {
   it("asks for no dashes and carries a newer version", () => {
     expect(SYSTEM_PROMPT).toContain('Use commas, full stops or "and" instead of dashes');
-    expect(PROMPT_VERSION).toBe("6");
+    expect(PROMPT_VERSION).toBe("8");
   });
 });
 

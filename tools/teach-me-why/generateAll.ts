@@ -22,6 +22,8 @@ export interface GenerateDeps {
   retryFailed: boolean;
   /** Only these keys, else all 126 */
   keys?: readonly ExplanationKey[];
+  /** A fact id to build a key on, in place of every fact its row offers */
+  forced?: Readonly<Record<string, string>>;
 }
 
 /** The model must be on the service's own list, nothing is substituted */
@@ -56,6 +58,16 @@ function adoptNewPrompt(progress: Progress, inputsHashNow: string): void {
   ];
   progress.header.promptVersion = PROMPT_VERSION;
   progress.header.inputsHash = inputsHashNow;
+}
+
+/** The facts a key is offered, only the forced one when it has one and the row allows it */
+function factsFor(key: ExplanationKey, name: string, forced?: Readonly<Record<string, string>>) {
+  const offered = eligibleFacts(key);
+  const id = forced?.[name];
+  if (id === undefined) return offered;
+  const fact = offered.find((candidate) => candidate.id === id);
+  if (!fact) throw new Error(`${name} cannot be built on ${id}, its row does not offer it`);
+  return [fact];
 }
 
 /** Runs every key not already done, saving after each one so a stop loses nothing */
@@ -95,7 +107,13 @@ export async function generateAll(deps: GenerateDeps): Promise<Progress> {
       return (actual: number) => deps.window.settle(hold, actual);
     };
     progress.items[name] = {
-      ...(await generateItem(key, eligibleFacts(key), send, beforeSend, done?.messages ?? [])),
+      ...(await generateItem(
+        key,
+        factsFor(key, name, deps.forced),
+        send,
+        beforeSend,
+        done?.messages ?? []
+      )),
       promptVersion: PROMPT_VERSION
     };
     deps.store.save(progress);

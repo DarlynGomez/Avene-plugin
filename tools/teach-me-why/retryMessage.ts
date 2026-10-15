@@ -14,11 +14,11 @@ export function retryMessage(key: ExplanationKey, rejection: Rejection): string 
     case "too-long":
       return `your last attempt had ${rejection.detail}, the maximum is ${limit.max}`;
     case "fix-wording":
-      return `you wrote ${quoted}, but {fix} is a colour and must come directly after "to", "with" or "use", for example "change the text to {fix}"`;
+      return `you wrote ${quoted}, but {fix} is a color and must come directly after "to", "with" or "use", for example "change the text to {fix}"`;
     case "direction-word":
       return `you wrote ${quoted}, but never write darken, darker, lighten or lighter near {foreground}, {background} or {fix}`;
     case "size-fix":
-      return `you wrote ${quoted}, but a change of text size or font weight is not the fix, the fix is the colour`;
+      return `you wrote ${quoted}, but a change of text size or font weight is not the fix, the fix is the color`;
     case "adverb":
       return `you wrote ${quoted}, but never put an -ly adverb next to {measured}, {required}, {foreground}, {background} or {fix}`;
     case "odd-character":
@@ -33,9 +33,9 @@ export function retryMessage(key: ExplanationKey, rejection: Rejection): string 
       return `you wrote ${rejection.detail}, but braces are only for the listed placeholders`;
     case "slot-not-allowed":
       return `you wrote ${rejection.detail}, which is allowed in Quick only`;
-    case "literal-colour":
+    case "literal-color":
     case "literal-size":
-      return `you typed ${quoted}, write the placeholder instead of a real colour or size`;
+      return `you typed ${quoted}, write the placeholder instead of a real color or size`;
     case "number-not-allowed":
       return `you wrote the number ${rejection.detail}, which is not in the fact you used`;
     case "banned-term":
@@ -53,4 +53,4 @@ export function retryMessage(key: ExplanationKey, rejection: Rejection): string 
 
 export const REPEAT_MESSAGE = (other: number, why: string) =>
   `you repeated depth ${other}'s ${why}, start with a different subject`;
-export const MISSING_SLOTS = "Quick must include {measured}, {required} and a {fix} colour";
+export const MISSING_SLOTS = "Quick must include {measured}, {required} and a {fix} color";
