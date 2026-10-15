@@ -3,14 +3,12 @@ import { sourceNamesFor } from "./sourceNames";
 
 describe("sourceNamesFor", () => {
   it("names each source once, in the order they first appear", () => {
-    expect(sourceNamesFor(["F01", "F03"])).toEqual([
-      "WebAIM Contrast and Color Accessibility",
-      "W3C"
-    ]);
-    expect(sourceNamesFor(["F15", "F01"])).toEqual([
+    const w3c = "World Wide Web Consortium (W3C), Contrast (Minimum)";
+    expect(sourceNamesFor(["F01", "F03"])).toEqual([w3c]);
+    expect(sourceNamesFor(["F15", "F01", "F05"])).toEqual([
       "WebAIM, The WebAIM Million 2026",
-      "WebAIM Contrast and Color Accessibility",
-      "W3C"
+      w3c,
+      "WebAIM, Contrast and Color Accessibility"
     ]);
   });
   it("gives nothing when no facts were used or an id is unknown", () => {

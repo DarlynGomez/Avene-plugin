@@ -17,6 +17,8 @@
 .note,
 .quiet {
   margin: 0;
+  /* A long source name wraps, it is never cut off or hidden */
+  overflow-wrap: anywhere;
   color: var(--color-muted);
   font-family: var(--font-body);
   font-size: var(--font-size-option-description);

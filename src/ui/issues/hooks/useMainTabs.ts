@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 
 import type { Root } from "../../../shared/grouping/groupingTypes";
+import { readContrastEvidence } from "../../../shared/issues/contrastEvidenceView";
+import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
 import type { MainTab } from "../components/Header";
 import { useTeachMeWhy } from "../teachMeWhy/useTeachMeWhy";
@@ -9,11 +11,21 @@ import { useTeachMeWhy } from "../teachMeWhy/useTeachMeWhy";
 export function useMainTabs(
   visibility: Pick<ParticipantVisibility, "teachMeWhyTab">,
   reviewRoots: readonly Root[],
-  decisionRoots: readonly Root[]
+  decisionRoots: readonly Root[],
+  issuesById: ReadonlyMap<string, IssueSummary>
 ) {
   const [mainTab, setMainTab] = useState<MainTab>("live-watch");
   const roots = useMemo(() => [...reviewRoots, ...decisionRoots], [reviewRoots, decisionRoots]);
-  const { state, openFromCard, openFromTabBar } = useTeachMeWhy(roots, setMainTab);
+  // The font size sits in the evidence of the issue a root shows, a slot in the text asks for it
+  const fontSizeOf = useCallback(
+    (issueId: string): number | null => {
+      const issue = issuesById.get(issueId);
+      const evidence = issue ? readContrastEvidence(issue.ruleId, issue.evidence) : null;
+      return evidence?.fontSizePx ?? null;
+    },
+    [issuesById]
+  );
+  const { state, openFromCard, openFromTabBar } = useTeachMeWhy(roots, setMainTab, fontSizeOf);
 
   const onMainTabChange = useCallback(
     (tab: MainTab) => (tab === "teach-me-why" ? openFromTabBar() : setMainTab(tab)),

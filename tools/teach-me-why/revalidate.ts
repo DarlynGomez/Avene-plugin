@@ -1,7 +1,7 @@
 import { parseKeyString } from "../../src/shared/teachMeWhy/explanationKey";
-import { shippableFacts } from "../../src/shared/teachMeWhy/facts";
+import { eligibleFacts } from "../../src/shared/teachMeWhy/factEligibility";
 import { parseCsv, toCsv } from "./csv";
-import { textReasons } from "./generateItem";
+import { textMessages, textReasons } from "./generateItem";
 import type { Progress } from "./types";
 
 /** Items that pass today's rules but did not before are left alone, only failures change */
@@ -14,10 +14,11 @@ export function revalidate(progress: Progress): {
   for (const [name, item] of Object.entries(progress.items)) {
     const key = parseKeyString(name);
     if (item.status !== "completed" || !key) continue;
-    const reasons = textReasons(key, shippableFacts(key), item.text, item.factIds);
+    const reasons = textReasons(key, eligibleFacts(key), item.text, item.factIds);
     if (reasons.length === 0) continue;
     failed.set(name, reasons);
-    items[name] = { ...item, status: "failed", reasons };
+    const messages = textMessages(key, eligibleFacts(key), item.text, item.factIds);
+    items[name] = { ...item, status: "failed", reasons, messages };
   }
   return { progress: { ...progress, items }, failed };
 }

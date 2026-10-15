@@ -58,7 +58,7 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   const view = usePanelView(issues, decisions);
   const canAdjust = (aiAssistanceLevel ?? 1) >= 2 && visibility.adjustSheet;
   const { endAdjustRequested } = useSheetGating(visibility, sheet, closeSheet);
-  const tabs = useMainTabs(visibility, view.reviewRoots, view.decisionRoots);
+  const tabs = useMainTabs(visibility, view.reviewRoots, view.decisionRoots, view.issuesById);
 
   useEscapePrecedence(sheet, closeSheet, showingCount, restoreShownSelection);
   const { handleToggleImportant, handleApplyDecisionOffer, handleRecordIgnore } = useRootHandlers({

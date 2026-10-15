@@ -36,6 +36,16 @@ export function flagRows(csvText: string, phrases: readonly string[]): Flag[] {
     if (unverified.length > 0) reasons.push(`fact not verified: ${unverified.join(", ")}`);
 
     const lower = text.toLowerCase();
+    // A warning only, larger text is not an option for text that is not large
+    if (/normal:\d$/.test(cell("key")) && /\b(larger|bigger)\b/.test(lower)) {
+      reasons.push("warning: larger or bigger on a normal size key");
+    }
+    // Direction words are not a failure, a person reads the row twice
+    const direction = [
+      ...new Set(lower.match(/\bdark(?:er|en\w*)\b|\blight(?:er|en\w*)\b/g) ?? [])
+    ];
+    if (direction.length > 0) reasons.push(`read twice: ${direction.join(", ")}`);
+
     const hit = phrases.filter((phrase) => lower.includes(phrase.toLowerCase()));
     if (hit.length > 0) reasons.push(`read twice: ${hit.join(", ")}`);
 

@@ -4,7 +4,9 @@ import { TOOL_DIR } from "./env";
 import { flagRows } from "./flagCheck";
 
 function main(): void {
-  const csv = readFileSync(join(TOOL_DIR, "review.csv"), "utf8");
+  const at = process.argv.indexOf("--out");
+  const suffix = at >= 0 ? `_${process.argv[at + 1]}` : "";
+  const csv = readFileSync(join(TOOL_DIR, `review${suffix}.csv`), "utf8");
   const config = JSON.parse(readFileSync(join(TOOL_DIR, "review_flags.json"), "utf8")) as {
     phrases: string[];
   };

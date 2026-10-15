@@ -105,15 +105,15 @@ describe("buildTable", () => {
     expect(result.ok).toBe(false);
   });
 
-  it("refuses a fact that is not cleared to ship", () => {
-    // F16 is allowed by the matrix for body depth 2 but is an unverified excerpt
+  it("refuses a fact that is not offered for the key", () => {
+    // F17 is verified but is not in the body depth 2 row
     const text = `${words(70)}`;
     const result = buildTable(
       csv(
         row({
           key: "body:low:normal:2",
           text,
-          fact_ids: "F16",
+          fact_ids: "F17",
           decision: "approve",
           reviewer: "DG"
         })

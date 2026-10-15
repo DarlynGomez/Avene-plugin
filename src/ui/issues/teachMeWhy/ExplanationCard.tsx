@@ -33,7 +33,7 @@ export function ExplanationCard({ view, hidden, onHide, onShowAgain }: Explanati
         <>
           <p className={styles.note}>{AI_LABEL}</p>
           {view.basedOn.length > 0 && (
-            <p className={styles.note}>Based on: {view.basedOn.join(", ")}</p>
+            <p className={styles.note}>Based on: {view.basedOn.join("; ")}</p>
           )}
           <button type="button" className={styles.action} onClick={onHide}>
             Hide this explanation

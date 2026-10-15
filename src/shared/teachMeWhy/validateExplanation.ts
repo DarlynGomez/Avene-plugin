@@ -1,14 +1,22 @@
+import { exclusiveViolations } from "./factEligibility";
 import { DEPTH_WORD_LIMITS, type ExplanationKey, type Fact } from "./explanationTypes";
 import type { SlotValues } from "./fillSlots";
+import { issueTextProblems, type IssueTextCode } from "./issueTextChecks";
 
 export type RejectionCode =
   | "fact-not-allowed"
+  | "facts-exclusive"
+  | "fact-count"
   | "number-not-allowed"
   | "banned-term"
   | "dash"
   | "unknown-slot"
+  | "slot-not-allowed"
+  | "literal-colour"
+  | "literal-size"
   | "too-short"
-  | "too-long";
+  | "too-long"
+  | IssueTextCode;
 
 export interface Rejection {
   code: RejectionCode;
@@ -32,7 +40,8 @@ const BANNED_TERMS = [
   "compliance",
   "compliant",
   "violation",
-  "success\\s+criterion"
+  "success\\s+criterion",
+  "glossy"
 ];
 const BANNED_PATTERNS = BANNED_TERMS.map(
   (term) => new RegExp(`(?<![A-Za-z0-9])${term}(?![A-Za-z0-9])`, "i")
@@ -44,6 +53,12 @@ const NUMBER = /\d+(?:\.\d+)?:\d+(?:\.\d+)?|\d+(?:\.\d+)?%|\d+(?:\.\d+)?/g;
 // En dash and em dash only, a hyphen inside a word is fine and curly quotes are fine
 const DASH = /[\u2013\u2014]/;
 const SLOT = /\{([^{}]*)\}/g;
+// Colours and sizes belong in slots only, the model never types one
+const HEX_COLOUR = /#[0-9A-Fa-f]{3,8}(?![0-9A-Za-z])/;
+const LENGTH = /\d+(?:\.\d+)?\s*(?:px|pt|rem|em)\b/i;
+const SLOT_NAMES = ["measured", "required", "foreground", "background", "fontsize"];
+/** The fix colour belongs to the quick explanation only */
+const QUICK_ONLY_SLOTS = ["fix"];
 
 function numbersIn(text: string): string[] {
   return text.match(NUMBER) ?? [];
@@ -60,13 +75,27 @@ export function validateExplanation(input: ValidationInput): Validation {
     else reasons.push({ code: "fact-not-allowed", detail: id });
   }
 
-  let body = input.text;
+  // Depths 2 and 3 are built on exactly one fact whenever the row offers any
+  if (input.key.depth !== 1 && input.allowedFacts.length > 0 && input.usedFactIds.length !== 1) {
+    reasons.push({ code: "fact-count", detail: `${input.usedFactIds.length} facts used` });
+  }
+  for (const group of exclusiveViolations(input.usedFactIds)) {
+    reasons.push({ code: "facts-exclusive", detail: group.join(" and ") });
+  }
+
   for (const match of input.text.matchAll(SLOT)) {
-    if (match[1] !== "measured" && match[1] !== "required") {
+    const name = match[1];
+    if (QUICK_ONLY_SLOTS.includes(name)) {
+      if (input.key.depth !== 1) reasons.push({ code: "slot-not-allowed", detail: match[0] });
+    } else if (!SLOT_NAMES.includes(name)) {
       reasons.push({ code: "unknown-slot", detail: match[0] });
     }
   }
-  body = body.replace(SLOT, " ");
+  const body = input.text.replace(SLOT, " ");
+  const hex = HEX_COLOUR.exec(body);
+  if (hex) reasons.push({ code: "literal-colour", detail: hex[0] });
+  const length = LENGTH.exec(body);
+  if (length) reasons.push({ code: "literal-size", detail: length[0] });
 
   const permitted = new Set<string>([input.slots.measured, input.slots.required]);
   for (const fact of used) {
@@ -85,6 +114,8 @@ export function validateExplanation(input: ValidationInput): Validation {
   }
 
   if (DASH.test(input.text)) reasons.push({ code: "dash", detail: "en dash or em dash" });
+
+  reasons.push(...issueTextProblems(input.text));
 
   const words = input.text.split(/\s+/).filter((word) => word !== "").length;
   const limits = DEPTH_WORD_LIMITS[input.key.depth];

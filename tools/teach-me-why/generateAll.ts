@@ -1,5 +1,6 @@
 import { keyToString } from "../../src/shared/teachMeWhy/explanationKey";
-import { FACT_LIBRARY, isShippable, shippableFacts } from "../../src/shared/teachMeWhy/facts";
+import type { ExplanationKey } from "../../src/shared/teachMeWhy/explanationTypes";
+import { eligibleFacts } from "../../src/shared/teachMeWhy/factEligibility";
 import type { GenAiClient } from "./client";
 import { generateItem } from "./generateItem";
 import { allKeys } from "./keys";
@@ -7,6 +8,7 @@ import { inputsHash, PROMPT_VERSION } from "./prompt";
 import type { Clock, TokenWindow } from "./rateLimit";
 import { withRateLimitRetry } from "./retry";
 import type { ProgressStore } from "./progressStore";
+import { markRepeats } from "./repeats";
 import type { Progress, RunHeader } from "./types";
 
 export interface GenerateDeps {
@@ -18,6 +20,8 @@ export interface GenerateDeps {
   store: ProgressStore;
   log: (line: string) => void;
   retryFailed: boolean;
+  /** Only these keys, else all 126 */
+  keys?: readonly ExplanationKey[];
 }
 
 /** The model must be on the service's own list, nothing is substituted */
@@ -33,8 +37,9 @@ export async function confirmModel(client: GenAiClient, model: string) {
 
 /** A newer prompt is allowed only to redo failed items, the rest keep the version that wrote them */
 function checkRerun(existing: RunHeader, now: RunHeader, retryFailed: boolean): void {
-  const fields: (keyof RunHeader)[] = ["model", "digest", "inputsHash"];
-  if (!retryFailed) fields.push("promptVersion");
+  const fields: (keyof RunHeader)[] = ["model", "digest"];
+  // A redo may follow a change to the prompt or its inputs, the rows keep the version that wrote them
+  if (!retryFailed) fields.push("inputsHash", "promptVersion");
   const changed = fields.filter((field) => existing[field] !== now[field]);
   if (changed.length > 0) {
     throw new Error(
@@ -43,13 +48,14 @@ function checkRerun(existing: RunHeader, now: RunHeader, retryFailed: boolean): 
   }
 }
 
-function adoptNewPrompt(progress: Progress): void {
+function adoptNewPrompt(progress: Progress, inputsHashNow: string): void {
   const old = progress.header.promptVersion;
   for (const item of Object.values(progress.items)) item.promptVersion ??= old;
   progress.header.promptVersions = [
     ...new Set([...(progress.header.promptVersions ?? [old]), PROMPT_VERSION])
   ];
   progress.header.promptVersion = PROMPT_VERSION;
+  progress.header.inputsHash = inputsHashNow;
 }
 
 /** Runs every key not already done, saving after each one so a stop loses nothing */
@@ -59,7 +65,7 @@ export async function generateAll(deps: GenerateDeps): Promise<Progress> {
     model: found.id,
     digest: found.digest,
     promptVersion: PROMPT_VERSION,
-    inputsHash: inputsHash(FACT_LIBRARY.filter(isShippable)),
+    inputsHash: inputsHash(allKeys().flatMap((key) => eligibleFacts(key))),
     generatedAt: new Date(deps.clock.now()).toISOString()
   };
   const existing = deps.store.load();
@@ -67,7 +73,7 @@ export async function generateAll(deps: GenerateDeps): Promise<Progress> {
   const progress: Progress = existing ?? { header, items: {} };
   const redoing = Object.values(progress.items).some((item) => item.status === "failed");
   if (existing && deps.retryFailed && redoing && existing.header.promptVersion !== PROMPT_VERSION) {
-    adoptNewPrompt(progress);
+    adoptNewPrompt(progress, header.inputsHash);
   }
   const retry = {
     maxRetries: 6,
@@ -79,7 +85,7 @@ export async function generateAll(deps: GenerateDeps): Promise<Progress> {
   const send: GenAiClient["complete"] = (request) =>
     withRateLimitRetry(() => deps.client.complete(request), retry);
 
-  const keys = allKeys();
+  const keys = deps.keys ?? allKeys();
   for (const [index, key] of keys.entries()) {
     const name = keyToString(key);
     const done = progress.items[name];
@@ -89,11 +95,13 @@ export async function generateAll(deps: GenerateDeps): Promise<Progress> {
       return (actual: number) => deps.window.settle(hold, actual);
     };
     progress.items[name] = {
-      ...(await generateItem(key, shippableFacts(key), send, beforeSend)),
+      ...(await generateItem(key, eligibleFacts(key), send, beforeSend, done?.messages ?? [])),
       promptVersion: PROMPT_VERSION
     };
     deps.store.save(progress);
     deps.log(`${index + 1}/${keys.length} ${name} ${progress.items[name].status}`);
   }
+  for (const line of markRepeats(progress)) deps.log(`repeat found, ${line}`);
+  deps.store.save(progress);
   return progress;
 }

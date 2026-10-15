@@ -8,9 +8,9 @@ function key(role: ElementRole, depth: Depth): ExplanationKey {
 const ids = (facts: readonly { id: string }[]) => facts.map((fact) => fact.id);
 
 describe("the fact library", () => {
-  it("has F01 to F17 once each, with a source, a date and a read status", () => {
+  it("has F01 to F25 once each, with a source, a date and a read status", () => {
     expect(ids(FACT_LIBRARY)).toEqual(
-      Array.from({ length: 17 }, (_, i) => `F${String(i + 1).padStart(2, "0")}`)
+      Array.from({ length: 25 }, (_, i) => `F${String(i + 1).padStart(2, "0")}`)
     );
     for (const fact of FACT_LIBRARY) {
       expect(fact.plain).not.toBe("");
@@ -53,8 +53,9 @@ describe("shippable facts", () => {
     expect(isShippable({ ...base, readStatus: "excerpt", excerptVerified: false })).toBe(false);
     expect(isShippable({ ...base, readStatus: "summary", excerptVerified: true })).toBe(false);
   });
-  it("drops unverified excerpts from the matrix row", () => {
-    expect(ids(shippableFacts(key("heading", 3)))).toEqual(["F01", "F03"]);
+  it("offers every fact of the matrix row now that all are verified", () => {
+    expect(ids(shippableFacts(key("heading", 2)))).toEqual(["F16", "F09"]);
+    expect(ids(shippableFacts(key("heading", 3)))).toEqual(["F01", "F02", "F03"]);
     expect(ids(shippableFacts(key("heading", 1)))).toEqual([]);
   });
 });

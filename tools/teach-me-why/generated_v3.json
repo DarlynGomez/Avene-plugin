@@ -1,0 +1,334 @@
+{
+  "header": {
+    "model": "gpt-oss:120b-gwtics-figma-frozen",
+    "digest": null,
+    "promptVersion": "6",
+    "inputsHash": "0e90080059146d2f",
+    "generatedAt": "2026-10-14T18:32:17.447Z",
+    "promptVersions": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ]
+  },
+  "items": {
+    "button text:medium:normal:1": {
+      "key": "button text:medium:normal:1",
+      "status": "completed",
+      "text": "Button text in {foreground} on {background} at {fontsize} falls short: ratio {measured} vs required {required}. Change the text to {fix} to meet the contrast need.",
+      "factIds": [],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "5"
+    },
+    "button text:medium:normal:2": {
+      "key": "button text:medium:normal:2",
+      "status": "completed",
+      "text": "The contrast of {foreground} on {background} for {fontsize} text is insufficient. In bright sunlight or when screen glare occurs, users often struggle to read such low‑contrast button labels, so the option may be missed or ignored. These situational visual impairments are common on mobile devices, making reliable interaction harder. Ensuring readability in these conditions helps maintain confidence and reduces frustration for all users.",
+      "factIds": [
+        "F16"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "too-short"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "5"
+    },
+    "button text:medium:normal:3": {
+      "key": "button text:medium:normal:3",
+      "status": "completed",
+      "text": "The {foreground} on {background} at {fontsize} falls short of the required contrast, which can feel like a missing guard rail for your design. One creator in that study described accessibility as a \"guard rail\" rather than a constraint, showing that meeting contrast needs can actually spark creative problem‑solving. You could keep the same hue and simply darken it a touch, or swap in another colour already in your palette that meets the ratio. If the button is larger or bolder, using the colour for that element can also satisfy the requirement. Alternatively, place the text on a darker surface, add a subtle overlay, or treat the colour as an accent while rendering the label itself in a darker shade for readability.",
+      "factIds": [
+        "F23"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "number-not-allowed"
+        ],
+        [
+          "unknown-slot"
+        ]
+      ],
+      "attempts": 3,
+      "promptVersion": "5"
+    },
+    "caption:high:normal:1": {
+      "key": "caption:high:normal:1",
+      "status": "completed",
+      "text": "The caption in {foreground} on {background} at {fontsize} falls short: ratio {measured} vs required {required}. Change the text to {fix}. This makes it hard to read, especially for users with low vision.",
+      "factIds": [],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "caption:high:normal:2": {
+      "key": "caption:high:normal:2",
+      "status": "completed",
+      "text": "The low contrast between {foreground} and {background} at {fontsize} falls short of the needed level ({measured} vs {required}), which can make the caption hard to read. In bright light, especially for people with cataracts, contrast matters most, so the insufficient contrast may cause the text to blend into the background and become difficult to see. You could improve readability by increasing the contrast.",
+      "factIds": [
+        "F07"
+      ],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "caption:high:normal:3": {
+      "key": "caption:high:normal:3",
+      "status": "completed",
+      "text": "The current {measured} contrast between {foreground} and {background} for {fontsize} falls short of the {required} level. One creator in that study described accessibility as a \"guard rail\" that actually sparks creative problem‑solving, showing how constraints can inspire new ideas. You could keep the hue of {foreground} and instead place the caption on a darker surface, or pair it with a passing colour already in the palette that meets the ratio. Another route is to treat the text as an accent and use a deeper shade for the words themselves. If the caption sits over an image, adding a subtle overlay, a blur, or a faint shadow can also raise readability without changing the original colour.",
+      "factIds": [
+        "F23"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "5"
+    },
+    "decorative:high:large:1": {
+      "key": "decorative:high:large:1",
+      "status": "completed",
+      "text": "The {foreground} on {background} at {fontsize} has a contrast of {measured}, which is below the required {required}. Change the text to {fix} to improve readability.",
+      "factIds": [],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "decorative:high:large:2": {
+      "key": "decorative:high:large:2",
+      "status": "completed",
+      "text": "Because {foreground} on {background} at {fontsize} falls short of the needed contrast ({measured} vs {required}), readers may miss the message if the text actually conveys information. Even decorative‑looking type can carry meaning, and without sufficient contrast it becomes hard to perceive, especially for people with visual impairments. Ensuring the contrast meets the requirement helps everyone notice the content, whether it’s truly decorative or not.",
+      "factIds": [
+        "F04"
+      ],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "decorative:high:large:3": {
+      "key": "decorative:high:large:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} at {fontsize} falls short of the required level, which matters because decorative text still competes for visual clarity. The principle here is that while pure decoration has no contrast minimum, you can keep the design intent by using alternative strategies. One option is to apply the same {foreground} colour to larger or bolder text where the contrast requirement is lower. You could also place the text on a surface that already provides a passing colour contrast, or use a subtle overlay or shadow to separate it from the background. If the text remains purely ornamental, consider treating it as an accent and pairing it with darker surrounding elements to maintain overall readability without changing the original hue.",
+      "factIds": [
+        "F04"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "direction-word"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "5"
+    },
+    "heading:low:large:1": {
+      "key": "heading:low:large:1",
+      "status": "completed",
+      "text": "Your heading at {fontsize} uses {foreground} on {background}; the contrast is {measured} which is below the required {required}. Change the text to {fix} to meet the target.",
+      "factIds": [],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "heading:low:large:2": {
+      "key": "heading:low:large:2",
+      "status": "completed",
+      "text": "People reading your {fontsize} heading may experience eye strain, and they tend to trust the message less when the contrast falls short. The current contrast of {foreground} on {background} measures {measured}, which is below the required {required} level, so the text can feel harder to read in everyday use. Improving readability helps keep the audience comfortable and confident in the information you present.",
+      "factIds": [
+        "F09"
+      ],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "heading:low:large:3": {
+      "key": "heading:low:large:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} measured at {measured} falls short of the {required} needed for {fontsize} large text. Because larger, bolder text has thicker strokes it can be read more easily, the contrast requirement is lower, which lets you treat this as a creative constraint. One option is to keep the hue but choose a passing colour already in your palette that meets the ratio. You could also apply the colour to larger or bolder elements where the requirement is easier to satisfy, or place the text on a darker surface to boost contrast. If the text is decorative, consider using it as an accent with a darker shade for the words, or add an overlay, blur, shadow or outline to improve readability.",
+      "factIds": [
+        "F03"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "5"
+    },
+    "unknown:high:large:1": {
+      "key": "unknown:high:large:1",
+      "status": "completed",
+      "text": "Your {foreground} on {background} at {fontsize} fails contrast: measured {measured} vs required {required}. Change the text to {fix} to meet the needed ratio and improve readability for users.",
+      "factIds": [],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "unknown:high:large:2": {
+      "key": "unknown:high:large:2",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} at {fontsize} falls short, with a measured ratio of {measured} versus the required {required}. This matters because people with cataracts often see everything hazy, and bright light makes low contrast especially hard to read, so the text may become illegible for them. Thinking about such situations can guide you toward designs that stay clear even when sunlight is strong.",
+      "factIds": [
+        "F07"
+      ],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "unknown:high:large:3": {
+      "key": "unknown:high:large:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} for {fontsize} text falls short of the {required} ratio, which matters because larger, bolder text has thicker strokes and is easier to read, so the minimum is lower. You could keep the current hue and simply darken it a touch, or select another passing colour already in your palette that meets the ratio. If the design allows, applying the colour to larger or bolder text (when the size class is large) also satisfies the requirement. Another option is to place the text on a darker surface, or use a subtle overlay, blur, shadow, or outline when the text sits over an image, preserving the visual intent while improving readability.",
+      "factIds": [
+        "F03"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "size-fix"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "6"
+    },
+    "unknown:high:normal:1": {
+      "key": "unknown:high:normal:1",
+      "status": "completed",
+      "text": "The {foreground} text on {background} at {fontsize} fails the contrast by {measured} versus the required {required}. Change the text to {fix} to meet the guideline.",
+      "factIds": [],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "6"
+    },
+    "unknown:high:normal:2": {
+      "key": "unknown:high:normal:2",
+      "status": "completed",
+      "text": "The low contrast between {foreground} and {background} at {fontsize} falls short of {required} by {measured}, which can make reading difficult for people with cataracts, especially in bright light. Because bright sunlight reduces the perceived difference, these users may miss important information, so improving contrast helps ensure the text remains legible in everyday conditions. Consider that many users rely on mobile devices outdoors, and a clearer contrast supports their ability to access content without strain.",
+      "factIds": [
+        "F07"
+      ],
+      "reasons": [],
+      "attemptReasons": [
+        [
+          "too-short"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "4"
+    },
+    "unknown:high:normal:3": {
+      "key": "unknown:high:normal:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} at {fontsize} falls short of {required}, and that matters because one creator in that study described accessibility as a \"guard rail\" rather than a constraint, showing how a clear limit can spark creative problem‑solving. You could keep the same hue and simply darken it a touch, or pick another colour already in the palette that meets the ratio. If the design uses larger or bolder text, you could apply the passing colour there instead. For text over an image, adding a subtle overlay, a soft blur, or a faint shadow can raise the perceived contrast without altering the original colour scheme.",
+      "factIds": [
+        "F23"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "size-fix"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "6"
+    },
+    "unknown:low:large:1": {
+      "key": "unknown:low:large:1",
+      "status": "completed",
+      "text": "The {foreground} on {background} at {fontsize} falls short: {measured} vs required {required}. Change the text to {fix}. This makes reading harder for users with low vision. Using a higher contrast colour will improve accessibility.",
+      "factIds": [],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "6"
+    },
+    "unknown:low:large:2": {
+      "key": "unknown:low:large:2",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} at {fontsize} falls short of {required} (measured {measured}), which can be especially problematic for people with cataracts who experience hazy vision in bright light. In bright conditions, low contrast makes it harder for them to distinguish letters, so the text may become unreadable. You could consider adjusting the colour to improve legibility for those users.",
+      "factIds": [
+        "F07"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "6"
+    },
+    "unknown:low:large:3": {
+      "key": "unknown:low:large:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} for {fontsize} falls short of the required level, and because larger, bolder text has thicker strokes it is easier to read, so the minimum ratio is lower for this size class. This means you can keep the hue you like and still improve readability by a few simple moves: you could darken the same colour a touch, you could swap to another colour that already passes the ratio, you could apply the colour to larger or bolder text where the requirement is easier, you could place the text on a darker surface, or you could treat the colour as an accent and use a darker shade for the actual words. Each option respects the original palette while meeting the contrast need.",
+      "factIds": [
+        "F03"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [
+        [
+          "number-not-allowed"
+        ]
+      ],
+      "attempts": 2,
+      "promptVersion": "5"
+    },
+    "unknown:medium:normal:1": {
+      "key": "unknown:medium:normal:1",
+      "status": "completed",
+      "text": "The {foreground} text on {background} at {fontsize} is only {measured} contrast, below the required {required}. This makes reading harder, so change the text to {fix} to meet contrast.",
+      "factIds": [],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "5"
+    },
+    "unknown:medium:normal:2": {
+      "key": "unknown:medium:normal:2",
+      "status": "completed",
+      "text": "People with cataracts often struggle to read text like {foreground} on {background} at {fontsize} because the contrast falls short, measured at {measured} versus the required {required}. In bright light the hazy view makes low contrast especially problematic, so the reduced readability can cause frustration and missed information. You could consider boosting the contrast to help those users see the content more clearly.",
+      "factIds": [
+        "F07"
+      ],
+      "reasons": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "4"
+    },
+    "unknown:medium:normal:3": {
+      "key": "unknown:medium:normal:3",
+      "status": "completed",
+      "text": "The contrast between {foreground} and {background} falls short of the {required} ratio, with a measured value of {measured}. One creator in that study described accessibility as a \"guard rail\" rather than a constraint, highlighting how designers can turn limits into creative opportunities. You could keep the same hue and simply darken it a touch, or you could swap it for another colour that already passes the ratio in your palette. Placing the text on a darker surface or treating it as an accent while rendering the main words in a darker shade are also effective routes. These approaches let you preserve the visual intent while ensuring the text remains comfortably readable for all users.",
+      "factIds": [
+        "F23"
+      ],
+      "reasons": [],
+      "messages": [],
+      "attemptReasons": [],
+      "attempts": 1,
+      "promptVersion": "5"
+    }
+  }
+}

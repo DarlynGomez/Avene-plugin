@@ -31,7 +31,8 @@ export interface TeachMeWhyState {
  */
 export function useTeachMeWhy(
   roots: readonly Root[],
-  setTab: (tab: "live-watch" | "teach-me-why") => void
+  setTab: (tab: "live-watch" | "teach-me-why") => void,
+  fontSizeOf: (issueId: string) => number | null
 ) {
   const [depth, setDepth] = useState<Depth>(1);
   const [lastOpened, setLastOpened] = useState<string | null>(null);
@@ -42,17 +43,32 @@ export function useTeachMeWhy(
     [roots, lastOpened]
   );
   const view = useMemo(
-    () => (root ? buildExplanationView(root, depth, EXPLANATION_TABLE, NO_ROLES) : null),
-    [root, depth]
+    () =>
+      root
+        ? buildExplanationView(
+            root,
+            depth,
+            EXPLANATION_TABLE,
+            NO_ROLES,
+            fontSizeOf(root.representativeIssueId)
+          )
+        : null,
+    [root, depth, fontSizeOf]
   );
 
   const open = useCallback(
     (target: Root, source: "tab" | "card") => {
       setLastOpened(target.signature);
-      const opened = buildExplanationView(target, depth, EXPLANATION_TABLE, NO_ROLES);
+      const opened = buildExplanationView(
+        target,
+        depth,
+        EXPLANATION_TABLE,
+        NO_ROLES,
+        fontSizeOf(target.representativeIssueId)
+      );
       sendExplanationEvent({ kind: "opened", key: opened.key, source });
     },
-    [depth]
+    [depth, fontSizeOf]
   );
 
   /** The link on a root card */

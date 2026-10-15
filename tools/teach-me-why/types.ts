@@ -21,6 +21,8 @@ export interface ItemResult {
   /** The reasons each earlier or final attempt failed for */
   attemptReasons: string[][];
   attempts: number;
+  /** What to tell the model if the row is tried again, one line for each failure */
+  messages?: string[];
   /** Missing means the version the header first recorded */
   promptVersion?: string;
 }

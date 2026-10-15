@@ -13,7 +13,9 @@
     "teach:import": "vite-node tools/teach-me-why/importCli.ts",
     "teach:coverage": "vite-node tools/teach-me-why/coverage.ts",
     "teach:flags": "vite-node tools/teach-me-why/flags.ts",
-    "teach:revalidate": "vite-node tools/teach-me-why/revalidateCli.ts"
+    "teach:revalidate": "vite-node tools/teach-me-why/revalidateCli.ts",
+    "teach:facts": "vite-node tools/teach-me-why/checkFacts.ts",
+    "teach:preview": "vite-node tools/teach-me-why/preview.ts"
   },
   "dependencies": {
     "lucide-react": "^1.48.0",

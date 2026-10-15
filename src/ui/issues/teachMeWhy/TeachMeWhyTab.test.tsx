@@ -28,7 +28,7 @@ vi.mock("../../../shared/teachMeWhy/explanationTableData", () => ({
         text: "Mid words at {measured} against {required}.",
         status: "approved",
         reviewer: "DG",
-        factIds: ["F15", "F01"]
+        factIds: ["F15", "F01", "F02"]
       },
       "unknown:high:normal:3": {
         text: "Deep words with no facts.",
@@ -156,7 +156,7 @@ describe("Teach Me Why tab", () => {
     expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Based on: WebAIM, The WebAIM Million 2026, WebAIM Contrast and Color Accessibility, W3C"
+        "Based on: WebAIM, The WebAIM Million 2026; World Wide Web Consortium (W3C), Contrast (Minimum)"
       )
     ).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Explanation" }).querySelector("a")).toBeNull();

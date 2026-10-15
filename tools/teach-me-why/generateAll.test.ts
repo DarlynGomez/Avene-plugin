@@ -6,15 +6,22 @@ import { TokenWindow, type Clock } from "./rateLimit";
 import type { Progress } from "./types";
 
 const clock: Clock = { now: () => 0, sleep: () => Promise.resolve() };
-const words = (count: number) => Array.from({ length: count }, () => "word").join(" ");
+const words = (count: number, word = "word") => Array.from({ length: count }, () => word).join(" ");
 
 /** Answers by depth, read from the word limit line the prompt carries */
 function goodReply(user: string) {
   const depth = /Depth: (\d)/.exec(user)?.[1];
   const text =
-    depth === "1" ? `{measured} {required} ${words(30)}` : depth === "2" ? words(70) : words(110);
+    depth === "1"
+      ? `{measured} {required} change the text to {fix} ${words(30, "quick")}`
+      : depth === "2"
+        ? `Situation first. ${words(70, "reader")}`
+        : `The principle for {foreground} first. ${words(110, "lesson")}`;
+  // Depths 2 and 3 are built on the first fact the row offers, when it offers any
+  const fact =
+    depth === "1" ? undefined : /^(F\d+)\b/m.exec(user.split("Allowed facts:")[1] ?? "")?.[1];
   return {
-    content: JSON.stringify({ text, fact_ids: [] }),
+    content: JSON.stringify({ text, fact_ids: fact ? [fact] : [] }),
     finishReason: "stop",
     totalTokens: 500
   };

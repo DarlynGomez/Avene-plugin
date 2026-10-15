@@ -1,0 +1,12 @@
+{
+  "attemptsByReason": {
+    "too-short": 2,
+    "number-not-allowed": 2,
+    "unknown-slot": 1,
+    "direction-word": 1,
+    "size-fix": 2
+  },
+  "failedItems": 0,
+  "completedItems": 24,
+  "mostFailed": "too-short"
+}

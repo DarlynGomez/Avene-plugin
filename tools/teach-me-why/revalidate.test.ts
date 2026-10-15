@@ -6,7 +6,7 @@ import { markFailedRows, revalidate } from "./revalidate";
 import type { ItemResult, Progress } from "./types";
 
 const words = (count: number) => Array.from({ length: count }, () => "word").join(" ");
-const good = `{measured} {required} ${words(30)}`;
+const good = `{measured} {required} change the text to {fix} ${words(30)}`;
 function item(key: string, text: string, status: ItemResult["status"] = "completed"): ItemResult {
   return { key, status, text, factIds: [], reasons: [], attemptReasons: [], attempts: 1 };
 }
@@ -24,7 +24,7 @@ const progress: Progress = {
 describe("the prompt", () => {
   it("asks for no dashes and carries a newer version", () => {
     expect(SYSTEM_PROMPT).toContain('Use commas, full stops or "and" instead of dashes');
-    expect(PROMPT_VERSION).toBe("2");
+    expect(PROMPT_VERSION).toBe("6");
   });
 });
 
