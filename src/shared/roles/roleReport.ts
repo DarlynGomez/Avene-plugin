@@ -20,7 +20,7 @@ const COLUMNS = [
   "reviewed"
 ];
 
-function cell(value: string): string {
+export function cell(value: string): string {
   return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 }
 

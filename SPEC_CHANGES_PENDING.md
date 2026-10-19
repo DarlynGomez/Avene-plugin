@@ -16,6 +16,11 @@ Each line names the spec section that is now out of date and the exact new wordi
 
 - ROLES_SPEC section 7 "What it keeps": in precompute mode, when ROLES_CROP_DIR is set, the server keeps for each request the prepared PNG as `<requestId>.png` and, beside it, `<requestId>.json` holding exactly requestId, crop, exportScale, fontSizePx, inputs, backgroundHex, and from the answer label, reason, model and ms. Both are written after the model answers, also when the answer is a failure (label unsure). The JSON never holds the image or any characters of the text. The request id starts with the Figma node id, which matches a crop to its layer. Nothing is kept in live mode.
 
+## C4 Review by CSV
+
+- ROLES_SPEC section 6 (review step): the review is a CSV round trip, as the spec allowed if S28 ran late, and no review panel is built. Menu command "Export role suggestions (researcher)" (export-role-suggestions) lists every visible text layer that holds a stored suggestion and offers a file with the columns screen, layer name, node id, model label, model, reviewed, input key, final label, note. Final label starts as the model label and reviewed as yes or no. The file holds layer names only and no characters of any text. Menu command "Import role review (researcher)" (import-role-review) reads the edited file and treats each row in this order: a node id that is unknown or not a text layer is skipped as "not found"; an input key that differs from the layer's current key is skipped as "layer changed since export"; a final label outside the seven is skipped as "label not on the list"; a row whose reviewed is not yes is left as it is; a final label of unsure removes the stored suggestion (an answer is kept); otherwise the suggestion is written with the final label, reviewed true, live false, the same input key, the model kept and at set to now. The panel then shows the counts imported, removed and skipped by reason, and nothing else. A suggestion is shown to a participant only after this import (or when it is a live one).
+- ROLES_SPEC section 16, "Not built" line: remove the review step. Still not built: a review panel inside the plugin (the CSV path replaces it).
+
 ## Blocked
 
 Nothing so far.

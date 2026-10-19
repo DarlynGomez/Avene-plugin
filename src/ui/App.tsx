@@ -2,7 +2,9 @@ import { CalibrationFlow } from "./calibration/CalibrationFlow";
 import { useCalibrationPersistence } from "./hooks/useCalibrationPersistence";
 import { IssuePanel } from "./issues/IssuePanel";
 import { PrecomputePanel } from "./roles/PrecomputePanel";
+import { ReviewPanel } from "./roles/ReviewPanel";
 import { usePrecomputeRun } from "./roles/usePrecomputeRun";
+import { useRoleReview } from "./roles/useRoleReview";
 import { StudyHost } from "./study/StudyHost";
 import { useParticipantVisibility } from "./study/useParticipantVisibility";
 
@@ -18,10 +20,15 @@ function AppScreens() {
   const { loadedProfile, loading, saveProfile, saveError } = useCalibrationPersistence();
   const visibility = useParticipantVisibility();
   const precompute = usePrecomputeRun();
+  const review = useRoleReview();
 
   // The researcher's precompute command takes the window until it is done
   if (precompute.status !== "idle") {
     return <PrecomputePanel ui={precompute} />;
+  }
+
+  if (review.status !== "idle") {
+    return <ReviewPanel ui={review} />;
   }
 
   if (loading) {
