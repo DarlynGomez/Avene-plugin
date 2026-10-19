@@ -18,6 +18,14 @@
       "command": "precompute-roles"
     },
     {
+      "name": "Export role suggestions (researcher)",
+      "command": "export-role-suggestions"
+    },
+    {
+      "name": "Import role review (researcher)",
+      "command": "import-role-review"
+    },
+    {
       "name": "Reset calibration (dev)",
       "command": "reset-calibration"
     },

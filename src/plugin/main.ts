@@ -1,5 +1,5 @@
 import { handleExplanationOrRole, isExplanationOrRole } from "./lifecycle/otherProtocols";
-import { PRECOMPUTE_ROLES_COMMAND, requestPrecompute } from "./roles/adapter/precompute";
+import { requestRoleCommand } from "./roles/adapter/roleCommands";
 import { handleAdjustMessage } from "./lifecycle/adjustProtocol";
 import { isAdjustMessage } from "./lifecycle/isAdjustMessage";
 import {
@@ -135,7 +135,7 @@ if (figma.command === RESET_COMMAND) {
 } else if (figma.command === EXPORT_ISSUES_COMMAND) {
   void exportIssuesToConsole().finally(() => figma.closePlugin());
 } else {
-  if (figma.command === PRECOMPUTE_ROLES_COMMAND) requestPrecompute();
+  requestRoleCommand(figma.command);
   startCalibrationUi();
   // Ahead of detection so no issue list can reach the UI before the study state
   sendStudyState((reply) => figma.ui.postMessage(reply));

@@ -19,6 +19,12 @@ export function writeSuggestion(node: BaseNode, suggestion: RoleSuggestion): voi
   write(node, { ...(readRoleData(node) ?? { v: 1 }), v: 1, suggestion });
 }
 
+/** Takes the model suggestion away and keeps any answer, the layer then counts as never asked */
+export function removeSuggestion(node: BaseNode): void {
+  const data = readRoleData(node);
+  if (data) write(node, { v: 1, answer: data.answer });
+}
+
 export function writeAnswer(node: BaseNode, answer: RoleAnswer): void {
   write(node, { ...(readRoleData(node) ?? { v: 1 }), v: 1, answer });
 }
