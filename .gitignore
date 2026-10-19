@@ -53,3 +53,8 @@ tools/roles-server/*.jsonl
 tools/roles-server/crops/
 tools/roles-server/.pytest_cache/
 tools/roles-server/**/__pycache__/
+
+# Role evaluation tool, its virtual environment and caches
+tools/roles-eval/.venv/
+tools/roles-eval/.pytest_cache/
+tools/roles-eval/**/__pycache__/
