@@ -2,7 +2,8 @@
 export const ROLE_SERVER = {
   /** localhost and not an address, the manifest does not accept one */
   baseUrl: "http://localhost:8750",
-  liveTimeoutMs: 5000,
+  /** Longer than the server's live timeout so the server answers first */
+  liveTimeoutMs: 13000,
   precomputeTimeoutMs: 60000,
   /** What the model is shown, the text alone or its small parent frame */
   cropContext: "node" as "node" | "parent",

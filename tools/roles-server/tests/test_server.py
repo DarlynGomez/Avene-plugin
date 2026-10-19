@@ -162,3 +162,10 @@ def test_crops_are_saved_in_precompute_mode_only(tmp_path):
         assert not crops.exists()
         client.post("/v1/role", json=role_body(requestId="pre/1", mode="precompute"))
     assert [p.name for p in crops.iterdir()] == ["pre_1.png"]
+
+
+def test_the_live_timeout_defaults_to_ten_seconds(tmp_path):
+    manager = Manager()
+    with client_for(tmp_path, manager) as client:
+        client.post("/v1/role", json=role_body())
+    assert manager.requests[0].extensions["timeout"]["read"] == 10.0

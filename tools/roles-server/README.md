@@ -29,7 +29,7 @@ with any other address. It warms the model once before it accepts requests.
 | Name | Default | Meaning |
 | --- | --- | --- |
 | GENAI_BASE_URL, GENAI_API_KEY, GENAI_MODEL | none | The service, the key and the frozen model tag |
-| GENAI_TIMEOUT_SECONDS | 4 | How long a live request waits for the model |
+| GENAI_TIMEOUT_SECONDS | 10 | How long a live request waits for the model |
 | GENAI_PRECOMPUTE_TIMEOUT_SECONDS | 30 | The same for precompute runs |
 | GENAI_WARMUP_TIMEOUT_SECONDS | 60 | The start-up request |
 | GENAI_THINKING_MODELS | none | Comma separated tags of thinking models, which get `reasoning_effort` and a larger output limit. Never set it for a model that rejects `reasoning_effort` |
