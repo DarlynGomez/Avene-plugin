@@ -4,6 +4,7 @@ import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
 import type { ExplanationEventMessage } from "./study/explanationMessageTypes";
+import type { RolePluginMessage, RoleUiMessage } from "./roles/roleMessages";
 import type { MarkerMessage } from "./markers/markerMessageTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
 import type { SelectionMessage } from "./selectionMessageTypes";
@@ -113,7 +114,8 @@ export type UiToPluginMessage =
   | SelectionMessage
   | AdjustMessage
   | StudyMessage
-  | ExplanationEventMessage;
+  | ExplanationEventMessage
+  | RoleUiMessage;
 
 /** Sandbox to UI messages */
 export type PluginToUiMessage =
@@ -126,7 +128,8 @@ export type PluginToUiMessage =
   | AdjustReplyMessage
   | StudyStateMessage
   | StudyExportReadyMessage
-  | MarkerMessage;
+  | MarkerMessage
+  | RolePluginMessage;
 
 /** Every message that crosses the plugin boundary */
 export type PluginMessage = UiToPluginMessage | PluginToUiMessage;
