@@ -55,29 +55,46 @@ function Picker({
   );
 }
 
+const sameAnswer = (a: RoleStateView["answer"], b: RoleStateView["answer"]) =>
+  a?.role === b?.role && a?.response === b?.response;
+
 /**
  * What kind of text this is, as a question, never a finding. A rule says why, a model suggestion is
  * labelled AI suggestion, and nothing is used until the participant confirms or changes it
  */
-export function RoleQuestion({ view, onAnswer }: RoleQuestionProps) {
+export function RoleQuestion({ view: latest, onAnswer }: RoleQuestionProps) {
   const [picking, setPicking] = useState(false);
+  // The question as it was when the participant began to answer, so a suggestion that arrives late
+  // changes neither the text nor what their choice counts as. Kept until their answer comes back
+  const [held, setHeld] = useState<RoleStateView | null>(null);
+  const view =
+    held && held.nodeId === latest.nodeId && (picking || !sameAnswer(held.answer, latest.answer))
+      ? held
+      : latest;
   const shown: RoleLabel | null = view.rule?.role ?? view.suggestion?.label ?? null;
+
+  function open() {
+    setHeld(latest);
+    setPicking(true);
+  }
+
+  function close() {
+    setHeld(null);
+    setPicking(false);
+  }
 
   function save(role: RoleLabel) {
     const response: RoleResponse =
       role === "unsure" ? "unsure" : role === shown ? "confirmed" : "changed";
     onAnswer(role, response);
+    setHeld({ ...view, answer: { role, response } });
     setPicking(false);
   }
 
   if (picking) {
     return (
       <section className={styles.box} aria-label="Kind of text">
-        <Picker
-          shown={view.answer?.role ?? shown}
-          onSave={save}
-          onCancel={() => setPicking(false)}
-        />
+        <Picker shown={view.answer?.role ?? shown} onSave={save} onCancel={close} />
       </section>
     );
   }
@@ -114,7 +131,7 @@ export function RoleQuestion({ view, onAnswer }: RoleQuestionProps) {
             {view.rule ? "That is right" : "Yes"}
           </button>
         )}
-        <button type="button" className={styles.quiet} onClick={() => setPicking(true)}>
+        <button type="button" className={styles.quiet} onClick={open}>
           {view.answer || shown ? "Change" : "Choose"}
         </button>
       </div>

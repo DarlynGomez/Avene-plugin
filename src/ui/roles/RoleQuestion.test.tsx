@@ -142,3 +142,58 @@ describe("confirming and changing", () => {
     expect(onAnswer).not.toHaveBeenCalled();
   });
 });
+
+describe("a suggestion that arrives while the participant is answering", () => {
+  const late = view({ suggestion: { label: "caption", model: "m", live: true } });
+
+  it("leaves the open choices alone and counts their choice against what they saw", async () => {
+    const onAnswer = vi.fn();
+    const { rerender } = render(<RoleQuestion view={view({})} onAnswer={onAnswer} />);
+    await userEvent.click(screen.getByRole("button", { name: "Choose" }));
+    rerender(<RoleQuestion view={late} onAnswer={onAnswer} />);
+    expect(screen.getByRole("radiogroup")).toBeInTheDocument();
+    expect(screen.queryByRole("radio", { checked: true })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("radio", { name: /caption/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(onAnswer).toHaveBeenCalledWith("caption", "changed");
+  });
+
+  it("keeps the old text after Save until the answer comes back, and never flashes the suggestion", async () => {
+    const answered = view({
+      suggestion: late.suggestion,
+      answer: { role: "caption", response: "changed" }
+    });
+    const { rerender } = render(<RoleQuestion view={view({})} onAnswer={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Choose" }));
+    rerender(<RoleQuestion view={late} onAnswer={vi.fn()} />);
+    await userEvent.click(screen.getByRole("radio", { name: /caption/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(screen.getByText(/You said/)).toHaveTextContent("You said caption.");
+    expect(screen.queryByText("AI suggestion")).not.toBeInTheDocument();
+    rerender(<RoleQuestion view={answered} onAnswer={vi.fn()} />);
+    expect(screen.getByText(/You said/)).toHaveTextContent("You said caption.");
+  });
+
+  it("shows the suggestion once the choices are cancelled", async () => {
+    const { rerender } = render(<RoleQuestion view={view({})} onAnswer={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Choose" }));
+    rerender(<RoleQuestion view={late} onAnswer={vi.fn()} />);
+    expect(screen.queryByText("AI suggestion")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getByText("AI suggestion")).toBeInTheDocument();
+  });
+
+  it("shows the suggestion at once when nobody has started answering", () => {
+    const { rerender } = render(<RoleQuestion view={view({})} onAnswer={vi.fn()} />);
+    rerender(<RoleQuestion view={late} onAnswer={vi.fn()} />);
+    expect(screen.getByText("AI suggestion")).toBeInTheDocument();
+  });
+
+  it("does not carry a held question over to another layer", async () => {
+    const { rerender } = render(<RoleQuestion view={view({})} onAnswer={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Choose" }));
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    rerender(<RoleQuestion view={{ ...late, nodeId: "2:2" }} onAnswer={vi.fn()} />);
+    expect(screen.getByText("AI suggestion")).toBeInTheDocument();
+  });
+});

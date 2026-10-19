@@ -26,6 +26,10 @@ Each line names the spec section that is now out of date and the exact new wordi
 - ROLES_SPEC section 12 (S29, the gate): the measures are computed by tools/roles-eval, which replays the crops kept by the server (C3) through POST /v1/role in live mode after a passing self-test. Agreement: unsure counts as not agreeing. Confident wrong: among answers that are not unsure. Fail or unsure: reason not ok or label unsure, including a reply the client gave up on after 13 s. Latency: median, 95th percentile and maximum, measured by the client. The pass mark is a committed JSON file (agreedOn, initials of both people, minAgreement, maxConfidentWrong, maxFailOrUnsure, maxLiveSeconds) whose commit date must precede the run, which is how it is shown to have been fixed before any result existed. The slowest acceptable reply (maxLiveSeconds) is compared with the maximum latency seen. The exit code is 0 for pass, 1 for fail and 2 for refused.
 - ROLES_SPEC section 12: the tool never chooses a model. It writes results-<label>-<timestamp>.csv and summary-<label>-<timestamp>.json, with no image, no text and no key.
 
+## C6 Late suggestion
+
+- ROLES_SPEC section 6 (the question in the panel): once the participant has opened the choices, the question and what their choice counts as (confirmed, changed) stay as they were when the choices opened. A suggestion that arrives meanwhile is shown only after they cancel or after their answer is stored, and the old text stays until the stored answer comes back.
+
 ## Blocked
 
 Nothing so far.
