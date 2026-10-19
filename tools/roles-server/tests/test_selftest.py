@@ -1,7 +1,10 @@
 """GET /selftest: image input, schema enforcement, model name and latency."""
 
+import logging
+
 import httpx
 
+from roles_server.hints import IMAGE_HINT, THINKING_HINT
 from tests.helpers import MODEL, Manager, chat_ok, client_for, log_lines
 
 
@@ -62,3 +65,45 @@ def test_an_unreachable_manager_fails_the_selftest_and_never_errors(tmp_path):
 def test_a_bad_key_is_reported_before_a_session(tmp_path):
     with client_for(tmp_path, Manager(lambda _r: httpx.Response(401))) as client:
         assert client.get("/selftest").json()["failures"] == ["auth"]
+
+
+CUT_OFF = chat_ok("", finish="length", prompt=1100, completion=64)
+
+
+def test_a_cut_off_empty_reply_from_an_unflagged_model_gives_the_thinking_hint(tmp_path):
+    with client_for(tmp_path, Manager(lambda _r: httpx.Response(200, json=CUT_OFF))) as client:
+        body = client.get("/selftest").json()
+    assert THINKING_HINT in body["hints"] and IMAGE_HINT not in body["hints"]
+
+
+def test_the_thinking_hint_is_absent_when_the_model_is_flagged(tmp_path):
+    with client_for(tmp_path, Manager(lambda _r: httpx.Response(200, json=CUT_OFF)), GENAI_THINKING_MODELS=MODEL) as client:
+        body = client.get("/selftest").json()
+    assert body["hints"] == []
+
+
+def test_very_few_prompt_tokens_for_an_image_gives_the_image_hint(tmp_path):
+    manager = Manager(lambda _r: httpx.Response(200, json=chat_ok({"label": "caption"}, prompt=221)))
+    with client_for(tmp_path, manager) as client:
+        body = client.get("/selftest").json()
+    assert body["hints"] == [IMAGE_HINT]
+
+
+def test_the_image_hint_threshold_is_a_setting(tmp_path):
+    manager = Manager(lambda _r: httpx.Response(200, json=chat_ok({"label": "caption"}, prompt=221)))
+    with client_for(tmp_path, manager, GENAI_MIN_IMAGE_PROMPT_TOKENS="200") as client:
+        assert client.get("/selftest").json()["hints"] == []
+
+
+def test_a_healthy_mock_has_no_hints(tmp_path):
+    manager = Manager(lambda _r: httpx.Response(200, json=chat_ok({"label": "caption"}, prompt=1100)))
+    with client_for(tmp_path, manager) as client:
+        assert client.get("/selftest").json()["hints"] == []
+
+
+def test_start_up_logs_one_warning_when_the_warm_up_is_cut_off(tmp_path, caplog):
+    with caplog.at_level(logging.WARNING, logger="roles_server"):
+        with client_for(tmp_path, Manager(lambda _r: httpx.Response(200, json=CUT_OFF)), warm=True):
+            pass
+    messages = [r.getMessage() for r in caplog.records if r.name == "roles_server"]
+    assert len(messages) == 1 and THINKING_HINT in messages[0] and "SECRET" not in messages[0]

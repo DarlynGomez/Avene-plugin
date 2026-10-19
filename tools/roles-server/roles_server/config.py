@@ -43,6 +43,7 @@ class Settings:
     min_text_px: float = 14.0
     tokens_per_minute: int = 10000
     image_patch_px: int = 14
+    min_image_prompt_tokens: int = 500
     log_path: str = "roles-server.log.jsonl"
     crop_dir: str | None = None
 
@@ -77,6 +78,7 @@ class Settings:
             min_text_px=_number(env, "ROLES_MIN_TEXT_PX", 14),
             tokens_per_minute=int(_number(env, "GENAI_TOKENS_PER_MINUTE", 10000)),
             image_patch_px=int(_number(env, "GENAI_IMAGE_PATCH_PX", 14)),
+            min_image_prompt_tokens=int(_number(env, "GENAI_MIN_IMAGE_PROMPT_TOKENS", 500)),
             log_path=env.get("ROLES_LOG_PATH", "roles-server.log.jsonl"),
             crop_dir=env.get("ROLES_CROP_DIR") or None,
         )

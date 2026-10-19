@@ -8,6 +8,10 @@ Each line names the spec section that is now out of date and the exact new wordi
 - ROLES_SPEC section 11 point 3: 5 seconds becomes 13 seconds.
 - The final live value is the advisor's "slowest acceptable reply" row of the pass mark.
 
+## C2 Self-test hints
+
+- ROLES_SPEC section 11, self-test: the result also holds a `hints` list of plain warnings. Hint 1, "The replies were cut off. If GENAI_MODEL is a thinking model, add it to GENAI_THINKING_MODELS so it gets room to think and answer.", appears when a reply is empty with finish_reason length and the model is not in GENAI_THINKING_MODELS. Hint 2, "The service reported very few prompt tokens for an image, so the image may not have reached the model.", appears when an image request reports fewer prompt tokens than GENAI_MIN_IMAGE_PROMPT_TOKENS (default 500; qwen reports 1057 to 1290 for the self-test crops, gemma reported 221). At start the server logs hint 1 as a warning when the warm-up reply is empty and cut off.
+
 ## Blocked
 
 Nothing so far.
