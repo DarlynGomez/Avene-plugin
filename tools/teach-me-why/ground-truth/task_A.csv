@@ -1,0 +1,32 @@
+task,screen,id,text,fg,bg,size,weight,role,root
+A,A1,A1.title,Lakeside Café,#2B2118,#FFFFFF,24,700,heading,
+A,A1,A1.subtitle,Open until 6 pm,#B6ADA5,#FFFFFF,14,400,caption,R1
+A,A1,A1.watermark,CAFÉ,#DDCEBF,#F1E6D8,56,700,decorative,R4
+A,A1,A1.tagline,"Fresh baked, every morning",#2B2118,#F1E6D8,16,500,body,
+A,A1,A1.section,Today's specials,#C59565,#FAF7F2,28,400,heading,R3
+A,A1,A1.card1.name,Avocado Toast,#2B2118,#FFFFFF,16,600,heading,
+A,A1,A1.card1.desc,"Sourdough, avocado, lemon",#5A4C3F,#FFFFFF,14,400,body,
+A,A1,A1.card1.caption,Vegan · 320 cal,#B6ADA5,#FFFFFF,12,400,caption,R1
+A,A1,A1.card1.price,$9.50,#2B2118,#FFFFFF,16,600,label,
+A,A1,A1.card1.button.label,Add,#FFFFFF,#CD7930,14,500,button text,R2
+A,A1,A1.card2.name,Oat Latte,#2B2118,#FFFFFF,16,600,heading,
+A,A1,A1.card2.desc,Espresso with steamed oat milk,#5A4C3F,#FFFFFF,14,400,body,
+A,A1,A1.card2.caption,Dairy free · 140 cal,#B6ADA5,#FFFFFF,12,400,caption,R1
+A,A1,A1.card2.price,$4.75,#2B2118,#FFFFFF,16,600,label,
+A,A1,A1.card2.button.label,Add,#FFFFFF,#CD7930,14,500,button text,R2
+A,A1,A1.card3.name,Ricotta Toast,#2B2118,#FFFFFF,16,600,heading,
+A,A1,A1.card3.desc,"Whipped ricotta, lemon zest, honey",#5A4C3F,#FFFFFF,14,400,body,
+A,A1,A1.card3.caption,Vegetarian · 280 cal,#B6ADA5,#FFFFFF,12,400,caption,R1
+A,A1,A1.card3.price,$8.25,#2B2118,#FFFFFF,16,600,label,
+A,A1,A1.card3.button.label,Add,#FFFFFF,#CD7930,14,500,button text,R2
+A,A2,A2.title,Lakeside Café,#2B2118,#FFFFFF,24,700,heading,
+A,A2,A2.heading,Order summary,#C59565,#FAF7F2,28,400,heading,R3
+A,A2,A2.card.item1,Avocado Toast,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.price1,$9.50,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.item2,Oat Latte,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.price2,$4.75,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.totallabel,Total,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.total,$14.25,#2B2118,#FFFFFF,16,600,label,
+A,A2,A2.card.note1,Pickup at 4:30 pm,#B6ADA5,#FFFFFF,12,400,caption,R1
+A,A2,A2.card.note2,Questions? Call the counter,#B6ADA5,#FFFFFF,12,400,caption,R1
+A,A2,A2.button.label,Place order,#FFFFFF,#2B2118,16,500,button text,

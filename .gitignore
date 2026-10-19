@@ -39,7 +39,6 @@ desktop.ini
 docs/
 CLAUDE.md
 
-tools/teach-me-why/ground-truth
 
 review_decisions.csv
 apply_review_decisions.py

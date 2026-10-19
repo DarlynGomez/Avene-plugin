@@ -1,0 +1,32 @@
+task,screen,id,text,fg,bg,size,weight,role,root
+B,B1,B1.title,Leaf & Co,#17261E,#FFFFFF,24,700,heading,
+B,B1,B1.subtitle,Free delivery over $40,#A2B3AA,#FFFFFF,14,400,caption,R1
+B,B1,B1.watermark,LEAF,#C1DACD,#E3EEE7,56,700,decorative,R4
+B,B1,B1.tagline,Fresh from the greenhouse,#17261E,#E3EEE7,16,500,body,
+B,B1,B1.section,This week's plants,#66AC89,#F4F8F5,28,400,heading,R3
+B,B1,B1.card1.name,Snake Plant,#17261E,#FFFFFF,16,600,heading,
+B,B1,B1.card1.desc,Thrives in low light,#3F5247,#FFFFFF,14,400,body,
+B,B1,B1.card1.caption,Low light · 14 in,#A2B3AA,#FFFFFF,12,400,caption,R1
+B,B1,B1.card1.price,$18.00,#17261E,#FFFFFF,16,600,label,
+B,B1,B1.card1.button.label,Add,#FFFFFF,#419E6F,14,500,button text,R2
+B,B1,B1.card2.name,Pothos,#17261E,#FFFFFF,16,600,heading,
+B,B1,B1.card2.desc,Trails beautifully from shelves,#3F5247,#FFFFFF,14,400,body,
+B,B1,B1.card2.caption,Easy care · 8 in,#A2B3AA,#FFFFFF,12,400,caption,R1
+B,B1,B1.card2.price,$14.00,#17261E,#FFFFFF,16,600,label,
+B,B1,B1.card2.button.label,Add,#FFFFFF,#419E6F,14,500,button text,R2
+B,B1,B1.card3.name,Peace Lily,#17261E,#FFFFFF,16,600,heading,
+B,B1,B1.card3.desc,Blooms white all season,#3F5247,#FFFFFF,14,400,body,
+B,B1,B1.card3.caption,Humid air · 16 in,#A2B3AA,#FFFFFF,12,400,caption,R1
+B,B1,B1.card3.price,$24.00,#17261E,#FFFFFF,16,600,label,
+B,B1,B1.card3.button.label,Add,#FFFFFF,#419E6F,14,500,button text,R2
+B,B2,B2.title,Leaf & Co,#17261E,#FFFFFF,24,700,heading,
+B,B2,B2.heading,Delivery summary,#66AC89,#F4F8F5,28,400,heading,R3
+B,B2,B2.card.item1,Snake Plant,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.price1,$18.00,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.item2,Pothos,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.price2,$14.00,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.totallabel,Total,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.total,$32.00,#17261E,#FFFFFF,16,600,label,
+B,B2,B2.card.note1,Arrives Thursday,#A2B3AA,#FFFFFF,12,400,caption,R1
+B,B2,B2.card.note2,Questions? Message us,#A2B3AA,#FFFFFF,12,400,caption,R1
+B,B2,B2.button.label,Place order,#FFFFFF,#17261E,16,500,button text,
