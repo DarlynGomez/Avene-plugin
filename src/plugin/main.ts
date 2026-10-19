@@ -1,5 +1,5 @@
-import { handleExplanationMessage } from "./lifecycle/explanationProtocol";
-import { isExplanationMessage } from "../shared/study/explanationMessageTypes";
+import { handleExplanationOrRole, isExplanationOrRole } from "./lifecycle/otherProtocols";
+import { PRECOMPUTE_ROLES_COMMAND, requestPrecompute } from "./roles/adapter/precompute";
 import { handleAdjustMessage } from "./lifecycle/adjustProtocol";
 import { isAdjustMessage } from "./lifecycle/isAdjustMessage";
 import {
@@ -45,8 +45,8 @@ async function handleUiMessage(rawMessage: unknown): Promise<void> {
     return;
   }
 
-  if (isExplanationMessage(message)) {
-    handleExplanationMessage(message);
+  if (isExplanationOrRole(message)) {
+    await handleExplanationOrRole(message, (reply) => figma.ui.postMessage(reply));
     return;
   }
 
@@ -135,6 +135,7 @@ if (figma.command === RESET_COMMAND) {
 } else if (figma.command === EXPORT_ISSUES_COMMAND) {
   void exportIssuesToConsole().finally(() => figma.closePlugin());
 } else {
+  if (figma.command === PRECOMPUTE_ROLES_COMMAND) requestPrecompute();
   startCalibrationUi();
   // Ahead of detection so no issue list can reach the UI before the study state
   sendStudyState((reply) => figma.ui.postMessage(reply));

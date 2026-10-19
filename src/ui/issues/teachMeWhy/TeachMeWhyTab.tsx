@@ -1,5 +1,6 @@
 import { rootName } from "../rootName";
 import type { TeachMeWhyState } from "./useTeachMeWhy";
+import { RoleQuestion } from "../../roles/RoleQuestion";
 import { DepthGroup } from "./DepthGroup";
 import { ExplanationCard } from "./ExplanationCard";
 import { ExplanationContextLine } from "./ExplanationContextLine";
@@ -26,6 +27,9 @@ export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
           required={view.required}
           onBack={state.backToIssue}
         />
+        {state.role?.view?.allowed && (
+          <RoleQuestion view={state.role.view} onAnswer={state.role.answer} />
+        )}
         <div className={styles.body}>
           <DepthGroup depth={state.depth} onChange={state.changeDepth} />
           <ExplanationCard

@@ -45,9 +45,10 @@ export function buildRoleAnswered(
   ctx: StudyEventContext,
   at: string,
   nodeId: string,
-  role: string
+  role: string,
+  details: Omit<RoleAnsweredEvent, "type" | "at" | "ctx" | "nodeId" | "role"> = {}
 ): RoleAnsweredEvent {
-  return { type: "role_answered", at, ctx, nodeId, role };
+  return { type: "role_answered", at, ctx, nodeId, role, ...details };
 }
 
 export function buildTeachMeWhyOpened(

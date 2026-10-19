@@ -8,10 +8,11 @@ import {
 import { EXPLANATION_TABLE } from "../../../shared/teachMeWhy/explanationTableData";
 import type { Depth } from "../../../shared/teachMeWhy/explanationTypes";
 import { resolveFocusRoot } from "../../../shared/teachMeWhy/resolveFocusRoot";
+import { toInstanceRoles } from "../../../shared/roles/lookupRole";
+import { useRoleState, type RoleQuestionState } from "../../roles/useRoleState";
 import { focusRootCard } from "../hooks/useMarkerSignals";
 import { sendExplanationEvent } from "./sendExplanationEvent";
 
-const NO_ROLES = () => undefined;
 const NO_SELECTION: ReadonlySet<string> = new Set();
 
 export interface TeachMeWhyState {
@@ -23,6 +24,8 @@ export interface TeachMeWhyState {
   hide: () => void;
   showAgain: () => void;
   backToIssue: () => void;
+  /** The question about what kind of text the shown issue is, null when it may not be shown */
+  role: RoleQuestionState | null;
 }
 
 /**
@@ -32,7 +35,8 @@ export interface TeachMeWhyState {
 export function useTeachMeWhy(
   roots: readonly Root[],
   setTab: (tab: "live-watch" | "teach-me-why") => void,
-  fontSizeOf: (issueId: string) => number | null
+  fontSizeOf: (issueId: string) => number | null,
+  roleQuestionsShown = false
 ) {
   const [depth, setDepth] = useState<Depth>(1);
   const [lastOpened, setLastOpened] = useState<string | null>(null);
@@ -42,6 +46,17 @@ export function useTeachMeWhy(
     () => resolveFocusRoot(roots, NO_SELECTION, lastOpened),
     [roots, lastOpened]
   );
+  const layerId =
+    root?.instances.find((instance) => instance.issueId === root.representativeIssueId)?.nodeId ??
+    null;
+  const role = useRoleState(layerId, roleQuestionsShown);
+  const answered = role.view?.answer?.role ?? null;
+  const ruleRole = role.view?.rule?.role ?? null;
+  // The answer wins, then the rule, and a model suggestion is never read until it is answered
+  const rolesFor = useCallback(
+    (nodeId: string) => (nodeId === layerId ? toInstanceRoles(ruleRole, answered) : undefined),
+    [layerId, ruleRole, answered]
+  );
   const view = useMemo(
     () =>
       root
@@ -49,11 +64,11 @@ export function useTeachMeWhy(
             root,
             depth,
             EXPLANATION_TABLE,
-            NO_ROLES,
+            rolesFor,
             fontSizeOf(root.representativeIssueId)
           )
         : null,
-    [root, depth, fontSizeOf]
+    [root, depth, fontSizeOf, rolesFor]
   );
 
   const open = useCallback(
@@ -63,12 +78,12 @@ export function useTeachMeWhy(
         target,
         depth,
         EXPLANATION_TABLE,
-        NO_ROLES,
+        rolesFor,
         fontSizeOf(target.representativeIssueId)
       );
       sendExplanationEvent({ kind: "opened", key: opened.key, source });
     },
-    [depth, fontSizeOf]
+    [depth, fontSizeOf, rolesFor]
   );
 
   /** The link on a root card */
@@ -113,6 +128,7 @@ export function useTeachMeWhy(
         return next;
       });
     },
+    role: roleQuestionsShown ? role : null,
     backToIssue: () => {
       const signature = root?.signature;
       setTab("live-watch");

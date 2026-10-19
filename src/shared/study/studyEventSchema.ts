@@ -87,7 +87,14 @@ const CHECKS: Record<StudyEvent["type"], (e: Rec) => boolean> = {
     (e.surface !== "teach_me_why" || (explanationKeyOk(e.key) && sourceOk(e.source))),
   depth_changed: (e) => explanationKeyOk(e.key) && depthOk(e.toDepth),
   explanation_dismissed: (e) => explanationKeyOk(e.key),
-  role_answered: (e) => str(e.nodeId) && str(e.role)
+  role_answered: (e) =>
+    str(e.nodeId) &&
+    str(e.role) &&
+    (e.source === undefined || oneOf(["rule", "ai_precomputed", "ai_live", "none"], e.source)) &&
+    (e.suggested === undefined || e.suggested === null || str(e.suggested)) &&
+    (e.response === undefined || oneOf(["confirmed", "changed", "unsure"], e.response)) &&
+    (e.ruleId === undefined || str(e.ruleId)) &&
+    (e.model === undefined || str(e.model))
 };
 
 /** Why a stored value is not a usable event, or null when it is one */

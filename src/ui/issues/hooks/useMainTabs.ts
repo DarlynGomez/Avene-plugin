@@ -9,7 +9,7 @@ import { useTeachMeWhy } from "../teachMeWhy/useTeachMeWhy";
 
 /** The two main tabs, a hidden Teach Me Why tab can never be the active one */
 export function useMainTabs(
-  visibility: Pick<ParticipantVisibility, "teachMeWhyTab">,
+  visibility: Pick<ParticipantVisibility, "teachMeWhyTab" | "elementRoleQuestions">,
   reviewRoots: readonly Root[],
   decisionRoots: readonly Root[],
   issuesById: ReadonlyMap<string, IssueSummary>
@@ -25,7 +25,12 @@ export function useMainTabs(
     },
     [issuesById]
   );
-  const { state, openFromCard, openFromTabBar } = useTeachMeWhy(roots, setMainTab, fontSizeOf);
+  const { state, openFromCard, openFromTabBar } = useTeachMeWhy(
+    roots,
+    setMainTab,
+    fontSizeOf,
+    visibility.teachMeWhyTab && visibility.elementRoleQuestions
+  );
 
   const onMainTabChange = useCallback(
     (tab: MainTab) => (tab === "teach-me-why" ? openFromTabBar() : setMainTab(tab)),

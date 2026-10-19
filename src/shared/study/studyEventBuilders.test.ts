@@ -400,3 +400,39 @@ describe("the remaining events", () => {
     for (const event of events) expect(isStudyEvent(event)).toBe(true);
   });
 });
+
+describe("role_answered with the source of the suggestion", () => {
+  const ctx = {
+    participantId: "P01",
+    block: 1,
+    task: "A",
+    condition: "live",
+    phase: "designing"
+  } as const;
+  it("carries the source, the label shown, the response and the model, and is a valid event", () => {
+    const event = buildRoleAnswered(ctx, "2026-10-15T10:00:00.000Z", "1:1", "label", {
+      source: "ai_live",
+      suggested: "button text",
+      response: "changed",
+      model: "qwen2.5vl:32b-gwtics-figma-frozen"
+    });
+    expect(event).toMatchObject({
+      type: "role_answered",
+      source: "ai_live",
+      suggested: "button text",
+      response: "changed"
+    });
+    expect(isStudyEvent(event)).toBe(true);
+  });
+  it("is still valid with no details, as older events were", () => {
+    expect(isStudyEvent(buildRoleAnswered(ctx, "2026-10-15T10:00:00.000Z", "1:1", "caption"))).toBe(
+      true
+    );
+  });
+  it("refuses a source that is not one of the four", () => {
+    const event = buildRoleAnswered(ctx, "2026-10-15T10:00:00.000Z", "1:1", "caption", {
+      source: "model" as never
+    });
+    expect(isStudyEvent(event)).toBe(false);
+  });
+});

@@ -65,3 +65,16 @@ describe("secondary text in the explanation card", () => {
     expect(read("ExplanationContextLine.module.css")).toMatch(/position:\s*sticky/);
   });
 });
+
+describe("secondary text in the role question", () => {
+  const css = read("../../roles/RoleQuestion.module.css");
+  it.each([
+    ["the note under a suggestion", ".note"],
+    ["each meaning in the choices", ".meaning"]
+  ])("%s reaches 4.5:1 on the card", (_name, selector) => {
+    expect(ratio(colorOf(css, selector), "--color-card")).toBeGreaterThanOrEqual(4.5);
+  });
+  it("the primary button text reaches 4.5:1 on its fill", () => {
+    expect(ratio(colorOf(css, ".primary"), "--color-accent")).toBeGreaterThanOrEqual(4.5);
+  });
+});
