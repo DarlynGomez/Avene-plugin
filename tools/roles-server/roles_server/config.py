@@ -30,7 +30,7 @@ class Settings:
     base_url: str
     api_key: str = field(repr=False)
     model: str
-    timeout_seconds: float = 4.0
+    timeout_seconds: float = 10.0
     precompute_timeout_seconds: float = 30.0
     warmup_timeout_seconds: float = 60.0
     thinking_models: frozenset[str] = frozenset()
@@ -64,7 +64,7 @@ class Settings:
             base_url=env["GENAI_BASE_URL"].rstrip("/"),
             api_key=env["GENAI_API_KEY"],
             model=env["GENAI_MODEL"],
-            timeout_seconds=_number(env, "GENAI_TIMEOUT_SECONDS", 4.0),
+            timeout_seconds=_number(env, "GENAI_TIMEOUT_SECONDS", 10.0),
             precompute_timeout_seconds=_number(env, "GENAI_PRECOMPUTE_TIMEOUT_SECONDS", 30.0),
             warmup_timeout_seconds=_number(env, "GENAI_WARMUP_TIMEOUT_SECONDS", 60.0),
             thinking_models=thinking,
