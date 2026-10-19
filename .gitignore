@@ -46,3 +46,11 @@ apply_review_decisions.py
 tools/teach-me-why/README.md
 review_v3.csv.bak
 review_decisions_v3.csv
+# Role suggestion server, its key file and its virtual environment
+tools/roles-server/.env
+tools/roles-server/.venv/
+
+tools/roles-server/*.jsonl
+tools/roles-server/crops/
+tools/roles-server/.pytest_cache/
+tools/roles-server/**/__pycache__/
