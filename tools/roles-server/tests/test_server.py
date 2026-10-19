@@ -6,7 +6,7 @@ import httpx
 import pytest
 
 from roles_server.config import ConfigError, Settings
-from tests.helpers import KEY, Manager, chat_ok, client_for, log_lines, png_b64, role_body, settings
+from tests.helpers import KEY, MODEL, Manager, chat_ok, client_for, log_lines, png_b64, role_body, settings
 
 
 def test_it_refuses_to_be_configured_to_listen_anywhere_but_this_computer(tmp_path):
@@ -161,7 +161,30 @@ def test_crops_are_saved_in_precompute_mode_only(tmp_path):
         client.post("/v1/role", json=role_body(requestId="live-1"))
         assert not crops.exists()
         client.post("/v1/role", json=role_body(requestId="pre/1", mode="precompute"))
-    assert [p.name for p in crops.iterdir()] == ["pre_1.png"]
+    assert sorted(p.name for p in crops.iterdir()) == ["pre_1.json", "pre_1.png"]
+
+
+def test_a_saved_crop_has_a_json_with_exactly_the_request_properties_and_the_answer(tmp_path):
+    crops = tmp_path / "crops"
+    image = png_b64()
+    with client_for(tmp_path, Manager(), ROLES_CROP_DIR=str(crops)) as client:
+        client.post("/v1/role", json=role_body(requestId="n1-170-1", image=image, mode="precompute"))
+    text = (crops / "n1-170-1.json").read_text()
+    saved = json.loads(text)
+    assert list(saved) == [
+        "requestId", "crop", "exportScale", "fontSizePx", "inputs", "backgroundHex", "label", "reason", "model", "ms",
+    ]
+    assert saved["requestId"] == "n1-170-1" and saved["label"] == "caption" and saved["model"] == MODEL
+    assert saved["inputs"] == role_body()["inputs"] and saved["backgroundHex"] == "#FFFFFF"
+    assert image not in text and "base64" not in text
+
+
+def test_a_failed_answer_is_saved_beside_its_crop_as_unsure(tmp_path):
+    crops = tmp_path / "crops"
+    with client_for(tmp_path, Manager(lambda _r: httpx.Response(503)), ROLES_CROP_DIR=str(crops)) as client:
+        client.post("/v1/role", json=role_body(requestId="n2-1-1", mode="precompute"))
+    saved = json.loads((crops / "n2-1-1.json").read_text())
+    assert saved["label"] == "unsure" and saved["reason"] == "unreachable"
 
 
 def test_the_live_timeout_defaults_to_ten_seconds(tmp_path):

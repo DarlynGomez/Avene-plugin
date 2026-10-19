@@ -41,7 +41,7 @@ with any other address. It warms the model once before it accepts requests.
 | GENAI_TOKENS_PER_MINUTE | 10000 | The service limit the server paces itself under |
 | ROLES_MAX_IMAGE_SIDE, ROLES_MIN_TEXT_PX | 1024, 14 | The image cap and the legibility floor |
 | ROLES_PORT, ROLES_HOST | 8750, 127.0.0.1 | Loopback only |
-| ROLES_LOG_PATH, ROLES_CROP_DIR | roles-server.log.jsonl, none | One JSON line per request, and where precompute crops are kept |
+| ROLES_LOG_PATH, ROLES_CROP_DIR | roles-server.log.jsonl, none | One JSON line per request, and where precompute crops are kept, each as `<id>.png` with `<id>.json` beside it |
 
 ## Tests
 

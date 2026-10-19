@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import hashlib
-import re
 import uuid
-from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from . import labels
 from .config import Settings
+from .cropstore import save_crop
 from .imaging import ImageRefused, prepare_image
 from .model_call import ModelCaller
 from .requestlog import RequestLog
@@ -32,13 +31,6 @@ class RoleRequest(BaseModel):
 
 def unsure(reason: str, model: str | None, ms: int = 0) -> dict[str, Any]:
     return {"label": "unsure", "reason": reason, "model": model, "ms": ms}
-
-
-def _save_crop(directory: str, request_id: str, png: bytes) -> None:
-    safe = re.sub(r"[^A-Za-z0-9_-]", "_", request_id)[:80] or "crop"
-    path = Path(directory)
-    path.mkdir(parents=True, exist_ok=True)
-    (path / f"{safe}.png").write_bytes(png)
 
 
 async def classify(
@@ -64,8 +56,6 @@ async def classify(
         )
     except ImageRefused as refused:
         return refuse(refused.reason)
-    if request.mode == "precompute" and settings.crop_dir:
-        _save_crop(settings.crop_dir, request.requestId, prepared.png)
     answer = await caller.ask(
         prepared.png, (prepared.width, prepared.height), labels.INSTRUCTION, request.mode, request.inputs
     )
@@ -76,4 +66,7 @@ async def classify(
         prompt_tokens=answer.prompt_tokens, completion_tokens=answer.completion_tokens,
         finish_reason=answer.finish_reason, schema_valid=answer.schema_valid,
     )
-    return {"label": label, "reason": answer.reason, "model": answer.model or settings.model, "ms": answer.ms}
+    result = {"label": label, "reason": answer.reason, "model": answer.model or settings.model, "ms": answer.ms}
+    if request.mode == "precompute" and settings.crop_dir:
+        save_crop(settings.crop_dir, request, prepared.png, result)
+    return result
