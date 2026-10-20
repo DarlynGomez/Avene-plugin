@@ -30,7 +30,7 @@ class Settings:
     base_url: str
     api_key: str = field(repr=False)
     model: str
-    timeout_seconds: float = 4.0
+    timeout_seconds: float = 10.0
     precompute_timeout_seconds: float = 30.0
     warmup_timeout_seconds: float = 60.0
     thinking_models: frozenset[str] = frozenset()
@@ -43,6 +43,7 @@ class Settings:
     min_text_px: float = 14.0
     tokens_per_minute: int = 10000
     image_patch_px: int = 14
+    min_image_prompt_tokens: int = 500
     log_path: str = "roles-server.log.jsonl"
     crop_dir: str | None = None
 
@@ -64,7 +65,7 @@ class Settings:
             base_url=env["GENAI_BASE_URL"].rstrip("/"),
             api_key=env["GENAI_API_KEY"],
             model=env["GENAI_MODEL"],
-            timeout_seconds=_number(env, "GENAI_TIMEOUT_SECONDS", 4.0),
+            timeout_seconds=_number(env, "GENAI_TIMEOUT_SECONDS", 10.0),
             precompute_timeout_seconds=_number(env, "GENAI_PRECOMPUTE_TIMEOUT_SECONDS", 30.0),
             warmup_timeout_seconds=_number(env, "GENAI_WARMUP_TIMEOUT_SECONDS", 60.0),
             thinking_models=thinking,
@@ -77,6 +78,7 @@ class Settings:
             min_text_px=_number(env, "ROLES_MIN_TEXT_PX", 14),
             tokens_per_minute=int(_number(env, "GENAI_TOKENS_PER_MINUTE", 10000)),
             image_patch_px=int(_number(env, "GENAI_IMAGE_PATCH_PX", 14)),
+            min_image_prompt_tokens=int(_number(env, "GENAI_MIN_IMAGE_PROMPT_TOKENS", 500)),
             log_path=env.get("ROLES_LOG_PATH", "roles-server.log.jsonl"),
             crop_dir=env.get("ROLES_CROP_DIR") or None,
         )

@@ -1,4 +1,5 @@
 import { ROLE_LABELS, type DecidedRole, type RoleLabel } from "./roleLabels";
+import type { ReviewResult } from "./reviewDecision";
 import type { RoleServerReply, RoleServerRequest } from "./roleRequest";
 import type { RoleResponse } from "./roleStorage";
 
@@ -28,6 +29,8 @@ export type RoleUiMessage =
   | { type: "ROLE_SERVER_RESULT"; nodeId: string; reply: RoleServerReply }
   | { type: "ROLE_ANSWER"; nodeId: string; role: RoleLabel; response: RoleResponse }
   | { type: "ROLE_PRECOMPUTE_SUBSCRIBE" }
+  | { type: "ROLE_REVIEW_SUBSCRIBE" }
+  | { type: "ROLE_REVIEW_IMPORT"; csv: string }
   | {
       type: "ROLE_PRECOMPUTE_RESULT";
       nodeId: string;
@@ -45,7 +48,10 @@ export type RolePluginMessage =
       nodeId: string;
       request: RoleServerRequest;
     }
-  | { type: "ROLE_PRECOMPUTE_DONE"; summary: PrecomputeSummary };
+  | { type: "ROLE_PRECOMPUTE_DONE"; summary: PrecomputeSummary }
+  | { type: "ROLE_REVIEW_MODE"; mode: "export"; count: number; csv: string }
+  | { type: "ROLE_REVIEW_MODE"; mode: "import" }
+  | { type: "ROLE_REVIEW_RESULT"; result: ReviewResult };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -56,7 +62,10 @@ export function isRoleUiMessage(value: unknown): value is RoleUiMessage {
   if (!isRecord(value)) return false;
   switch (value.type) {
     case "ROLE_PRECOMPUTE_SUBSCRIBE":
+    case "ROLE_REVIEW_SUBSCRIBE":
       return true;
+    case "ROLE_REVIEW_IMPORT":
+      return typeof value.csv === "string";
     case "ROLE_QUERY":
       return typeof value.nodeId === "string";
     case "ROLE_SERVER_RESULT":
@@ -86,7 +95,9 @@ export function isRolePluginMessage(value: unknown): value is RolePluginMessage 
       "ROLE_STATE",
       "ROLE_PRECOMPUTE_START",
       "ROLE_PRECOMPUTE_ITEM",
-      "ROLE_PRECOMPUTE_DONE"
+      "ROLE_PRECOMPUTE_DONE",
+      "ROLE_REVIEW_MODE",
+      "ROLE_REVIEW_RESULT"
     ].includes(String(value.type))
   );
 }

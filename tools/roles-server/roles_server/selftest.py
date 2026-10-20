@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import io
+import logging
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
 
 from . import labels
 from .config import Settings
+from .hints import THINKING_HINT, cut_off, hints_for
 from .model_call import Answer, ModelCaller
 from .requestlog import RequestLog
 
 PROBE_INSTRUCTION = "Describe this image in a paragraph."
+
+logger = logging.getLogger("roles_server")
 
 
 def _png(image: Image.Image) -> bytes:
@@ -42,6 +46,8 @@ async def warm_up(settings: Settings, caller: ModelCaller, log: RequestLog) -> A
         prompt_tokens=answer.prompt_tokens, completion_tokens=answer.completion_tokens,
         finish_reason=answer.finish_reason, schema_valid=answer.schema_valid,
     )
+    if cut_off(settings, answer):
+        logger.warning("Warm-up reply was empty and cut off. %s", THINKING_HINT)
     return answer
 
 
@@ -82,4 +88,5 @@ async def run_selftest(settings: Settings, caller: ModelCaller, log: RequestLog)
         "failures": failures,
         "results": results,
         "probe": {"reason": probe.reason, "schema_valid": probe.schema_valid},
+        "hints": hints_for(settings, every),
     }
