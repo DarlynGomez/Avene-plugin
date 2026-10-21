@@ -23,6 +23,9 @@ describe("manifest network access", () => {
     expect(manifest.networkAccess.reasoning).toMatch(/role suggestion server/);
     expect(manifest.networkAccess.reasoning).toMatch(/RIT/);
   });
+  it("has the debug command that reports why detection finds nothing", () => {
+    expect(manifest.menu.map((item) => item.command)).toContain("detection-check");
+  });
   it("has the researcher command that precomputes roles", () => {
     expect(manifest.menu.map((item) => item.command)).toContain("precompute-roles");
   });

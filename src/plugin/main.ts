@@ -7,8 +7,7 @@ import {
   registerAdjustSelectionRestore
 } from "./lifecycle/adjustLifecycle";
 import { handleCalibrationMessage, isCalibrationMessage } from "./lifecycle/calibrationProtocol";
-// Temporary, see exportIssuesDebug.ts for how to remove it
-import { exportIssuesToConsole } from "./lifecycle/exportIssuesDebug";
+import { DEBUG_COMMANDS, runDebugCommand } from "./lifecycle/debugCommands";
 import { handleIssueMessage, isIssueMessage } from "./lifecycle/issuesProtocol";
 import { handleRootMessage, isRootMessage } from "./lifecycle/rootActionsProtocol";
 import { handleSelectionMessage, isSelectionMessage } from "./lifecycle/selectionProtocol";
@@ -20,7 +19,6 @@ import { resetCalibration, type CalibrationResetResult } from "./storage/resetCa
 
 const RESET_COMMAND = "reset-calibration";
 const RESET_STUDY_COMMAND = "reset-study";
-const EXPORT_ISSUES_COMMAND = "export-issues"; // TEMPORARY, see exportIssuesDebug.ts
 const UI_WIDTH = 460;
 const UI_HEIGHT = 680;
 
@@ -132,8 +130,8 @@ if (figma.command === RESET_COMMAND) {
   void runReset();
 } else if (figma.command === RESET_STUDY_COMMAND) {
   runResetStudy();
-} else if (figma.command === EXPORT_ISSUES_COMMAND) {
-  void exportIssuesToConsole().finally(() => figma.closePlugin());
+} else if (DEBUG_COMMANDS.includes(figma.command)) {
+  void runDebugCommand(figma.command);
 } else {
   requestRoleCommand(figma.command);
   startCalibrationUi();
