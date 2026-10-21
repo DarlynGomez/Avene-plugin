@@ -34,6 +34,10 @@
       "command": "reset-study"
     },
     {
+      "name": "Detection check (debug)",
+      "command": "detection-check"
+    },
+    {
       "name": "Export issues JSON (dev, temporary)",
       "command": "export-issues"
     }
