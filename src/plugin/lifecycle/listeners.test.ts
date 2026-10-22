@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { scanAndSync } from "./scanAndSync";
 
 vi.mock("./scanAndSync", () => ({ scanAndSync: vi.fn() }));
+vi.mock("../detection/adapter/dependentTexts", () => ({
+  dependentTextIds: (node: { texts?: string[] }) => node.texts ?? []
+}));
 
 describe("registerDocumentChangeListener", () => {
   let documentChangeHandler: ((event: { documentChanges: unknown[] }) => void) | undefined;
@@ -49,6 +52,71 @@ describe("registerDocumentChangeListener", () => {
   it("always scans a deleted node, so its issue can resolve", async () => {
     await fireAndFlush([{ type: "DELETE", id: "1:3" }]);
     expect(scanAndSync).toHaveBeenCalledWith(new Set(["1:3"]), "scan");
+  });
+
+  describe("a layer behind or around text", () => {
+    const shape = (patch: Record<string, unknown> = {}) => ({
+      type: "RECTANGLE",
+      removed: false,
+      texts: ["9:1", "9:2"],
+      ...patch
+    });
+
+    it("rescans the text on a shape or frame whose fill changed, as well as the shape", async () => {
+      await fireAndFlush([
+        { type: "PROPERTY_CHANGE", id: "2:2", properties: ["fills"], node: shape() }
+      ]);
+      expect(scanAndSync).toHaveBeenCalledWith(new Set(["2:2", "9:1", "9:2"]), "scan");
+    });
+
+    it.each(["visible", "opacity", "parent"])(
+      "does so for a change of %s too",
+      async (property) => {
+        await fireAndFlush([
+          { type: "PROPERTY_CHANGE", id: "2:2", properties: [property], node: shape() }
+        ]);
+        expect(scanAndSync).toHaveBeenCalledWith(new Set(["2:2", "9:1", "9:2"]), "scan");
+      }
+    );
+
+    it("does not rescan the text when the shape only moved or was resized", async () => {
+      await fireAndFlush([
+        { type: "PROPERTY_CHANGE", id: "2:2", properties: ["x", "y", "width"], node: shape() }
+      ]);
+      expect(scanAndSync).not.toHaveBeenCalled();
+    });
+
+    it("does not look for dependents of a shape that was removed", async () => {
+      await fireAndFlush([
+        {
+          type: "PROPERTY_CHANGE",
+          id: "2:2",
+          properties: ["fills"],
+          node: shape({ removed: true })
+        }
+      ]);
+      expect(scanAndSync).toHaveBeenCalledWith(new Set(["2:2"]), "scan");
+    });
+
+    it("rescans a text that was moved or resized, since it may now sit on something else", async () => {
+      const text = { type: "TEXT", removed: false };
+      await fireAndFlush([
+        { type: "PROPERTY_CHANGE", id: "3:3", properties: ["x", "y"], node: text }
+      ]);
+      expect(scanAndSync).toHaveBeenCalledWith(new Set(["3:3"]), "scan");
+    });
+
+    it("does not rescan a shape that was moved when it is not text", async () => {
+      await fireAndFlush([
+        {
+          type: "PROPERTY_CHANGE",
+          id: "3:3",
+          properties: ["x"],
+          node: { type: "FRAME", removed: false }
+        }
+      ]);
+      expect(scanAndSync).not.toHaveBeenCalled();
+    });
   });
 
   it("coalesces many rapid relevant changes into exactly one scan", async () => {

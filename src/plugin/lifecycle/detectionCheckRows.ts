@@ -45,16 +45,40 @@ function chainOf(node: TextNode): string[] {
   return layers;
 }
 
-/** The same snapshot and rule live detection uses, run here without saving anything */
-export async function rowFor(node: TextNode): Promise<TextRow> {
-  const snapshot = await snapshotTextNode(node);
-  const finding = contrastRule.evaluate(snapshot);
+type Snapshot = Awaited<ReturnType<typeof snapshotTextNode>>;
+
+function describeBackground(snapshot: Snapshot): string {
+  const { background } = snapshot;
+  return background
+    ? `${rgbToHex(background)} alpha ${snapshot.backgroundAlpha}, from ${JSON.stringify(snapshot.backgroundSource)}`
+    : "not resolved";
+}
+
+/** What the contrast rule makes of one snapshot, the same steps live detection takes */
+function judge(snapshot: Snapshot) {
   const { foreground, background, fontSizePx, isBold } = snapshot;
   const measured = foreground && background ? contrastRatio(foreground, background) : null;
   const sizeClass =
     fontSizePx !== null && isBold !== null ? classifyTextSize(fontSizePx, isBold) : null;
   const evaluated =
     snapshot.indeterminateReasons.length === 0 && measured !== null && sizeClass !== null;
+  const verdict: TextRow["verdict"] = contrastRule.evaluate(snapshot)
+    ? "flagged"
+    : evaluated
+      ? "passes"
+      : "not evaluated";
+  return { measured, sizeClass, verdict };
+}
+
+/** The same snapshot and rule live detection uses, run here without saving anything */
+export async function rowFor(node: TextNode): Promise<TextRow> {
+  const snapshot = await snapshotTextNode(node);
+  const old = await snapshotTextNode(node, { shapesBehind: false });
+  const now = judge(snapshot);
+  const before = judge(old);
+  const { foreground, sizeClass, measured, verdict } = { ...now, foreground: snapshot.foreground };
+  const sameResult =
+    describeBackground(old) === describeBackground(snapshot) && before.verdict === verdict;
   return {
     id: node.id,
     name: node.name,
@@ -67,9 +91,7 @@ export async function rowFor(node: TextNode): Promise<TextRow> {
     foreground: foreground
       ? `${rgbToHex(foreground)} alpha ${snapshot.foregroundAlpha}`
       : "not resolved",
-    background: background
-      ? `${rgbToHex(background)} alpha ${snapshot.backgroundAlpha}, from ${JSON.stringify(snapshot.backgroundSource)}`
-      : "not resolved",
+    background: describeBackground(snapshot),
     indeterminate: [...snapshot.indeterminateReasons],
     sizeClass: sizeClass ?? "unknown",
     required:
@@ -79,6 +101,10 @@ export async function rowFor(node: TextNode): Promise<TextRow> {
           ? CONTRAST_THRESHOLD_LARGE_TEXT
           : CONTRAST_THRESHOLD_NORMAL_TEXT,
     measured,
-    verdict: finding ? "flagged" : evaluated ? "passes" : "not evaluated"
+    verdict,
+    // Only kept when counting shapes behind the text changed something, which is what the study files must not do
+    withoutShapes: sameResult
+      ? null
+      : { background: describeBackground(old), measured: before.measured, verdict: before.verdict }
   };
 }

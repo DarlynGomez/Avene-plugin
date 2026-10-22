@@ -103,6 +103,7 @@ export async function collectCheckData(): Promise<CheckData> {
       visible: nodes.filter((n) => n.visible).length,
       checked: rows.length,
       flagged: rows.filter((row) => row.verdict === "flagged").length,
+      changedByShapes: rows.filter((row) => row.withoutShapes !== null).length,
       rows: rows.slice(0, MAX_ROWS)
     },
     errors

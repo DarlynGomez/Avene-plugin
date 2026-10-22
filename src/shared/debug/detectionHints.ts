@@ -39,6 +39,11 @@ export function hintsFor(data: CheckData): string[] {
       "Issues exist now but none are saved. Close CADT and open it again from Plugins, Development, CADT, and check you are running the build named above."
     );
   }
+  if (data.text.changedByShapes > 0) {
+    hints.push(
+      `Counting shapes behind the text changed ${data.text.changedByShapes} result(s), shown as CHANGED below. On the study task files this should be 0.`
+    );
+  }
   if (data.build.commit === "unknown")
     hints.push(
       "The build has no commit recorded. Rebuild with npm run build inside the git folder."
