@@ -18,6 +18,7 @@ const row = (patch: Partial<TextRow> = {}): TextRow => ({
   required: 4.5,
   measured: 2.21,
   verdict: "flagged",
+  withoutShapes: null,
   ...patch
 });
 
@@ -36,7 +37,7 @@ const data = (patch: Partial<CheckData> = {}): CheckData => ({
   writeTest: "ok, wrote and read back a value",
   stored: { issueCount: 1, byState: { open: 1 }, study: "none" },
   selection: [],
-  text: { total: 1, visible: 1, checked: 1, flagged: 1, rows: [row()] },
+  text: { total: 1, visible: 1, checked: 1, flagged: 1, changedByShapes: 0, rows: [row()] },
   errors: [],
   ...patch
 });
@@ -63,7 +64,9 @@ describe("hintsFor", () => {
     );
   });
   it("says there is no text on the page", () => {
-    const empty = data({ text: { total: 0, visible: 0, checked: 0, flagged: 0, rows: [] } });
+    const empty = data({
+      text: { total: 0, visible: 0, checked: 0, flagged: 0, changedByShapes: 0, rows: [] }
+    });
     expect(hintsFor(empty)[0]).toMatch(/no text layer on the current page/);
   });
   it("explains a pass, and names the colours that always fail", () => {
@@ -73,6 +76,7 @@ describe("hintsFor", () => {
         visible: 1,
         checked: 1,
         flagged: 0,
+        changedByShapes: 0,
         rows: [row({ verdict: "passes", measured: 3.5, required: 3 })]
       }
     });
@@ -86,6 +90,7 @@ describe("hintsFor", () => {
         visible: 1,
         checked: 1,
         flagged: 0,
+        changedByShapes: 0,
         rows: [row({ verdict: "not evaluated", indeterminate: ["background-gradient"] })]
       }
     });
@@ -98,6 +103,32 @@ describe("hintsFor", () => {
     expect(
       hintsFor(data({ build: { commit: "unknown", dirty: null, builtAt: "unknown" } })).join(" ")
     ).toMatch(/no commit recorded/);
+  });
+});
+
+describe("shapes behind the text", () => {
+  const changed = row({
+    withoutShapes: {
+      background: '#F5F5F5 alpha 1, from {"kind":"page"}',
+      measured: 19.26,
+      verdict: "passes"
+    }
+  });
+  const withChange = data({
+    text: { total: 1, visible: 1, checked: 1, flagged: 1, changedByShapes: 1, rows: [changed] }
+  });
+  it("shows what a result was before shapes counted, only for a layer that changed", () => {
+    const text = formatReport(withChange, [], "t");
+    expect(text).toContain("1 changed by counting shapes behind the text");
+    expect(text).toContain(
+      "CHANGED by counting shapes behind the text. Before: background #F5F5F5"
+    );
+    expect(text).toContain("measured 19.26, verdict passes");
+    expect(formatReport(data(), [], "t")).not.toContain("CHANGED by");
+  });
+  it("tells the reader the study task files should show none", () => {
+    expect(hintsFor(withChange).join(" ")).toMatch(/changed 1 result\(s\).*should be 0/);
+    expect(hintsFor(data()).join(" ")).not.toMatch(/changed/);
   });
 });
 
@@ -123,6 +154,7 @@ describe("formatReport", () => {
         visible: 0,
         checked: 1,
         flagged: 0,
+        changedByShapes: 0,
         rows: [
           row({
             visible: false,

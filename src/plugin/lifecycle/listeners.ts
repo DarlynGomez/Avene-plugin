@@ -1,5 +1,6 @@
 import { createChangeBuffer } from "../detection/changeBuffer";
-import { isRelevantPropertyChange } from "../detection/relevance";
+import { dependentTextIds } from "../detection/adapter/dependentTexts";
+import { isPaintChange, isRelevantPropertyChange, isTextMove } from "../detection/relevance";
 import { activePreviewNodeIds } from "../adjust/adapter/previewState";
 import { isMarkerNodeId } from "../markers/adapter/markerNodeRegistry";
 import { MARKER_TAG_KEY } from "../markers/adapter/markerTags";
@@ -54,8 +55,18 @@ export function registerDocumentChangeListener(): void {
         buffer.add(change.id);
         continue;
       }
-      if (change.type === "PROPERTY_CHANGE" && isRelevantPropertyChange(change.properties)) {
+      if (change.type !== "PROPERTY_CHANGE") continue;
+      const node: SceneNode | RemovedNode | undefined = change.node;
+      const isText = node?.type === "TEXT";
+      if (
+        isRelevantPropertyChange(change.properties) ||
+        (isText && isTextMove(change.properties))
+      ) {
         buffer.add(change.id);
+      }
+      // A container or shape that changed paint changes the background of the text on it
+      if (node && !node.removed && !isText && isPaintChange(change.properties)) {
+        dependentTextIds(node).forEach((id) => buffer.add(id));
       }
     }
   });

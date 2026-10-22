@@ -2,7 +2,9 @@ import type { NodeSnapshot } from "../../../shared/issues/issueTypes";
 import { isBoldStyleName } from "../rules/contrast/textSizeClass";
 import { BOLD_MIN_FONT_WEIGHT } from "../rules/contrast/thresholds";
 import { resolveColors } from "../colorResolution";
+import { FEATURE_BACKDROP_SHAPES } from "../../../shared/detectionFlags";
 import { buildAncestorChain } from "./ancestorChain";
+import { buildBackdropChain } from "./backdropChain";
 import { extractNodeLayer } from "./paintExtraction";
 import { resolveForegroundBinding } from "./resolveBinding";
 import { resolveScreen } from "./resolveScreen";
@@ -11,7 +13,10 @@ import { resolveScreen } from "./resolveScreen";
  * Builds a NodeSnapshot, one of the few files that read Figma node properties
  * Async only because the binding lookup awaits, every other field reads straight off the node
  */
-export async function snapshotTextNode(node: TextNode): Promise<NodeSnapshot> {
+export async function snapshotTextNode(
+  node: TextNode,
+  options: { shapesBehind: boolean } = { shapesBehind: FEATURE_BACKDROP_SHAPES }
+): Promise<NodeSnapshot> {
   const reasons = new Set<string>();
 
   const fontSize = node.fontSize;
@@ -24,7 +29,8 @@ export async function snapshotTextNode(node: TextNode): Promise<NodeSnapshot> {
   const fontStyleName = fontName === figma.mixed ? null : fontName.style;
   const isBold = resolveIsBold(node, fontName, reasons);
 
-  const chain = [extractNodeLayer(node), ...buildAncestorChain(node)];
+  const behind = options.shapesBehind ? buildBackdropChain(node) : buildAncestorChain(node);
+  const chain = [extractNodeLayer(node), ...behind];
   const colorResult = resolveColors(chain);
   for (const reason of colorResult.indeterminateReasons) {
     reasons.add(reason);

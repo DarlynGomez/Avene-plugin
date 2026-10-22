@@ -52,6 +52,7 @@ export function buildTree(): Tree {
     blendMode: "NORMAL",
     visible: true,
     absoluteBoundingBox: { x: 0, y: 0, width: 390, height: 844 },
+    children: [] as Fake[],
     findAll: (test: (n: Fake) => boolean) => find(test)
   }) as Fake;
   nodes.set("s1", screen);
@@ -80,6 +81,7 @@ export function buildTree(): Tree {
       ...extra
     }) as Fake;
     nodes.set(id, node);
+    ((node.parent as Fake).children as Fake[] | undefined)?.push(node);
     return node;
   };
   const frame: Tree["frame"] = (id, name, extra = {}) => {
@@ -92,9 +94,11 @@ export function buildTree(): Tree {
       height: 100,
       fills: [],
       visible: true,
+      children: [] as Fake[],
       ...extra
     }) as Fake;
     nodes.set(id, node);
+    ((node.parent as Fake).children as Fake[] | undefined)?.push(node);
     return node;
   };
   vi.stubGlobal("figma", {

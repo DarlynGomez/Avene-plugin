@@ -16,6 +16,8 @@ export interface TextRow {
   required: number | null;
   measured: number | null;
   verdict: "flagged" | "passes" | "not evaluated";
+  /** What it was before shapes behind the text counted, null when counting them changed nothing */
+  withoutShapes: { background: string; measured: number | null; verdict: string } | null;
 }
 
 export interface CheckData {
@@ -33,7 +35,15 @@ export interface CheckData {
   writeTest: string;
   stored: { issueCount: number | null; byState: Record<string, number>; study: string };
   selection: string[];
-  text: { total: number; visible: number; checked: number; flagged: number; rows: TextRow[] };
+  text: {
+    total: number;
+    visible: number;
+    checked: number;
+    flagged: number;
+    /** Text layers whose result changes when shapes behind them count */
+    changedByShapes: number;
+    rows: TextRow[];
+  };
   errors: string[];
 }
 
@@ -46,6 +56,12 @@ function formatRow(row: TextRow, index: number): string[] {
     `   foreground ${row.foreground}, background ${row.background}`,
     `   size class ${row.sizeClass}, needs ${ratio(row.required)}, measured ${ratio(row.measured)}, verdict: ${row.verdict}`
   ];
+  if (row.withoutShapes) {
+    const old = row.withoutShapes;
+    lines.push(
+      `   CHANGED by counting shapes behind the text. Before: background ${old.background}, measured ${ratio(old.measured)}, verdict ${old.verdict}`
+    );
+  }
   if (row.indeterminate.length > 0)
     lines.push(`   could not be measured because: ${row.indeterminate.join(", ")}`);
   row.chain.forEach((layer, level) => lines.push(`   ${"  ".repeat(level)}inside ${layer}`));
@@ -78,7 +94,7 @@ export function formatReport(data: CheckData, hints: readonly string[], at: stri
     `selection: ${data.selection.length > 0 ? data.selection.join("; ") : "nothing selected"}`,
     "",
     "TEXT ON THIS PAGE",
-    `${text.total} text layer(s), ${text.visible} visible, ${text.checked} checked, ${text.flagged} would be flagged now`,
+    `${text.total} text layer(s), ${text.visible} visible, ${text.checked} checked, ${text.flagged} would be flagged now, ${text.changedByShapes} changed by counting shapes behind the text`,
     ...text.rows.flatMap(formatRow)
   ];
   if (data.errors.length > 0)
