@@ -58,3 +58,4 @@ tools/roles-server/**/__pycache__/
 tools/roles-eval/.venv/
 tools/roles-eval/.pytest_cache/
 tools/roles-eval/**/__pycache__/
+tools/roles-server/tools
