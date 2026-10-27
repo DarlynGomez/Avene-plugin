@@ -1,5 +1,6 @@
 import type { GroupableFinding, RootDecision } from "../grouping/groupingTypes";
 import type { Severity } from "../issues/issueTypes";
+import type { NodeNote } from "./noteStorage";
 
 export type Label = "Detected" | "Decision" | "Needs check";
 export type Audience = "developer" | "pm" | "higherUp" | "client";
@@ -42,6 +43,13 @@ export interface HandoffChange {
   instanceCount: number;
 }
 
+/** A designer note on one layer, the layer name comes from the file as it is now */
+export interface HandoffNote {
+  nodeName: string;
+  link?: string;
+  note: NodeNote;
+}
+
 export interface HandoffScreen {
   id: string;
   name: string;
@@ -60,6 +68,8 @@ export interface HandoffInput {
   meta: Readonly<Record<string, HandoffItemMeta>>;
   changes: readonly HandoffChange[];
   questions: readonly HandoffQuestion[];
+  /** Notes that are not questions, which print under Designer notes */
+  notes?: readonly HandoffNote[];
   reviewer?: { name: string; date: string };
 }
 

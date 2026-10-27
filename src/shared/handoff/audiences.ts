@@ -5,7 +5,7 @@ import { structureHash } from "./hash";
 import { CLIENT_LINE, HIGHER_UP_LINE, NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { pmSummaryLines } from "./pmSummary";
-import { advisorySection, changeLines, questionLines } from "./sectionLines";
+import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
 import { createSlots } from "./slots";
 import { summaryLines } from "./summaryLines";
 import type {
@@ -65,6 +65,7 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
     developer: [
       ...part("summary", "Summary", summary),
       ...part("action", "Needs developer action", action),
+      ...part("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
       ...part("changes", "Changes made in this file", changeLines(input.changes, slots)),
       ...part("questions", "Open questions", questionLines(questions, slots)),
       ...tail

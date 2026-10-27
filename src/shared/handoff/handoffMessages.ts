@@ -34,6 +34,8 @@ export interface HandoffDataMessage {
   /** As stored, so it is empty unless logging consent was given */
   adjustLog: HandoffAdjustEntry[];
   notes: Record<string, NodeNote[]>;
+  /** The current layer name for each id in notes */
+  noteNames: Record<string, string>;
   meta: HandoffMetaMap;
   fileUrl: string | null;
 }
@@ -76,6 +78,28 @@ export function isHandoffUiMessage(value: unknown): value is HandoffUiMessage {
       );
     case "HANDOFF_FILE_URL_SET":
       return typeof value.url === "string";
+    default:
+      return false;
+  }
+}
+
+/** Shape only, the panel ignores any other message */
+export function isHandoffPluginMessage(value: unknown): value is HandoffPluginMessage {
+  if (!isRecord(value)) return false;
+  switch (value.type) {
+    case "HANDOFF_REFUSED":
+      return true;
+    case "HANDOFF_WRITE_RESULT":
+      return typeof value.saved === "boolean";
+    case "HANDOFF_DATA":
+      return (
+        Array.isArray(value.issues) &&
+        Array.isArray(value.adjustLog) &&
+        isRecord(value.decisions) &&
+        isRecord(value.notes) &&
+        isRecord(value.noteNames) &&
+        isRecord(value.meta)
+      );
     default:
       return false;
   }

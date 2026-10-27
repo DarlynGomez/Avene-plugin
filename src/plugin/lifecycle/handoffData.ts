@@ -9,6 +9,11 @@ import { buildDisplayList } from "./issueDisplay";
 
 /** Everything the panel builds a document from, read as stored and changed in no way */
 export async function buildHandoffData(): Promise<HandoffDataMessage> {
+  const notes = await loadAllNotes();
+  const noteNames: Record<string, string> = {};
+  for (const id of Object.keys(notes)) {
+    noteNames[id] = (await figma.getNodeByIdAsync(id))?.name ?? "";
+  }
   return {
     type: "HANDOFF_DATA",
     generatedAt: new Date().toISOString(),
@@ -16,7 +21,8 @@ export async function buildHandoffData(): Promise<HandoffDataMessage> {
     issues: await buildDisplayList(await loadIssues()),
     decisions: loadDecisions(),
     adjustLog: loadAdjustLog(),
-    notes: await loadAllNotes(),
+    notes,
+    noteNames,
     meta: loadHandoffMeta(),
     fileUrl: loadFileUrl()
   };

@@ -3,7 +3,7 @@ import { findingsHash, structureHash } from "./hash";
 import { buildHeader } from "./header";
 import { NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
-import { advisorySection, changeLines, questionLines } from "./sectionLines";
+import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
 import { createSlots, fillSlots } from "./slots";
 import { summaryLines } from "./summaryLines";
 import type { DocSection, HandoffDoc, HandoffInput } from "./types";
@@ -37,6 +37,7 @@ export function buildDoc(input: HandoffInput): HandoffDoc {
       left.flatMap((i) => leftLines(i, slots))
     ),
     ...section("changes", "Changes made in this file", changeLines(input.changes, slots)),
+    ...section("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
     ...section("questions", "Open questions", questionLines(input.questions, slots)),
     ...(advisory ? [advisory] : []),
     { id: "notCovered", title: "Not covered", lines: [NOT_COVERED_LINE] }
