@@ -49,6 +49,8 @@ export interface HandoffScreen {
 
 export interface HandoffInput {
   fileName: string;
+  /** The address the designer pasted once, absent means no links */
+  fileUrl?: string;
   generatedAt: string;
   /** The chosen screens, in the order they print */
   screens: readonly HandoffScreen[];
@@ -83,7 +85,18 @@ export interface DocSection {
   lines: readonly string[];
 }
 
+/** What a version may show, developers see everything, clients see the least */
+export interface LineOptions {
+  hex: boolean;
+  names: boolean;
+  status: boolean;
+}
+
 export interface HandoffDoc {
+  /** Short hash of the values, the same in every version */
+  hash: string;
+  /** Hash of the lines and values of this version, the key for a cached draft */
+  structureHash: string;
   /** Metadata lines, exempt from the label rule */
   header: readonly string[];
   sections: readonly DocSection[];
@@ -105,4 +118,20 @@ export interface DraftBlock {
 export interface Draft {
   audience: Audience;
   blocks: readonly DraftBlock[];
+}
+
+/** A version for one reader, notices are fixed lines exempt from the label rule like the header */
+export interface AudienceDoc extends HandoffDoc {
+  audience: Audience;
+  notices: readonly string[];
+  /** Designer text in this version that holds a hex value or a digit run, never altered */
+  warnings: readonly DesignerTextHit[];
+}
+
+export interface DesignerTextHit {
+  /** The root signature, or question and its position */
+  item: string;
+  field: string;
+  kind: "hex" | "digits";
+  match: string;
 }

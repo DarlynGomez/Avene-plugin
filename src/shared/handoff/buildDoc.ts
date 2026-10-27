@@ -1,4 +1,5 @@
 import { buildItems } from "./buildItems";
+import { findingsHash, structureHash } from "./hash";
 import { buildHeader } from "./header";
 import { NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
@@ -40,7 +41,15 @@ export function buildDoc(input: HandoffInput): HandoffDoc {
     ...(advisory ? [advisory] : []),
     { id: "notCovered", title: "Not covered", lines: [NOT_COVERED_LINE] }
   ];
-  return { header: buildHeader(input), sections, slots: slots.table() };
+  const table = slots.table();
+  const hash = findingsHash(table);
+  return {
+    header: buildHeader(input, hash),
+    hash,
+    structureHash: structureHash(sections, table),
+    sections,
+    slots: table
+  };
 }
 
 /** Plain text, headings start with two hashes and are exempt like the header */

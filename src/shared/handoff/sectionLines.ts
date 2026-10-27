@@ -23,7 +23,8 @@ export function questionLines(questions: readonly HandoffQuestion[], slots: Slot
 /** Hidden while every item is standard, which is always true today */
 export function advisorySection(
   items: readonly HandoffItem[],
-  slots: SlotBuilder
+  slots: SlotBuilder,
+  names = true
 ): DocSection | null {
   const flagged = items.filter((item) => item.condition !== "standard");
   if (flagged.length === 0) return null;
@@ -31,7 +32,7 @@ export function advisorySection(
     `${LABEL_NEEDS_CHECK}: ${ADVISORY_LABEL}.`,
     ...flagged.map((item) => {
       const condition: string = item.condition;
-      return `${LABEL_NEEDS_CHECK}: "${slots.auto("L", item.representative.nodeName)}" under the condition ${slots.auto("w", condition)}.`;
+      return `${LABEL_NEEDS_CHECK}: ${names ? `"${slots.auto("L", item.representative.nodeName)}"` : "A text layer"} under the condition ${slots.auto("w", condition)}.`;
     })
   ];
   return { id: "advisory", title: "Advisory: conditions of use", lines };

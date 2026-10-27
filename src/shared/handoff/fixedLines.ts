@@ -12,3 +12,9 @@ export const HIGHER_UP_LINE =
   "Whether these items affect a conformance claim depends on what the organization has claimed. Avene makes no conformance claim.";
 
 export const ADVISORY_LABEL = "Inference, not a measured failure";
+
+export const TICKET_IMPACT =
+  "People with low vision, or reading in bright light, may not be able to read this text.";
+
+export const PM_NOT_VERIFIED =
+  "Needs check: Keyboard, screen reader output, code order and alt text quality are not verified. Test on the build.";

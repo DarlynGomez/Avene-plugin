@@ -1,26 +1,33 @@
 import { LABEL_DECISION, LABEL_DETECTED, LABEL_NEEDS_CHECK } from "./labels";
 import type { SlotBuilder } from "./slots";
 import { dateOnly, formatRatio, oneLine, plural } from "./text";
-import type { HandoffItem } from "./types";
+import type { HandoffItem, LineOptions } from "./types";
 
-/** Hex pair, ratios and criterion, shared by action and left items */
-function measuredText(item: HandoffItem, slots: SlotBuilder): string {
+export const FULL: LineOptions = { hex: true, names: true, status: true };
+
+function ratios(item: HandoffItem, slots: SlotBuilder): string {
   const r = item.representative;
-  const colors = `${slots.auto("fg", r.foregroundHex)} on ${slots.auto("bg", r.backgroundHex)}`;
-  const ratios = `measured ${slots.auto("r", formatRatio(r.measuredRatio))}:1, needs ${slots.auto("q", r.requiredRatio)}:1`;
-  return `${colors}, ${ratios}`;
+  return `measured ${slots.auto("r", formatRatio(r.measuredRatio))}:1, needs ${slots.auto("q", r.requiredRatio)}:1`;
 }
 
-function where(item: HandoffItem, slots: SlotBuilder): string {
-  return `"${slots.auto("L", item.representative.nodeName)}" on ${slots.auto("S", item.screenName)}`;
+function colors(item: HandoffItem, slots: SlotBuilder): string {
+  const r = item.representative;
+  return `${slots.auto("fg", r.foregroundHex)} on ${slots.auto("bg", r.backgroundHex)}`;
 }
 
-function linkText(item: HandoffItem, slots: SlotBuilder): string {
+function where(item: HandoffItem, slots: SlotBuilder, names: boolean): string {
+  const screen = slots.auto("S", item.screenName);
+  return names
+    ? `"${slots.auto("L", item.representative.nodeName)}" on ${screen}`
+    : `Text on ${screen}`;
+}
+
+function linkText(item: HandoffItem, slots: SlotBuilder, o: LineOptions): string {
   const link = item.representative.link;
-  return link ? ` Link: ${slots.auto("k", link)}` : "";
+  return link && o.names ? ` Link: ${slots.auto("k", link)}` : "";
 }
 
-export function actionLines(item: HandoffItem, slots: SlotBuilder): string[] {
+export function actionLines(item: HandoffItem, slots: SlotBuilder, o = FULL): string[] {
   const r = item.representative;
   const count = item.instances.length;
   const share =
@@ -31,28 +38,32 @@ export function actionLines(item: HandoffItem, slots: SlotBuilder): string[] {
     r.foregroundBinding === null
       ? "Not bound to a variable."
       : `Bound to ${slots.auto("b", r.foregroundBinding)}.`;
+  const measured = o.hex
+    ? `text ${colors(item, slots)}, ${ratios(item, slots)}`
+    : ratios(item, slots);
   const criterion = slots.put("sc", "WCAG 1.4.3");
   return [
-    `${LABEL_DETECTED}: ${where(item, slots)}: text ${measuredText(item, slots)} (${criterion}). ${share} ${binding}${linkText(item, slots)}`
+    `${LABEL_DETECTED}: ${where(item, slots, o.names)}: ${measured} (${criterion}). ${share} ${binding}${linkText(item, slots, o)}`
   ];
 }
 
-function statusLine(item: HandoffItem, slots: SlotBuilder): string {
+function statusLine(item: HandoffItem, slots: SlotBuilder, o: LineOptions): string {
   const { meta } = item;
-  const link = linkText(item, slots);
+  const link = linkText(item, slots, o);
   if (meta.signOff === "needs") return `${LABEL_NEEDS_CHECK}: Status: Needs sign-off.${link}`;
   const by = meta.signedBy ? ` by ${slots.auto("p", oneLine(meta.signedBy))}` : "";
   const at = meta.signedAt ? `, ${slots.auto("d", dateOnly(meta.signedAt))}` : "";
   return `${LABEL_DECISION}: Signed off${by}${at}.${link}`;
 }
 
-export function leftLines(item: HandoffItem, slots: SlotBuilder): string[] {
+export function leftLines(item: HandoffItem, slots: SlotBuilder, o = FULL): string[] {
   const { decision, meta } = item;
   const count = item.instances.length;
   const layers = `${slots.auto("c", count)} ${plural(count, "layer", "layers")}`;
   const sc = slots.put("sc", "WCAG 1.4.3");
+  const measured = o.hex ? `${colors(item, slots)}, ${ratios(item, slots)}` : ratios(item, slots);
   const lines = [
-    `${LABEL_DETECTED}: ${where(item, slots)}: ${measuredText(item, slots)} (${sc}), ${layers}.`
+    `${LABEL_DETECTED}: ${where(item, slots, o.names)}: ${measured} (${sc}), ${layers}.`
   ];
   lines.push(
     decision
@@ -72,6 +83,6 @@ export function leftLines(item: HandoffItem, slots: SlotBuilder): string[] {
       `${LABEL_DETECTED}: Worse since it was decided: ${decision.severityAtDecision} then, ${item.highestSeverity} now.`
     );
   }
-  lines.push(statusLine(item, slots));
+  if (o.status) lines.push(statusLine(item, slots, o));
   return lines;
 }

@@ -2,13 +2,15 @@ import { LABEL_DETECTED, LABEL_NEEDS_CHECK } from "./labels";
 import type { SlotBuilder } from "./slots";
 import { plural } from "./text";
 import { highestSeverity } from "./buildItems";
-import type { HandoffItem } from "./types";
+import type { HandoffItem, LineOptions } from "./types";
+import { FULL } from "./itemLines";
 
 export function summaryLines(
   items: readonly HandoffItem[],
   deferredLayers: number,
   questionCount: number,
-  slots: SlotBuilder
+  slots: SlotBuilder,
+  o: LineOptions = FULL
 ): string[] {
   const action = items.filter((item) => item.kind === "action");
   const left = items.filter((item) => item.kind === "left");
@@ -31,16 +33,15 @@ export function summaryLines(
 
   const parts: string[] = [];
   if (left.length > 0) {
-    parts.push(
-      `${slots.put("n_left", left.length)} knowingly left as-is, ${slots.put("n_waiting", waiting)} waiting for sign-off.`
-    );
+    const waitingText = o.status ? `, ${slots.put("n_waiting", waiting)} waiting for sign-off` : "";
+    parts.push(`${slots.put("n_left", left.length)} knowingly left as-is${waitingText}.`);
   }
-  if (deferredLayers > 0) {
+  if (deferredLayers > 0 && o.status) {
     parts.push(`${slots.put("n_deferred", deferredLayers)} deferred (not for developers now).`);
   }
   if (parts.length > 0) lines.push(`${LABEL_DETECTED}: ${parts.join(" ")}`);
 
-  if (action.length > 0) {
+  if (action.length > 0 && o.status) {
     const severity = slots.put(
       "severity",
       highestSeverity(action.map((i) => ({ severity: i.highestSeverity })))
