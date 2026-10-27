@@ -4,6 +4,7 @@ import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
 import type { ExplanationEventMessage } from "./study/explanationMessageTypes";
+import type { HandoffPluginMessage, HandoffUiMessage } from "./handoff/handoffMessages";
 import type { RolePluginMessage, RoleUiMessage } from "./roles/roleMessages";
 import type { MarkerMessage } from "./markers/markerMessageTypes";
 import type { RootActionFailedMessage, RootMessage } from "./rootMessageTypes";
@@ -115,7 +116,8 @@ export type UiToPluginMessage =
   | AdjustMessage
   | StudyMessage
   | ExplanationEventMessage
-  | RoleUiMessage;
+  | RoleUiMessage
+  | HandoffUiMessage;
 
 /** Sandbox to UI messages */
 export type PluginToUiMessage =
@@ -129,7 +131,8 @@ export type PluginToUiMessage =
   | StudyStateMessage
   | StudyExportReadyMessage
   | MarkerMessage
-  | RolePluginMessage;
+  | RolePluginMessage
+  | HandoffPluginMessage;
 
 /** Every message that crosses the plugin boundary */
 export type PluginMessage = UiToPluginMessage | PluginToUiMessage;
