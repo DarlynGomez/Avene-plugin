@@ -48,6 +48,19 @@ const ALL: HandoffUiMessage[] = [
   },
   { type: "HANDOFF_FILE_URL_SET", url: "https://www.figma.com/design/KEY/Checkout" }
 ];
+const DRAFTS_MESSAGE: HandoffUiMessage = {
+  type: "HANDOFF_DRAFTS_SET",
+  drafts: {
+    "pm|left|m": {
+      audience: "pm",
+      blockId: "left",
+      modelId: "m",
+      structureHash: "abcd1234",
+      sentences: ["Detected: {L1}"],
+      generatedAt: "2026-10-28T10:00:00.000Z"
+    }
+  }
+};
 
 interface Spies {
   gets: ReturnType<typeof vi.fn>;
@@ -91,7 +104,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("while a study session is active", () => {
   beforeEach(() => vi.mocked(activeStudySession).mockReturnValue(SESSION));
 
-  it.each(ALL.map((message) => [message.type, message] as const))(
+  it.each([...ALL, DRAFTS_MESSAGE].map((message) => [message.type, message] as const))(
     "refuses %s with no read and no write",
     async (_name, message) => {
       await run(message);
@@ -182,6 +195,16 @@ describe("with no study session", () => {
     await run({ type: "HANDOFF_META_SET", signature: other, meta });
     await run({ type: "HANDOFF_META_SET", signature: SIG, meta, live: [] });
     expect(Object.keys((replies[1] as { meta: object }).meta)).toEqual([SIG]);
+  });
+
+  it("stores the drafts, sends them back with the data, and writes nothing else", async () => {
+    await run(DRAFTS_MESSAGE);
+    expect(replies[0]).toMatchObject({ target: "drafts", saved: true });
+    expect(spies.sets.mock.calls.map(([key]) => key)).toEqual(["cadt.handoff.drafts.v1"]);
+    await run({ type: "HANDOFF_DATA_REQUEST" });
+    expect(replies[1]).toMatchObject({
+      drafts: DRAFTS_MESSAGE.type === "HANDOFF_DRAFTS_SET" ? DRAFTS_MESSAGE.drafts : {}
+    });
   });
 
   it("reports a refused write as not saved", async () => {

@@ -14,6 +14,8 @@ describe("isHandoffUiMessage", () => {
       isHandoffUiMessage({ type: "HANDOFF_META_SET", signature: SIG, meta: META, live: [SIG] })
     ).toBe(true);
     expect(isHandoffUiMessage({ type: "HANDOFF_FILE_URL_SET", url: "" })).toBe(true);
+    expect(isHandoffUiMessage({ type: "HANDOFF_DRAFTS_SET", drafts: {} })).toBe(true);
+    expect(isHandoffUiMessage({ type: "HANDOFF_DRAFTS_SET" })).toBe(false);
   });
 
   it("refuses a meta write without a signature the panel worked out", () => {

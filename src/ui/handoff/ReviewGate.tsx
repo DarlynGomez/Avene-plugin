@@ -2,11 +2,12 @@ import { useId, useMemo, useRef, useState } from "react";
 
 import { buildAudienceDoc } from "../../shared/handoff/audiences";
 import { buildItems, DEFAULT_META } from "../../shared/handoff/buildItems";
-import { renderAudience } from "../../shared/handoff/render";
+import { composeCopy, type ChosenText } from "../../shared/handoff/compose";
 import type { Audience, HandoffInput, HandoffItemMeta } from "../../shared/handoff/types";
 import { plural } from "../../shared/handoff/text";
 import { copyText } from "../study/downloadFile";
 import { GateItemRow } from "./GateItemRow";
+import { GateNotes } from "./GateNotes";
 import styles from "./Handoff.module.css";
 import sheet from "./HandoffSheet.module.css";
 import { useSheetFocus } from "./useSheetFocus";
@@ -16,6 +17,10 @@ interface ReviewGateProps {
   audience: Audience;
   onMeta: (signature: string, meta: HandoffItemMeta) => void;
   onClose: () => void;
+  /** The blocks the designer chose an AI draft for, with the checks that still have something to say */
+  chosenText?: ChosenText;
+  aiTitles?: readonly string[];
+  draftWarnings?: readonly string[];
 }
 
 /** Every item with leave-out cleared, so an item that was left out can still be listed and brought back */
@@ -30,7 +35,15 @@ function withLeaveOutCleared(input: HandoffInput): HandoffInput {
 }
 
 /** Name first, then what will be listed, then copy; copy waits for the name */
-export function ReviewGate({ input, audience, onMeta, onClose }: ReviewGateProps) {
+export function ReviewGate({
+  input,
+  audience,
+  onMeta,
+  onClose,
+  chosenText = {},
+  aiTitles = [],
+  draftWarnings = []
+}: ReviewGateProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   useSheetFocus(ref, onClose);
@@ -44,7 +57,11 @@ export function ReviewGate({ input, audience, onMeta, onClose }: ReviewGateProps
 
   async function copy() {
     const reviewer = { name: name.trim(), date: new Date().toISOString() };
-    const text = renderAudience(buildAudienceDoc({ ...input, reviewer }, audience));
+    const text = composeCopy(
+      buildAudienceDoc({ ...input, reviewer }, audience),
+      chosenText,
+      reviewer.name
+    );
     setStatus(
       (await copyText(text))
         ? "Copied. Paste it where it is going."
@@ -92,21 +109,7 @@ export function ReviewGate({ input, audience, onMeta, onClose }: ReviewGateProps
           );
         })}
       </ul>
-      <p className={sheet.status}>
-        This version has: {doc.sections.map((s) => s.title).join(", ")}.
-      </p>
-      <p className={sheet.status}>
-        Text written by an AI: none. This version is template text only.
-      </p>
-      {doc.warnings.length > 0 && (
-        <ul className={sheet.list} aria-label="Things to look at">
-          {doc.warnings.map((w) => (
-            <li key={`${w.item}-${w.field}-${w.match}`} className={styles.error}>
-              {`Your ${w.field} text holds ${w.kind === "hex" ? "a color code" : "a number"}: ${w.match}`}
-            </li>
-          ))}
-        </ul>
-      )}
+      <GateNotes doc={doc} aiTitles={aiTitles} draftWarnings={draftWarnings} />
       <p className={sheet.status} role="status">
         {status}
       </p>

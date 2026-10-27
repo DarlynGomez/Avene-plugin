@@ -49,7 +49,8 @@ export function handoffData(meta: Record<string, HandoffItemMeta> = {}): Handoff
     notes: {},
     noteNames: {},
     meta,
-    fileUrl: null
+    fileUrl: null,
+    drafts: {}
   };
 }
 

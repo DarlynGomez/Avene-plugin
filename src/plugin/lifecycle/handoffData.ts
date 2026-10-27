@@ -2,6 +2,7 @@ import type { HandoffDataMessage } from "../../shared/handoff/handoffMessages";
 import { loadDecisions } from "../accountability/decisionStore";
 import { loadIssues } from "../accountability/issueStore";
 import { loadAdjustLog } from "../adjust/adapter/adjustLogging";
+import { loadDraftCache } from "../handoff/adapter/draftCacheStore";
 import { loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta } from "../handoff/adapter/metaStore";
 import { loadAllNotes } from "../handoff/adapter/notesStore";
@@ -24,6 +25,7 @@ export async function buildHandoffData(): Promise<HandoffDataMessage> {
     notes,
     noteNames,
     meta: loadHandoffMeta(),
-    fileUrl: loadFileUrl()
+    fileUrl: loadFileUrl(),
+    drafts: loadDraftCache()
   };
 }

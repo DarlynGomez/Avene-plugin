@@ -2,6 +2,7 @@ import type { RootDecision } from "../grouping/groupingTypes";
 import type { IssueSummary } from "../issues/issueTypes";
 import { parseRootSignature } from "../issues/rootSignature";
 import { normalizeMeta, type HandoffMetaMap } from "./metaStorage";
+import type { DraftCache } from "./draftCache";
 import type { NodeNote } from "./noteStorage";
 import type { HandoffItemMeta } from "./types";
 
@@ -23,7 +24,9 @@ export type HandoffUiMessage =
   | { type: "HANDOFF_NOTES_SET"; nodeId: string; notes: NodeNote[] }
   /** The panel works out the signature, the sandbox never does; live lets stale entries go */
   | { type: "HANDOFF_META_SET"; signature: string; meta: HandoffItemMeta; live?: string[] }
-  | { type: "HANDOFF_FILE_URL_SET"; url: string };
+  | { type: "HANDOFF_FILE_URL_SET"; url: string }
+  /** Drafts the panel made, kept in the file so a demo file carries them */
+  | { type: "HANDOFF_DRAFTS_SET"; drafts: DraftCache };
 
 export interface HandoffDataMessage {
   type: "HANDOFF_DATA";
@@ -38,16 +41,18 @@ export interface HandoffDataMessage {
   noteNames: Record<string, string>;
   meta: HandoffMetaMap;
   fileUrl: string | null;
+  drafts: DraftCache;
 }
 
 export interface HandoffWriteResult {
   type: "HANDOFF_WRITE_RESULT";
-  target: "notes" | "meta" | "fileUrl";
+  target: "notes" | "meta" | "fileUrl" | "drafts";
   saved: boolean;
   error?: string;
   nodeId?: string;
   meta?: HandoffMetaMap;
   fileUrl?: string | null;
+  drafts?: DraftCache;
 }
 
 /** Sent for every handoff message while handoff is off or a study session is active */
@@ -78,6 +83,8 @@ export function isHandoffUiMessage(value: unknown): value is HandoffUiMessage {
       );
     case "HANDOFF_FILE_URL_SET":
       return typeof value.url === "string";
+    case "HANDOFF_DRAFTS_SET":
+      return isRecord(value.drafts);
     default:
       return false;
   }
@@ -98,6 +105,7 @@ export function isHandoffPluginMessage(value: unknown): value is HandoffPluginMe
         isRecord(value.decisions) &&
         isRecord(value.notes) &&
         isRecord(value.noteNames) &&
+        isRecord(value.drafts) &&
         isRecord(value.meta)
       );
     default:

@@ -40,6 +40,7 @@ function data(over: Partial<HandoffDataMessage> = {}): HandoffDataMessage {
     noteNames: {},
     meta: {},
     fileUrl: null,
+    drafts: {},
     ...over
   };
 }

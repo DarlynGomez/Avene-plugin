@@ -1,4 +1,4 @@
-import { displayLabel } from "./labels";
+import { displayLabel, LABELS } from "./labels";
 import { fillSlots } from "./slots";
 import type { Audience, AudienceDoc, Label } from "./types";
 
@@ -29,4 +29,11 @@ export function renderAudience(doc: AudienceDoc): string {
 /** The only lines allowed to carry no label: the header block and the fixed notices */
 export function exemptLines(doc: AudienceDoc): string[] {
   return [...doc.header, ...doc.notices];
+}
+
+/** The reverse of relabel, so text shown in plain words can be checked against the canonical labels */
+export function canonicalLabel(line: string, audience: Audience): string {
+  if (audience === "developer") return line;
+  const hit = LABELS.find((label) => line.startsWith(displayLabel(label, audience)));
+  return hit ? hit + line.slice(displayLabel(hit, audience).length) : line;
 }

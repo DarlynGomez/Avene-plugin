@@ -2,6 +2,7 @@ import type { HandoffPluginMessage, HandoffUiMessage } from "../../shared/handof
 import { setMeta } from "../../shared/handoff/metaStorage";
 import { FEATURE_HANDOFF, handoffAllowed } from "../../shared/handoffFlags";
 import { isStudyActive } from "../../shared/study/studyActive";
+import { saveDraftCache } from "../handoff/adapter/draftCacheStore";
 import { saveFileUrl, loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta, saveHandoffMeta } from "../handoff/adapter/metaStore";
 import { setNodeNotes } from "../handoff/adapter/notesStore";
@@ -30,6 +31,11 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
       const live = message.live ? new Set([...message.live, message.signature]) : undefined;
       const { map, ...result } = saveHandoffMeta(next, live);
       reply({ type: "HANDOFF_WRITE_RESULT", target: "meta", meta: map, ...result });
+      return;
+    }
+    case "HANDOFF_DRAFTS_SET": {
+      const { cache, ...result } = saveDraftCache(message.drafts);
+      reply({ type: "HANDOFF_WRITE_RESULT", target: "drafts", drafts: cache, ...result });
       return;
     }
     case "HANDOFF_FILE_URL_SET": {

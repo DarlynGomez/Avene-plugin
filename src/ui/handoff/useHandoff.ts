@@ -5,6 +5,7 @@ import {
   type HandoffDataMessage,
   type HandoffUiMessage
 } from "../../shared/handoff/handoffMessages";
+import type { DraftCache } from "../../shared/handoff/draftCache";
 import type { NodeNote } from "../../shared/handoff/noteStorage";
 import type { HandoffItemMeta } from "../../shared/handoff/types";
 
@@ -44,5 +45,9 @@ export function useHandoff() {
     []
   );
   const setFileUrl = useCallback((url: string) => send({ type: "HANDOFF_FILE_URL_SET", url }), []);
-  return { data, refused, writeError, setNotes, setMeta, setFileUrl };
+  const setDrafts = useCallback(
+    (drafts: DraftCache) => send({ type: "HANDOFF_DRAFTS_SET", drafts }),
+    []
+  );
+  return { data, refused, writeError, setNotes, setMeta, setFileUrl, setDrafts };
 }
