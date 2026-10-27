@@ -5,6 +5,12 @@ import { buildTree } from "../roles/testing/fakeFigma";
 import { activeStudySession } from "../study/adapter/studySessionStore";
 import { handleHandoffMessage } from "./handoffProtocol";
 
+// The demo commit turns the flag on, this file keeps proving what a build with it off does
+vi.mock("../../shared/handoffFlags", async (original) => ({
+  ...(await original<typeof import("../../shared/handoffFlags")>()),
+  FEATURE_HANDOFF: false
+}));
+
 vi.mock("../study/adapter/studySessionStore", async (original) => ({
   ...(await original<typeof import("../study/adapter/studySessionStore")>()),
   activeStudySession: vi.fn(() => null)

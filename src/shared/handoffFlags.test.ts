@@ -13,8 +13,8 @@ describe("handoffAllowed", () => {
   });
 });
 
-describe("handoff flag default", () => {
-  it("is off unless a demo build or test turns it on", () => {
-    expect(FEATURE_HANDOFF).toBe(false);
+describe("handoff flag in the demo build", () => {
+  it("is on, and only this branch has it on", () => {
+    expect(FEATURE_HANDOFF).toBe(true);
   });
 });
