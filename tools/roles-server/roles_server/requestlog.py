@@ -30,6 +30,7 @@ class RequestLog:
         completion_tokens: int = 0,
         finish_reason: str | None = None,
         schema_valid: bool | None = None,
+        text_length: int | None = None,
     ) -> None:
         line: dict[str, Any] = {
             "time": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
@@ -45,6 +46,9 @@ class RequestLog:
             "finishReason": finish_reason,
             "schemaViolation": None if schema_valid is None else not schema_valid,
         }
+        if text_length is not None:
+            # Only how long the request was, the text itself is never accepted here
+            line["textLength"] = text_length
         with self._lock:
             self._path.parent.mkdir(parents=True, exist_ok=True)
             with self._path.open("a", encoding="utf-8") as handle:
