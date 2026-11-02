@@ -1,0 +1,39 @@
+{
+  "id": "M06",
+  "title": "Placeholder and Decorative Text",
+  "context": "Placeholder, disabled, and decorative text",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "Different kinds of text have different roles. Knowing what carries meaning can help preserve useful contrast without treating every mark the same way.",
+  "learningObjectives": [
+    "Identify why placeholders can make forms harder to use.",
+    "Understand contrast exemptions for disabled controls.",
+    "Differentiate meaningful text from pure decoration."
+  ],
+  "lessonParagraphs": [
+    "Contrast matters for text that conveys information. Some text, such as text in an inactive control or pure decoration, has different requirements.",
+    "Placeholder text can be low contrast and disappears when someone starts typing. That can make it harder to remember instructions or check formatting. A visible label outside the field remains available while typing.",
+    "Text in a genuinely inactive, disabled button is exempt from minimum contrast. If a control looks disabled but is meant to be used, its low contrast can become a barrier.",
+    "Purely decorative text that carries no meaning is also exempt. The useful question is whether the text matters for understanding the page."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "jrigp2L-P-0",
+    "title": "Placeholders in Form Fields are Harmful",
+    "publisher": "Nielsen Norman Group",
+    "startSeconds": 0,
+    "endSeconds": 80,
+    "durationSeconds": 80,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Placeholder text can disappear while someone is using a form.",
+    "Genuinely disabled controls are exempt from the minimum contrast requirement.",
+    "Decorative text with no meaning has no contrast requirement."
+  ],
+  "reviewFlags": []
+}

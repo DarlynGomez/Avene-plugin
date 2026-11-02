@@ -1,0 +1,47 @@
+{
+  "moduleId": "M01",
+  "questions": [
+    {
+      "questionId": "M01Q1",
+      "prompt": "What is the primary function of contrast in typography?",
+      "options": [
+        { "id": "A", "text": "To establish the brand's primary color palette." },
+        { "id": "B", "text": "To create a sharp visual boundary between a letter and the background." },
+        { "id": "C", "text": "To ensure the font size automatically scales on mobile devices." },
+        { "id": "D", "text": "To reduce the file size of the loaded web fonts." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Contrast defines the boundary of a shape, allowing the eye to resolve it clearly without straining.",
+      "hint": "Consider how shapes are separated from what sits behind them.",
+      "testedLearningPoint": "Understand how contrast impacts readability for aging eyes and low vision."
+    },
+    {
+      "questionId": "M01Q2",
+      "prompt": "What is the target contrast ratio required for normal body text?",
+      "options": [
+        { "id": "A", "text": "3 to 1" },
+        { "id": "B", "text": "7 to 1" },
+        { "id": "C", "text": "4.5 to 1" },
+        { "id": "D", "text": "14 to 1" }
+      ],
+      "correctOptionId": "C",
+      "explanation": "Standard body text requires a ratio of 4.5 to support readability for users with moderate vision loss.",
+      "hint": "It is the standard threshold that sits between 3 and 7.",
+      "testedLearningPoint": "Identify the 4.5 threshold for standard text readability."
+    },
+    {
+      "questionId": "M01Q3",
+      "prompt": "According to the research, approximately how many homepages contain low-contrast text?",
+      "options": [
+        { "id": "A", "text": "Less than 10 percent" },
+        { "id": "B", "text": "About 30 percent" },
+        { "id": "C", "text": "Roughly 50 percent" },
+        { "id": "D", "text": "Over 80 percent" }
+      ],
+      "correctOptionId": "D",
+      "explanation": "The research reports that 83.9 percent of the top one million homepages contained low-contrast text.",
+      "hint": "Low contrast is described as the most common failure on the internet.",
+      "testedLearningPoint": "Recognize the prevalence of low contrast issues across modern digital design."
+    }
+  ]
+}

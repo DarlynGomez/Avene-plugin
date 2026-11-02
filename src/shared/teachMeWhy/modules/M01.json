@@ -1,0 +1,47 @@
+{
+  "id": "M01",
+  "title": "Why Text Contrast Matters",
+  "context": "Low vision, aging eyes, and everyday reading",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "Contrast creates the boundary between a letter and its background. Without a clear boundary, reading can become tiring or difficult.",
+  "learningObjectives": [
+    "Understand how contrast affects readability for aging eyes and low vision.",
+    "Identify the 4.5:1 target for standard text.",
+    "Recognize how common low-contrast text is across digital design."
+  ],
+  "lessonParagraphs": [
+    "Text contrast measures the difference in lightness between a letter and its background. A strong difference makes the letter's shape easier to resolve. A small difference makes the boundary blend into the background.",
+    "Contrast sensitivity can decrease with age, and people with low vision may rely on stronger contrast to distinguish digital content. The research document reports that 83.9 percent of home pages in a one-million-page analysis contained low-contrast text.",
+    "The target ratio for standard body text is 4.5:1. It is intended to account for reduced contrast sensitivity associated with moderate low vision and aging.",
+    "Checking a color pair is a way to keep the visual boundary intact while navigating aesthetic choices. A clearer boundary can reduce friction when reading."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "a9kNUv6N8Rk",
+    "title": "Web Accessibility Perspectives: Colors with Good Contrast",
+    "publisher": "W3C Web Accessibility Initiative",
+    "startSeconds": 0,
+    "endSeconds": 72,
+    "durationSeconds": 72,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "W3C License"
+  },
+  "optionalArticle": {
+    "title": "Why Color Contrast is Non-Negotiable for Web Design",
+    "author": "Kareena P",
+    "published": "March 2026",
+    "url": "https://medium.com/@kareenap/why-color-contrast-is-non-negotiable-for-web-design-db6897f09b89",
+    "minutesToRead": 4
+  },
+  "keyTakeaways": [
+    "Contrast defines the visual boundary between text and its background.",
+    "Standard text has a 4.5:1 target.",
+    "The research document reports low contrast on over 80 percent of home pages."
+  ],
+  "reviewFlags": [
+    "Verify the year attached to the 83.9 percent statistic. The lesson says 2026, but the source list links to the 2025 WebAIM Million report."
+  ]
+}

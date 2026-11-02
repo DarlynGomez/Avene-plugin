@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "reportedTotalMinutes": 44.5,
+  "reviewFlags": [
+    "The introduction reports 44.5 minutes, but detailed module budgets total 44 minutes and the overview table totals 43.5 minutes.",
+    "M09 is listed as 4 minutes in the overview and 4.5 minutes in its detailed time budget.",
+    "M01 describes the 83.9 percent statistic as a 2026 analysis, while the source list links to WebAIM's 2025 Million report."
+  ],
+  "modules": [
+    { "id": "M01", "file": "M01.json", "quizFile": "quizzes/M01.json" },
+    { "id": "M02", "file": "M02.json", "quizFile": "quizzes/M02.json" },
+    { "id": "M03", "file": "M03.json", "quizFile": "quizzes/M03.json" },
+    { "id": "M04", "file": "M04.json", "quizFile": "quizzes/M04.json" },
+    { "id": "M05", "file": "M05.json", "quizFile": "quizzes/M05.json" },
+    { "id": "M06", "file": "M06.json", "quizFile": "quizzes/M06.json" },
+    { "id": "M07", "file": "M07.json", "quizFile": "quizzes/M07.json" },
+    { "id": "M08", "file": "M08.json", "quizFile": "quizzes/M08.json" },
+    { "id": "M09", "file": "M09.json", "quizFile": "quizzes/M09.json" },
+    { "id": "M10", "file": "M10.json", "quizFile": "quizzes/M10.json" }
+  ]
+}

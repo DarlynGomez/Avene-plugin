@@ -1,0 +1,45 @@
+{
+  "id": "M02",
+  "title": "Designing for the Real World",
+  "context": "Situational impairments, including glare, sunlight, fatigue, and motion",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "A screen designed in a controlled room can become difficult to read outdoors or while someone is moving.",
+  "learningObjectives": [
+    "Define situationally induced impairments.",
+    "Understand how ambient sunlight reduces screen visibility.",
+    "Identify how movement can affect reading precision."
+  ],
+  "lessonParagraphs": [
+    "People use mobile devices in changing environments, not only at a desk with steady lighting. The context can temporarily restrict someone's ability to see or interact with a device, creating a situational impairment.",
+    "Direct sunlight can overpower the light emitted by a phone display. As ambient light increases, perceived screen contrast drops, and text that relies on subtle grays can wash out.",
+    "Movement, noise, and temperature can also affect interaction. Walking divides attention and can reduce reading comprehension, motor accuracy, and visual stability.",
+    "Strong contrast helps a design handle changing light and motion. It can support a transition from a dim room to a bright, moving environment."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "pnstAE4NtL4",
+    "title": "Alternatives to Low-Contrast Text",
+    "publisher": "Nielsen Norman Group",
+    "startSeconds": 0,
+    "endSeconds": 90,
+    "durationSeconds": 90,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": {
+    "title": "Challenges of Situational Impairments during Interaction with Mobile Devices",
+    "author": "Zhanna Sarsenbayeva",
+    "url": "https://www.jorgegoncalves.com/docs/ozchi17.pdf",
+    "minutesToRead": 5
+  },
+  "keyTakeaways": [
+    "Environments can create temporary situational impairments.",
+    "Bright sunlight can wash out screen contrast.",
+    "Strong contrast helps designs handle unpredictable lighting and motion."
+  ],
+  "reviewFlags": [],
+  "internalNote": "Situational impairments are not formally evaluated by automated tools."
+}

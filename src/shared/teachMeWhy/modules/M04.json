@@ -1,0 +1,39 @@
+{
+  "id": "M04",
+  "title": "Text Size and Weight",
+  "context": "Why large and bold text has a lower contrast threshold",
+  "estimatedMinutes": 4,
+  "timeBudgetMinutes": { "reading": 2, "video": 1, "quiz": 1 },
+  "whyItMatters": "Larger, thicker letterforms can be easier for the eye to resolve, allowing a lower contrast threshold.",
+  "learningObjectives": [
+    "Recognize how text size affects visual perception.",
+    "Identify the 3:1 target for large text.",
+    "Define the size breakpoints used for large text."
+  ],
+  "lessonParagraphs": [
+    "Small, thin text needs a stronger difference from its background to remain clear. A large, bold headline has more visible surface area, so its shapes can be easier for the eye to resolve.",
+    "The research describes a 3:1 target for large text and a 4.5:1 target for standard text. The lower threshold for large text is tied to how its larger or thicker letterforms are perceived.",
+    "Text is considered large at 24 pixels in a regular weight, or about 18.5 pixels when bold. Below those dimensions, the standard text target applies.",
+    "Size-based thresholds offer room for expressive color choices in prominent text while keeping smaller details easier to read."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "65G_twR47OQ",
+    "title": "Web Accessibility Perspectives: Large Links, Buttons, and Controls",
+    "publisher": "W3C Web Accessibility Initiative",
+    "startSeconds": 0,
+    "endSeconds": 50,
+    "durationSeconds": 50,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "W3C License"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Larger, thicker text is easier to resolve.",
+    "Large text has a 3:1 target instead of 4.5:1.",
+    "The research defines large text as 24 pixels regular or about 18.5 pixels bold."
+  ],
+  "reviewFlags": []
+}

@@ -1,0 +1,47 @@
+{
+  "moduleId": "M06",
+  "questions": [
+    {
+      "questionId": "M06Q1",
+      "prompt": "Why is placeholder text inside a form field considered harmful to usability?",
+      "options": [
+        { "id": "A", "text": "It makes the form field look too cluttered." },
+        { "id": "B", "text": "It takes up too much database storage." },
+        { "id": "C", "text": "It disappears on typing, which strains short-term memory and stops error checking." },
+        { "id": "D", "text": "It triggers false warnings in screen reading software." }
+      ],
+      "correctOptionId": "C",
+      "explanation": "Because it vanishes, users cannot look back to verify what information they were supposed to enter.",
+      "hint": "Think about what happens the moment typing into a placeholder begins.",
+      "testedLearningPoint": "Identify why placeholders in forms harm usability."
+    },
+    {
+      "questionId": "M06Q2",
+      "prompt": "When is text exempt from minimum contrast rules?",
+      "options": [
+        { "id": "A", "text": "When it is located in the main body paragraph." },
+        { "id": "B", "text": "When it is part of a disabled, inactive control." },
+        { "id": "C", "text": "When a brand color is prioritized above legibility." },
+        { "id": "D", "text": "When the text is formatted as a primary button." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Inactive elements are exempt because faded contrast communicates that the element cannot be used.",
+      "hint": "Consider elements that are not currently allowed to be clicked.",
+      "testedLearningPoint": "Understand the contrast exemptions for disabled controls."
+    },
+    {
+      "questionId": "M06Q3",
+      "prompt": "How should a designer treat purely decorative text?",
+      "options": [
+        { "id": "A", "text": "It must always meet the strict 4.5 ratio." },
+        { "id": "B", "text": "It should be accompanied by an audio description." },
+        { "id": "C", "text": "It has no contrast requirement if it is not needed to understand the page." },
+        { "id": "D", "text": "It must be hidden completely on mobile devices." }
+      ],
+      "correctOptionId": "C",
+      "explanation": "Text used entirely as a visual texture and carrying no meaning is exempt from contrast rules.",
+      "hint": "Ask whether the text matters for comprehension.",
+      "testedLearningPoint": "Differentiate between essential text and pure decoration."
+    }
+  ]
+}

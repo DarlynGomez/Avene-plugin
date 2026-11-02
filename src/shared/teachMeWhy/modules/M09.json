@@ -1,0 +1,42 @@
+{
+  "id": "M09",
+  "title": "Contrast for Interface Parts",
+  "context": "Non-text contrast for inputs, borders, icons, and charts",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "Text is not the only part of an interface that needs to be visible. Boundaries help people find controls and distinguish chart information.",
+  "learningObjectives": [
+    "Identify user interface components.",
+    "Understand the 3:1 target for borders and icons.",
+    "Apply contrast ideas to data visualizations."
+  ],
+  "lessonParagraphs": [
+    "Buttons, text input borders, icons, and chart elements are interface components without words. They need a clear boundary so people can see where to interact.",
+    "A faint field border can blend into its background. The research gives a 3:1 target for non-text graphical components against adjacent colors. Avene currently focuses on text contrast, so this topic is outside its detection scope.",
+    "Adjacent colors in a pie chart can blend together. The research suggests using distinct lightness or adding a dark border between slices.",
+    "A visible cue can also communicate a component boundary. For example, a button without a border may still be clear if its text signals its purpose."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "rxaF9XzStOU",
+    "title": "Contrast in Charts",
+    "publisher": "Nielsen Norman Group",
+    "startSeconds": 0,
+    "endSeconds": 70,
+    "durationSeconds": 70,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Icons, borders, and input fields need a visible boundary.",
+    "The research gives a 3:1 target for non-text components.",
+    "Other cues can help distinguish chart elements and controls."
+  ],
+  "reviewFlags": [
+    "The overview lists 4 minutes, while the detailed reading, video, and quiz budget totals 4.5 minutes."
+  ],
+  "internalNote": "This topic is outside the scope of Avene's text-only detection engine."
+}
