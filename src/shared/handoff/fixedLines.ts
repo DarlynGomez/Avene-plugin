@@ -11,6 +11,9 @@ export const CLIENT_LINE = "Draft for the designer to send. Not a conformance st
 export const HIGHER_UP_LINE =
   "Whether these items affect a conformance claim depends on what the organization has claimed. Avene makes no conformance claim.";
 
+/** The last line of a copy made before anyone has reviewed it */
+export const NOT_REVIEWED_LINE = "Not yet reviewed by a person.";
+
 export const ADVISORY_LABEL = "Inference, not a measured failure";
 
 export const TICKET_IMPACT =

@@ -1,3 +1,5 @@
+import { fireEvent, screen } from "@testing-library/react";
+
 import type { HandoffDataMessage } from "../../shared/handoff/handoffMessages";
 import type { HandoffItemMeta } from "../../shared/handoff/types";
 import type { IssueSummary } from "../../shared/issues/issueTypes";
@@ -56,4 +58,9 @@ export function handoffData(meta: Record<string, HandoffItemMeta> = {}): Handoff
 
 export function emit(message: unknown) {
   window.dispatchEvent(new MessageEvent("message", { data: { pluginMessage: message } }));
+}
+
+/** The document starts as cards, the exact text is one click away */
+export function showText(): void {
+  fireEvent.click(screen.getByRole("button", { name: "Text" }));
 }

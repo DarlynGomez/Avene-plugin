@@ -4,6 +4,7 @@ import { buildHeader } from "./header";
 import { NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
+import { group, groupedSection } from "./sections";
 import { createSlots, fillSlots } from "./slots";
 import { summaryLines } from "./summaryLines";
 import type { DocSection, HandoffDoc, HandoffInput } from "./types";
@@ -26,15 +27,15 @@ export function buildDoc(input: HandoffInput): HandoffDoc {
       "Summary",
       summaryLines(items, deferredLayers, input.questions.length, slots)
     ),
-    ...section(
+    ...groupedSection(
       "action",
       "Needs developer action",
-      action.flatMap((i) => actionLines(i, slots))
+      action.map((i) => group(actionLines(i, slots), i))
     ),
-    ...section(
+    ...groupedSection(
       "left",
       "Knowingly left as-is",
-      left.flatMap((i) => leftLines(i, slots))
+      left.map((i) => group(leftLines(i, slots), i))
     ),
     ...section("changes", "Changes made in this file", changeLines(input.changes, slots)),
     ...section("notes", "Designer notes", noteLines(input.notes ?? [], slots)),

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DraftCache } from "../../shared/handoff/draftCache";
 import { reword } from "../../shared/handoff/draftFixtures";
 import { copyText } from "../study/downloadFile";
-import { emit, handoffData } from "./fixtures";
+import { emit, handoffData, showText } from "./fixtures";
 import { HandoffTab } from "./HandoffTab";
 
 vi.mock("../study/downloadFile", () => ({
@@ -63,7 +63,13 @@ afterEach(() => {
 function mount(drafts: DraftCache = {}) {
   render(<HandoffTab />);
   act(() => emit({ ...handoffData(), drafts }));
+  showText();
+  // the drafts live in the review sheet, which stays open for these tests
+  fireEvent.click(screen.getByRole("button", { name: "Review and copy" }));
 }
+
+const aiCards = () => screen.getAllByRole("button", { name: /^AI Rewrite/ });
+const templateCards = () => screen.getAllByRole("button", { name: /^Template \(Standard\)/ });
 
 async function draftThisVersion() {
   fireEvent.click(screen.getByRole("button", { name: "Draft this version" }));
@@ -73,10 +79,11 @@ async function draftThisVersion() {
 }
 
 async function copyAs(name: string): Promise<string> {
-  fireEvent.click(screen.getByRole("button", { name: "Review and copy" }));
   const gate = screen.getByRole("dialog");
-  fireEvent.change(within(gate).getByLabelText("Reviewed by"), { target: { value: name } });
-  await act(async () => fireEvent.click(within(gate).getByRole("button", { name: "Copy" })));
+  fireEvent.change(within(gate).getByLabelText(/Reviewer full name/), { target: { value: name } });
+  await act(async () =>
+    fireEvent.click(within(gate).getByRole("button", { name: "Finalize and copy" }))
+  );
   return vi.mocked(copyText).mock.calls.at(-1)?.[0] ?? "";
 }
 
@@ -105,14 +112,21 @@ describe("drafting", () => {
   it("shows the template text beside the draft, every sentence tagged, and the template chosen", async () => {
     mount();
     await draftThisVersion();
-    const tags = screen.getAllByText("AI-drafted");
-    expect(tags.length).toBe(sent.reduce((n, b) => n + b.lines.length, 0));
-    expect(screen.getAllByText("Template text").length).toBe(sent.length);
-    for (const radio of screen.getAllByLabelText("Use the template text"))
-      expect(radio).toBeChecked();
-    for (const radio of screen.getAllByLabelText("Use the AI-drafted text"))
-      expect(radio).not.toBeChecked();
+    // each AI card carries the label, and every sentence carries its own once the card is chosen
+    expect(screen.getAllByText("AI-DRAFTED")).toHaveLength(sent.length);
+    expect(templateCards()).toHaveLength(sent.length);
+    for (const card of templateCards()) expect(card).toHaveAttribute("aria-pressed", "true");
+    for (const card of aiCards()) expect(card).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByText("Template chosen by default")).toBeInTheDocument();
     expect(screen.getByLabelText("Document for developers")).not.toHaveTextContent("sole layer");
+  });
+
+  it("tags every sentence of a chosen AI card for editing", async () => {
+    mount();
+    await draftThisVersion();
+    fireEvent.click(aiCards()[1]);
+    const action = sent.find((b) => b.blockId === "action");
+    expect(screen.getAllByText("AI-drafted")).toHaveLength(action?.lines.length ?? 0);
   });
 
   it("copies the template text unless a draft is chosen", async () => {
@@ -126,7 +140,7 @@ describe("drafting", () => {
   it("copies a chosen draft with one attribution line for it and one line at the top", async () => {
     mount();
     await draftThisVersion();
-    fireEvent.click(screen.getAllByLabelText("Use the AI-drafted text")[1]);
+    fireEvent.click(aiCards()[1]);
     expect(screen.getByLabelText("Document for developers")).toHaveTextContent("sole layer");
     const text = await copyAs("Sam Lee");
     expect(text).toContain(
@@ -163,7 +177,7 @@ describe("edits", () => {
   async function chooseDraft() {
     mount();
     await draftThisVersion();
-    fireEvent.click(screen.getAllByLabelText("Use the AI-drafted text")[1]);
+    fireEvent.click(aiCards()[1]);
     return screen.getByLabelText("Needs developer action, sentence 1") as HTMLTextAreaElement;
   }
 
@@ -189,21 +203,19 @@ describe("edits", () => {
     expect(screen.getByLabelText("Things to look at in Needs developer action")).toHaveTextContent(
       "Pay now"
     );
-    fireEvent.click(screen.getByRole("button", { name: "Review and copy" }));
     const gate = screen.getByRole("dialog");
     expect(
       within(gate).getByLabelText("Things to look at in the AI-drafted text")
     ).toHaveTextContent("Needs developer action: Quoted text that is not an id: Pay now");
-    expect(
-      within(gate).getByText(/Text written by an AI: Needs developer action/)
-    ).toBeInTheDocument();
+    expect(within(gate).getByText("AI text chosen for 1 block")).toBeInTheDocument();
   });
 
   it("shows plain-word labels in the draft for a reader who is not a developer", async () => {
     mount();
-    fireEvent.click(screen.getByLabelText("A client"));
+    fireEvent.click(screen.getByLabelText("Client"));
     fireEvent.click(screen.getByRole("button", { name: "Draft this version" }));
     await screen.findByText(/Drafts are ready to look at/);
+    fireEvent.click(aiCards()[0]);
     const field = screen.getByLabelText("Summary, sentence 1") as HTMLTextAreaElement;
     expect(field.value.startsWith("Measured:")).toBe(true);
     fireEvent.change(field, { target: { value: field.value.replace("need", "require") } });
@@ -219,7 +231,7 @@ describe("when drafting does not work", () => {
     expect(
       await screen.findByText("The drafting helper is not running, so the template text stays.")
     ).toBeInTheDocument();
-    expect(screen.queryByLabelText("Use the AI-drafted text")).toBeNull();
+    for (const card of aiCards()) expect(card).toBeDisabled();
     expect(posted.some((m) => m.type === "HANDOFF_DRAFTS_SET")).toBe(false);
     const text = await copyAs("Sam");
     expect(text).not.toContain("drafted by a language model");
@@ -239,7 +251,7 @@ describe("when drafting does not work", () => {
     expect(screen.getAllByRole("alert")[0]).toHaveTextContent(
       "No drafting model is set up on this computer"
     );
-    expect(screen.queryByLabelText("Use the AI-drafted text")).toBeNull();
+    for (const card of aiCards()) expect(card).toBeDisabled();
   });
 
   it("does not offer a draft that fails the checks", async () => {
@@ -253,7 +265,7 @@ describe("when drafting does not work", () => {
     mount();
     await draftThisVersion();
     expect(screen.getAllByRole("alert")[0]).toHaveTextContent("did not pass the checks");
-    expect(screen.queryByLabelText("Use the AI-drafted text")).toBeNull();
+    for (const card of aiCards()) expect(card).toBeDisabled();
     expect(posted.some((m) => m.type === "HANDOFF_DRAFTS_SET")).toBe(false);
   });
 });
@@ -262,7 +274,7 @@ describe("saved drafts", () => {
   async function liveRun() {
     mount();
     await draftThisVersion();
-    fireEvent.click(screen.getAllByLabelText("Use the AI-drafted text")[1]);
+    fireEvent.click(aiCards()[1]);
     const tags = screen.getAllByText(/AI-drafted/).map((el) => el.textContent);
     const text = await copyAs("Sam Lee");
     const drafts = savedDrafts();
@@ -276,7 +288,7 @@ describe("saved drafts", () => {
     mount(live.drafts);
     expect(sent).toEqual([]);
     expect(screen.queryByText("Draft is from earlier findings")).toBeNull();
-    fireEvent.click(screen.getAllByLabelText("Use the AI-drafted text")[1]);
+    fireEvent.click(aiCards()[1]);
     const tags = screen.getAllByText(/AI-drafted/).map((el) => el.textContent);
     expect(tags).toEqual(live.tags);
     expect(await copyAs("Sam Lee")).toBe(live.text);
@@ -291,7 +303,7 @@ describe("saved drafts", () => {
     stubServer();
     mount(stale);
     expect(screen.getAllByText("Draft is from earlier findings").length).toBe(2);
-    expect(screen.queryByLabelText("Use the AI-drafted text")).toBeNull();
+    for (const card of aiCards()) expect(card).toBeDisabled();
     expect(screen.queryAllByText("AI-drafted")).toEqual([]);
     expect(await copyAs("Sam")).not.toContain("drafted by a language model");
   });
@@ -305,7 +317,7 @@ describe("saved drafts", () => {
       ])
     );
     mount(broken);
-    expect(screen.queryByLabelText("Use the AI-drafted text")).toBeNull();
+    for (const card of aiCards()) expect(card).toBeDisabled();
     expect(screen.getAllByText(/did not pass the checks/).length).toBe(2);
   });
 });

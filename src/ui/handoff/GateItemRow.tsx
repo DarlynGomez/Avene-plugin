@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 
+import { formatRatio, plural } from "../../shared/handoff/text";
 import type { HandoffItem, HandoffItemMeta } from "../../shared/handoff/types";
 import styles from "./Handoff.module.css";
 import sheet from "./HandoffSheet.module.css";
@@ -11,23 +12,31 @@ interface GateItemRowProps {
   onMeta: (meta: HandoffItemMeta) => void;
 }
 
-/** One item in the review step: leave it out, and for a left-as-is item add the details */
+/** One item in the review: its name, how far it is off, and a box to include it, with details for a kept item */
 export function GateItemRow({ item, meta, onMeta }: GateItemRowProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const name = item.representative.nodeName;
-  const kind = item.kind === "action" ? "needs a fix" : "left as it is";
+  const count = item.instances.length;
   return (
     <li className={sheet.item}>
-      <span className={sheet.itemText}>{`"${name}" on ${item.screenName}, ${kind}`}</span>
-      <label className={styles.choice}>
-        <input
-          type="checkbox"
-          checked={meta.leaveOut}
-          onChange={(e) => onMeta({ ...meta, leaveOut: e.target.checked })}
-        />
-        {`Leave "${name}" out of this document`}
-      </label>
+      <div className={sheet.itemRow}>
+        <span className={sheet.itemName}>
+          {name}
+          <span className={sheet.itemSub}>
+            {`${formatRatio(item.representative.measuredRatio)}:1 contrast (${count} ${plural(count, "layer", "layers")}) on ${item.screenName}`}
+          </span>
+        </span>
+        <label className={sheet.include}>
+          <input
+            type="checkbox"
+            aria-label={`Include "${name}"`}
+            checked={!meta.leaveOut}
+            onChange={(e) => onMeta({ ...meta, leaveOut: !e.target.checked })}
+          />
+          Include
+        </label>
+      </div>
       {item.kind === "left" && (
         <>
           <button

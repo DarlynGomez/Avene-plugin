@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from "react";
 
+import { displayLabel } from "../../shared/handoff/labels";
 import {
   NOTE_CATEGORIES,
   removeNote,
@@ -7,19 +8,15 @@ import {
   type NodeNote,
   type NoteCategory
 } from "../../shared/handoff/noteStorage";
-import type { Owner } from "../../shared/handoff/types";
+import type { Audience, Owner } from "../../shared/handoff/types";
 import styles from "./Handoff.module.css";
 import sheet from "./HandoffSheet.module.css";
+import { CATEGORY_NAMES } from "./noteCategoryNames";
+import { NoteFooter } from "./NoteFooter";
 import { NoteKindFields } from "./NoteKindFields";
+import { NoteTextFields } from "./NoteTextFields";
+import { SheetHeader } from "./SheetHeader";
 import { useSheetFocus } from "./useSheetFocus";
-
-const CATEGORY_NAMES: Record<NoteCategory, string> = {
-  alt: "Image description (alt text)",
-  heading: "Heading",
-  name: "Name for a control",
-  state: "A state that is missing",
-  question: "A question for someone"
-};
 
 export interface NoteLayer {
   nodeId: string;
@@ -27,6 +24,9 @@ export interface NoteLayer {
 }
 
 interface NoteSheetProps {
+  /** The kind of note to start on, a question when it was opened from the document */
+  initialCategory?: NoteCategory;
+  audience?: Audience;
   layers: readonly NoteLayer[];
   notesByNode: Readonly<Record<string, NodeNote[]>>;
   onSave: (nodeId: string, notes: NodeNote[]) => void;
@@ -34,13 +34,21 @@ interface NoteSheetProps {
 }
 
 /** One note per kind per layer, saving the same kind again replaces it */
-export function NoteSheet({ layers, notesByNode, onSave, onClose }: NoteSheetProps) {
+export function NoteSheet({
+  initialCategory = "alt",
+  audience = "developer",
+  layers,
+  notesByNode,
+  onSave,
+  onClose
+}: NoteSheetProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   useSheetFocus(ref, onClose);
   const [nodeId, setNodeId] = useState(layers[0]?.nodeId ?? "");
-  const [category, setCategory] = useState<NoteCategory>("alt");
+  const [category, setCategory] = useState<NoteCategory>(initialCategory);
   const [text, setText] = useState("");
+  const [contact, setContact] = useState("");
   const [decorative, setDecorative] = useState(false);
   const [level, setLevel] = useState(1);
   const [owner, setOwner] = useState<Owner>("Dev");
@@ -50,6 +58,7 @@ export function NoteSheet({ layers, notesByNode, onSave, onClose }: NoteSheetPro
 
   function save() {
     const note: NodeNote = { category, text, updatedAt: new Date().toISOString() };
+    if (contact.trim() !== "") note.contact = contact;
     if (category === "alt" && decorative) note.decorative = true;
     if (category === "heading") note.headingLevel = level;
     if (category === "question") note.owner = owner;
@@ -65,14 +74,14 @@ export function NoteSheet({ layers, notesByNode, onSave, onClose }: NoteSheetPro
       aria-modal="true"
       aria-labelledby={`${id}-t`}
     >
-      <h2 id={`${id}-t`} className={styles.title}>
-        Add a note for a layer
-      </h2>
-      <p className={styles.helper}>
-        Notes are yours. CADT does not check them, and they print under your name.
-      </p>
+      <SheetHeader
+        id={`${id}-t`}
+        title="Add designer note to layer"
+        subtitle={`Prints as a formal statement under the ${displayLabel("Decision", audience)} label.`}
+        onClose={onClose}
+      />
       <label className={styles.label} htmlFor={`${id}-layer`}>
-        Layer
+        Layer target name
       </label>
       <select
         id={`${id}-layer`}
@@ -87,7 +96,7 @@ export function NoteSheet({ layers, notesByNode, onSave, onClose }: NoteSheetPro
         ))}
       </select>
       <label className={styles.label} htmlFor={`${id}-kind`}>
-        What is it about?
+        Note category
       </label>
       <select
         id={`${id}-kind`}
@@ -111,37 +120,24 @@ export function NoteSheet({ layers, notesByNode, onSave, onClose }: NoteSheetPro
         onLevel={setLevel}
         onOwner={setOwner}
       />
-      <label className={styles.label} htmlFor={`${id}-text`}>
-        Your note
-      </label>
-      <textarea
-        id={`${id}-text`}
-        className={styles.input}
-        rows={3}
-        value={text}
-        disabled={category === "alt" && decorative}
-        onChange={(e) => setText(e.target.value)}
+      <NoteTextFields
+        id={id}
+        text={text}
+        contact={contact}
+        locked={category === "alt" && decorative}
+        onText={setText}
+        onContact={setContact}
       />
-      <div className={sheet.actions}>
-        {existing.some((n) => n.category === category) && (
-          <button
-            type="button"
-            className={styles.button}
-            onClick={() => {
-              onSave(nodeId, removeNote(existing, category));
-              onClose();
-            }}
-          >
-            Remove this note
-          </button>
-        )}
-        <button type="button" className={styles.button} onClick={onClose}>
-          Cancel
-        </button>
-        <button type="button" className={styles.primary} disabled={!valid} onClick={save}>
-          Save note
-        </button>
-      </div>
+      <NoteFooter
+        canRemove={existing.some((x) => x.category === category)}
+        valid={valid}
+        onRemove={() => {
+          onSave(nodeId, removeNote(existing, category));
+          onClose();
+        }}
+        onCancel={onClose}
+        onSave={save}
+      />
     </div>
   );
 }

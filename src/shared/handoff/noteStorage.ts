@@ -1,4 +1,4 @@
-import { cutChars, NOTE_TEXT_MAX_CHARS } from "./limits";
+import { cutChars, META_SHORT_MAX_CHARS, NOTE_TEXT_MAX_CHARS } from "./limits";
 import type { Owner } from "./types";
 
 export const NOTE_CATEGORIES = ["alt", "heading", "name", "state", "question"] as const;
@@ -16,6 +16,8 @@ export interface NodeNote {
   headingLevel?: number;
   /** Question only */
   owner?: Owner;
+  /** Who to ask about it, in the designer's own words, a name and a role */
+  contact?: string;
   updatedAt: string;
 }
 
@@ -32,7 +34,14 @@ export function normalizeNote(value: unknown): NodeNote | null {
   const category = NOTE_CATEGORIES.find((name) => name === raw.category);
   if (!category) return null;
   const text = cutChars(raw.text.trim(), NOTE_TEXT_MAX_CHARS);
-  const note: NodeNote = { category, text, updatedAt: raw.updatedAt };
+  const contact =
+    typeof raw.contact === "string" ? cutChars(raw.contact.trim(), META_SHORT_MAX_CHARS) : "";
+  const note: NodeNote = {
+    category,
+    text,
+    updatedAt: raw.updatedAt,
+    ...(contact ? { contact } : {})
+  };
   if (category === "alt" && raw.decorative === true) return { ...note, text: "", decorative: true };
   if (category === "heading") {
     const level = raw.headingLevel;

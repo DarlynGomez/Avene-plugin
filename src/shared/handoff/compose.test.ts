@@ -23,7 +23,7 @@ describe("composeCopy", () => {
     expect(text.split("(AI-drafted, reviewed by Sam Lee)")).toHaveLength(2);
     const lines = text.split("\n");
     const at = lines.indexOf("(AI-drafted, reviewed by Sam Lee)");
-    expect(lines[at - 1]).toContain("It is not bound");
+    expect(lines.slice(at - 2, at).join(" ")).toContain("It is not bound");
     expect(lines[at + 1]).toBe("");
   });
 

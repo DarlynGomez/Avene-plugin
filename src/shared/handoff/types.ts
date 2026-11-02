@@ -88,11 +88,19 @@ export interface HandoffItem {
   meta: HandoffItemMeta;
 }
 
+/** The lines of one item, and the layers it is about so a panel can select them */
+export interface ItemGroup {
+  lines: readonly string[];
+  nodeIds: readonly string[];
+}
+
 /** Section lines are logical lines in slot form, each starting with a label */
 export interface DocSection {
   id: string;
   title: string;
   lines: readonly string[];
+  /** The same lines grouped by item, for a card view; absent for sections of single lines */
+  groups?: readonly ItemGroup[];
 }
 
 /** What a version may show, developers see everything, clients see the least */
@@ -111,23 +119,6 @@ export interface HandoffDoc {
   header: readonly string[];
   sections: readonly DocSection[];
   slots: Readonly<Record<string, string>>;
-}
-
-export interface ModelSentence {
-  text: string;
-  edited: boolean;
-}
-
-export interface DraftBlock {
-  id: string;
-  templateText: string;
-  modelSentences: readonly ModelSentence[];
-  chosen: "template" | "model";
-}
-
-export interface Draft {
-  audience: Audience;
-  blocks: readonly DraftBlock[];
 }
 
 /** A version for one reader, notices are fixed lines exempt from the label rule like the header */

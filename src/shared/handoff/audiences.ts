@@ -6,6 +6,7 @@ import { CLIENT_LINE, HIGHER_UP_LINE, NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { pmSummaryLines } from "./pmSummary";
 import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
+import { group, groupedSection } from "./sections";
 import { createSlots } from "./slots";
 import { summaryLines } from "./summaryLines";
 import type {
@@ -54,8 +55,9 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
     audience === "higherUp"
       ? pmSummaryLines(items, scope, slots).slice(0, 2)
       : summaryLines(items, deferredLayers, questions.length, slots, o);
-  const action = of("action").flatMap((item) => actionLines(item, slots, o));
-  const left = (list: readonly HandoffItem[]) => list.flatMap((item) => leftLines(item, slots, o));
+  const action = of("action").map((item) => group(actionLines(item, slots, o), item));
+  const left = (list: readonly HandoffItem[]) =>
+    list.map((item) => group(leftLines(item, slots, o), item));
   const tail = [
     ...(advisory ? [advisory] : []),
     { id: "notCovered", title: "Not covered", lines: [NOT_COVERED_LINE] }
@@ -64,7 +66,7 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
   const sections: Record<Audience, DocSection[]> = {
     developer: [
       ...part("summary", "Summary", summary),
-      ...part("action", "Needs developer action", action),
+      ...groupedSection("action", "Needs developer action", action),
       ...part("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
       ...part("changes", "Changes made in this file", changeLines(input.changes, slots)),
       ...part("questions", "Open questions", questionLines(questions, slots)),
@@ -72,18 +74,18 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
     ],
     pm: [
       ...part("summary", "Summary", summary),
-      ...part("left", "Knowingly left as-is", left(of("left"))),
+      ...groupedSection("left", "Knowingly left as-is", left(of("left"))),
       ...part("questions", "Open questions", questionLines(questions, slots)),
       ...tail
     ],
     higherUp: [
       ...part("summary", "Summary", summary),
-      ...part("waiting", "Decisions waiting", left(waiting)),
+      ...groupedSection("waiting", "Decisions waiting", left(waiting)),
       ...tail
     ],
     client: [
       ...part("summary", "Summary", summary),
-      ...part("left", "What was decided", left(of("left"))),
+      ...groupedSection("left", "What was decided", left(of("left"))),
       ...tail
     ]
   };

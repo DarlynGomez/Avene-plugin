@@ -49,7 +49,11 @@ const NOTE_WORDS: Record<string, string> = {
 export function noteLines(notes: readonly HandoffNote[], slots: SlotBuilder): string[] {
   return notes.map(({ nodeName, link, note }) => {
     const layer = `"${slots.auto("L", nodeName)}"`;
-    const tail = link ? ` Link: ${slots.auto("k", link)}` : "";
+    const who =
+      note.contact && note.category !== "question"
+        ? ` Owner: ${slots.auto("p", oneLine(note.contact))}.`
+        : "";
+    const tail = `${who}${link ? ` Link: ${slots.auto("k", link)}` : ""}`;
     if (note.category === "alt" && note.decorative) {
       return `${LABEL_DECISION}: ${layer} is decorative, so the alt text is empty.${tail}`;
     }

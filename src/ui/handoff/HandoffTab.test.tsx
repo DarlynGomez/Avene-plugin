@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { copyText } from "../study/downloadFile";
-import { emit, handoffData, HELPER_SIG, PRICE_SIG } from "./fixtures";
+import { emit, handoffData, HELPER_SIG, PRICE_SIG, showText } from "./fixtures";
 import { HandoffTab } from "./HandoffTab";
 
 vi.mock("../study/downloadFile", () => ({
@@ -28,8 +28,9 @@ afterEach(() => {
 function open() {
   render(<HandoffTab />);
   act(() => emit(handoffData()));
+  showText();
   fireEvent.click(screen.getByRole("button", { name: "Review and copy" }));
-  return screen.getByRole("dialog");
+  return screen.getByRole("dialog", { name: "Review and finalize handoff" });
 }
 
 describe("HandoffTab", () => {
@@ -37,9 +38,10 @@ describe("HandoffTab", () => {
     render(<HandoffTab />);
     expect(posted[0]).toEqual({ type: "HANDOFF_DATA_REQUEST" });
     act(() => emit(handoffData()));
+    showText();
     expect(screen.getByLabelText("Document for developers")).toHaveTextContent("Helper text");
-    fireEvent.click(screen.getByLabelText("A client"));
-    const client = screen.getByLabelText("Document for a client");
+    fireEvent.click(screen.getByLabelText("Client"));
+    const client = screen.getByLabelText("Document for client");
     expect(client).toHaveTextContent(
       "Draft for the designer to send. Not a conformance statement."
     );
@@ -51,24 +53,38 @@ describe("HandoffTab", () => {
     act(() => emit({ type: "HANDOFF_REFUSED" }));
     expect(screen.getByText("Handoff is not available right now.")).toBeInTheDocument();
   });
+
+  it("has three steps and no fourth, the drafts are part of the review", () => {
+    render(<HandoffTab />);
+    act(() => emit(handoffData()));
+    expect(screen.queryByRole("heading", { name: "Drafts by an AI" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Draft this version" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Review and copy" }));
+    expect(screen.getByRole("heading", { name: "Drafts by an AI" })).toBeInTheDocument();
+  });
 });
 
-describe("review gate", () => {
-  it("opens with the name empty and focused, and copy disabled", () => {
+describe("review sheet", () => {
+  it("is titled, and opens with the reviewer name empty and focused, and copy disabled", () => {
     const gate = open();
-    const name = within(gate).getByLabelText("Reviewed by");
+    expect(within(gate).getByText("REQUIRED TO COPY")).toBeInTheDocument();
+    const name = within(gate).getByLabelText(/Reviewer full name/);
     expect(name).toHaveValue("");
     expect(name).toHaveFocus();
-    expect(within(gate).getByRole("button", { name: "Copy" })).toBeDisabled();
+    expect(within(gate).getByRole("button", { name: "Finalize and copy" })).toBeDisabled();
   });
 
   it("keeps copy disabled for a blank name and copies the document with the reviewer once named", async () => {
     const gate = open();
-    const name = within(gate).getByLabelText("Reviewed by");
+    const name = within(gate).getByLabelText(/Reviewer full name/);
     fireEvent.change(name, { target: { value: "   " } });
-    expect(within(gate).getByRole("button", { name: "Copy" })).toBeDisabled();
+    expect(within(gate).getByRole("button", { name: "Finalize and copy" })).toBeDisabled();
+    expect(within(gate).queryByText(/Reviewer named/)).toBeNull();
     fireEvent.change(name, { target: { value: "Sam Lee" } });
-    const copy = within(gate).getByRole("button", { name: "Copy" });
+    expect(
+      within(gate).getByText("Reviewer named. You can now finalize and copy the notes.")
+    ).toBeInTheDocument();
+    const copy = within(gate).getByRole("button", { name: "Finalize and copy" });
     expect(copy).toBeEnabled();
     await act(async () => fireEvent.click(copy));
     const text = vi.mocked(copyText).mock.calls[0][0];
@@ -80,17 +96,23 @@ describe("review gate", () => {
   it("says what could not be copied instead of claiming success", async () => {
     vi.mocked(copyText).mockResolvedValueOnce(false);
     const gate = open();
-    fireEvent.change(within(gate).getByLabelText("Reviewed by"), { target: { value: "Sam" } });
-    await act(async () => fireEvent.click(within(gate).getByRole("button", { name: "Copy" })));
+    fireEvent.change(within(gate).getByLabelText(/Reviewer full name/), {
+      target: { value: "Sam" }
+    });
+    await act(async () =>
+      fireEvent.click(within(gate).getByRole("button", { name: "Finalize and copy" }))
+    );
     expect(within(gate).getByText(/Copying did not work here/)).toBeInTheDocument();
   });
 
-  it("counts the items listed and a leave-out changes the count and the document", () => {
+  it("lists the items needing action with how many are included, and a box takes one out", () => {
     const gate = open();
     expect(
-      within(gate).getByText("2 items will be listed as needing developer action")
+      within(gate).getByRole("heading", { name: "Items needing action (2)" })
     ).toBeInTheDocument();
-    fireEvent.click(within(gate).getByLabelText('Leave "Helper text" out of this document'));
+    expect(within(gate).getByText("2 included in document")).toBeInTheDocument();
+    expect(within(gate).getAllByText(/2\.8:1 contrast \(1 layer\) on Payment/)).toHaveLength(2);
+    fireEvent.click(within(gate).getByLabelText('Include "Helper text"'));
     expect(posted.at(-1)).toMatchObject({
       type: "HANDOFF_META_SET",
       signature: HELPER_SIG,
@@ -100,26 +122,30 @@ describe("review gate", () => {
       [HELPER_SIG, PRICE_SIG].sort()
     );
     act(() => emit(handoffData({ [HELPER_SIG]: { signOff: "needs", leaveOut: true } })));
-    expect(
-      within(gate).getByText("1 item will be listed as needing developer action")
-    ).toBeInTheDocument();
-    expect(within(gate).getByLabelText('Leave "Helper text" out of this document')).toBeChecked();
+    expect(within(gate).getByText("1 included in document")).toBeInTheDocument();
+    expect(within(gate).getByLabelText('Include "Helper text"')).not.toBeChecked();
     expect(screen.getByLabelText("Document for developers")).not.toHaveTextContent("Helper text");
   });
 
-  it("closes with Escape or Close and puts focus back on the button that opened it", () => {
-    const opener = screen.queryByRole("button", { name: "Review and copy" });
-    expect(opener).toBeNull();
-    open();
+  it("closes with Escape, the X or Back to edit, and puts focus back on the button that opened it", () => {
+    render(<HandoffTab />);
+    act(() => emit(handoffData()));
     const button = screen.getByRole("button", { name: "Review and copy" });
     button.focus();
+    fireEvent.click(button);
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(button).toHaveFocus();
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("button", { name: "Back to edit" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("says no text was written by an AI, because this version is template only", () => {
+  it("says the template is chosen until a draft is", () => {
     const gate = open();
-    expect(within(gate).getByText(/Text written by an AI: none/)).toBeInTheDocument();
+    expect(within(gate).getByText("Template chosen by default")).toBeInTheDocument();
   });
 });

@@ -4,22 +4,13 @@ import sheet from "./HandoffSheet.module.css";
 
 interface GateNotesProps {
   doc: AudienceDoc;
-  aiTitles: readonly string[];
   draftWarnings: readonly string[];
 }
 
-/** What this version holds, which parts an AI wrote, and everything the checks still have to say */
-export function GateNotes({ doc, aiTitles, draftWarnings }: GateNotesProps) {
+/** Everything the checks still have to say, in plain words, before anything is copied */
+export function GateNotes({ doc, draftWarnings }: GateNotesProps) {
   return (
     <>
-      <p className={sheet.status}>
-        This version has: {doc.sections.map((s) => s.title).join(", ")}.
-      </p>
-      <p className={sheet.status}>
-        {aiTitles.length === 0
-          ? "Text written by an AI: none. This version is template text only."
-          : `Text written by an AI: ${aiTitles.join(", ")}. You are named as its reviewer.`}
-      </p>
       {draftWarnings.length > 0 && (
         <ul className={sheet.list} aria-label="Things to look at in the AI-drafted text">
           {draftWarnings.map((w) => (

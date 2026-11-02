@@ -1,0 +1,52 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-card);
+}
+
+/* The card being worked in, the mockup draws it with an ink border */
+.emphasis {
+  border: var(--size-focus-ring) solid var(--color-ink);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--space-5);
+}
+
+.badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--space-2) + var(--space-1));
+  height: calc(var(--space-2) + var(--space-1));
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-severity-label);
+  font-weight: var(--font-weight-medium);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-issue-title);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.aside {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+}

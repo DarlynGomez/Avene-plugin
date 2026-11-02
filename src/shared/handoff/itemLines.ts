@@ -1,5 +1,6 @@
 import { LABEL_DECISION, LABEL_DETECTED, LABEL_NEEDS_CHECK } from "./labels";
 import type { SlotBuilder } from "./slots";
+import { suggestColor } from "./suggestFix";
 import { dateOnly, formatRatio, oneLine, plural } from "./text";
 import type { HandoffItem, LineOptions } from "./types";
 
@@ -42,9 +43,16 @@ export function actionLines(item: HandoffItem, slots: SlotBuilder, o = FULL): st
     ? `text ${colors(item, slots)}, ${ratios(item, slots)}`
     : ratios(item, slots);
   const criterion = slots.put("sc", "WCAG 1.4.3");
-  return [
+  const lines = [
     `${LABEL_DETECTED}: ${where(item, slots, o.names)}: ${measured} (${criterion}). ${share} ${binding}${linkText(item, slots, o)}`
   ];
+  const suggestion = o.hex ? suggestColor(r.foregroundHex, r.backgroundHex, r.requiredRatio) : null;
+  if (suggestion) {
+    lines.push(
+      `${LABEL_DETECTED}: A color on the same hue that would reach it: ${slots.auto("sg", suggestion.hex)}, measuring ${slots.auto("sr", suggestion.ratio)}:1.`
+    );
+  }
+  return lines;
 }
 
 function statusLine(item: HandoffItem, slots: SlotBuilder, o: LineOptions): string {

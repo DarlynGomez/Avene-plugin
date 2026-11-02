@@ -1,6 +1,7 @@
 import { buildItems } from "./buildItems";
 import { TICKET_IMPACT } from "./fixedLines";
 import { parseFileUrl } from "./links";
+import { suggestColor } from "./suggestFix";
 import { formatRatio, plural } from "./text";
 import type { HandoffInput, HandoffItem } from "./types";
 
@@ -19,9 +20,16 @@ export interface Ticket {
   lines: string[];
 }
 
-function criterion(item: HandoffItem): string {
+function criterion(item: HandoffItem, hex: boolean): string {
   const r = item.representative;
-  return `- [ ] "${r.nodeName}" reaches at least ${r.requiredRatio}:1 against ${r.backgroundHex} (measured ${formatRatio(r.measuredRatio)}:1)`;
+  if (!hex) {
+    return `- [ ] "${r.nodeName}" reaches at least ${r.requiredRatio}:1 against its background (measured ${formatRatio(r.measuredRatio)}:1)`;
+  }
+  const fix = suggestColor(r.foregroundHex, r.backgroundHex, r.requiredRatio);
+  const hint = fix
+    ? `. A color on the same hue that would reach it: ${fix.hex} (${fix.ratio}:1)`
+    : "";
+  return `- [ ] "${r.nodeName}" reaches at least ${r.requiredRatio}:1 against ${r.backgroundHex} (measured ${formatRatio(r.measuredRatio)}:1)${hint}`;
 }
 
 function layerLines(items: readonly HandoffItem[]): string[] {
@@ -41,7 +49,8 @@ function build(
   chunk: readonly HandoffItem[],
   title: string,
   input: HandoffInput,
-  exceptions: number
+  exceptions: number,
+  hex: boolean
 ): Ticket {
   const first = chunk[0];
   const design = first.representative.link ? `Design: ${first.representative.link}` : "";
@@ -52,7 +61,7 @@ function build(
     `Impact: ${TICKET_IMPACT}`,
     ...(links ? [links] : []),
     "Acceptance criteria",
-    ...chunk.map(criterion),
+    ...chunk.map((item) => criterion(item, hex)),
     KEYBOARD_CRITERION,
     ...layerLines(chunk),
     ...(exceptions > 0
@@ -65,7 +74,8 @@ function build(
 }
 
 /** One ticket per screen, split by root when criteria would pass the convention */
-export function buildTickets(input: HandoffInput): Ticket[] {
+/** Color codes belong to the developer version, anyone else gets the ratios and the layer */
+export function buildTickets(input: HandoffInput, hex = true): Ticket[] {
   const { items } = buildItems(input);
   const tickets: Ticket[] = [];
   for (const screen of input.screens) {
@@ -78,7 +88,7 @@ export function buildTickets(input: HandoffInput): Ticket[] {
       const layers = chunk.reduce((sum, item) => sum + item.instances.length, 0);
       const part = parts > 1 ? ` (part ${index + 1} of ${parts})` : "";
       const title = `[A11y] ${screen.name}: text contrast, ${layers} ${plural(layers, "layer", "layers")}${part}`;
-      tickets.push(build(chunk, title, input, exceptions));
+      tickets.push(build(chunk, title, input, exceptions, hex));
     }
   }
   return tickets;

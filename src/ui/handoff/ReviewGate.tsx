@@ -1,26 +1,27 @@
+import { Copy } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 
 import { buildAudienceDoc } from "../../shared/handoff/audiences";
-import { buildItems, DEFAULT_META } from "../../shared/handoff/buildItems";
-import { composeCopy, type ChosenText } from "../../shared/handoff/compose";
+import { buildItems } from "../../shared/handoff/buildItems";
+import { composeCopy } from "../../shared/handoff/compose";
 import type { Audience, HandoffInput, HandoffItemMeta } from "../../shared/handoff/types";
-import { plural } from "../../shared/handoff/text";
 import { copyText } from "../study/downloadFile";
-import { GateItemRow } from "./GateItemRow";
+import { DraftsSection } from "./DraftsSection";
 import { GateNotes } from "./GateNotes";
 import styles from "./Handoff.module.css";
 import sheet from "./HandoffSheet.module.css";
+import { ItemRows } from "./ItemRows";
+import { ReviewerBox } from "./ReviewerBox";
+import { SheetHeader } from "./SheetHeader";
+import type { useDrafts } from "./useDrafts";
 import { useSheetFocus } from "./useSheetFocus";
 
 interface ReviewGateProps {
   input: HandoffInput;
   audience: Audience;
+  drafts: ReturnType<typeof useDrafts>;
   onMeta: (signature: string, meta: HandoffItemMeta) => void;
   onClose: () => void;
-  /** The blocks the designer chose an AI draft for, with the checks that still have something to say */
-  chosenText?: ChosenText;
-  aiTitles?: readonly string[];
-  draftWarnings?: readonly string[];
 }
 
 /** Every item with leave-out cleared, so an item that was left out can still be listed and brought back */
@@ -34,16 +35,8 @@ function withLeaveOutCleared(input: HandoffInput): HandoffInput {
   return { ...input, meta };
 }
 
-/** Name first, then what will be listed, then copy; copy waits for the name */
-export function ReviewGate({
-  input,
-  audience,
-  onMeta,
-  onClose,
-  chosenText = {},
-  aiTitles = [],
-  draftWarnings = []
-}: ReviewGateProps) {
+/** Name first, then what goes in, then which phrasing, then copy; copy waits for the name */
+export function ReviewGate({ input, audience, drafts, onMeta, onClose }: ReviewGateProps) {
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   useSheetFocus(ref, onClose);
@@ -51,21 +44,18 @@ export function ReviewGate({
   const [status, setStatus] = useState("");
   const items = useMemo(() => buildItems(withLeaveOutCleared(input)).items, [input]);
   const doc = useMemo(() => buildAudienceDoc(input, audience), [input, audience]);
-  const listed = items.filter(
-    (item) => item.kind === "action" && !input.meta[item.signature]?.leaveOut
-  ).length;
 
   async function copy() {
     const reviewer = { name: name.trim(), date: new Date().toISOString() };
     const text = composeCopy(
       buildAudienceDoc({ ...input, reviewer }, audience),
-      chosenText,
+      drafts.chosenText,
       reviewer.name
     );
     setStatus(
       (await copyText(text))
         ? "Copied. Paste it where it is going."
-        : "Copying did not work here. Select the preview text and copy it by hand."
+        : "Copying did not work here. Switch the document to Text, select it and copy it by hand."
     );
   }
 
@@ -77,53 +67,44 @@ export function ReviewGate({
       aria-modal="true"
       aria-labelledby={`${id}-t`}
     >
-      <h2 id={`${id}-t`} className={styles.title}>
-        Before you copy
-      </h2>
-      <label className={styles.label} htmlFor={`${id}-name`}>
-        Reviewed by
-      </label>
-      <p className={styles.helper} id={`${id}-help`}>
-        Type your name. It prints at the top of what you copy.
-      </p>
-      <input
-        id={`${id}-name`}
-        className={styles.input}
-        value={name}
-        aria-describedby={`${id}-help`}
-        onChange={(e) => setName(e.target.value)}
+      <SheetHeader
+        id={`${id}-t`}
+        title="Review and finalize handoff"
+        subtitle="Checks the reviewer name, what is left out, and what you kept as it is."
+        onClose={onClose}
       />
+      <ReviewerBox name={name} onChange={setName} />
+      <ItemRows
+        title="Items needing action"
+        hint="Toggle off any item to exclude it from the copied notes."
+        items={items.filter((i) => i.kind === "action")}
+        input={input}
+        onMeta={onMeta}
+      />
+      <ItemRows
+        title="Kept as they are"
+        hint="Add who decided, what makes it easier to live with, and who signed off."
+        items={items.filter((i) => i.kind === "left")}
+        input={input}
+        onMeta={onMeta}
+      />
+      <DraftsSection audience={audience} doc={doc} drafts={drafts} />
+      <GateNotes doc={doc} draftWarnings={drafts.draftWarnings} />
       <p className={styles.helper} role="status">
-        {`${listed} ${plural(listed, "item", "items")} will be listed as needing developer action`}
-      </p>
-      <ul className={sheet.list} aria-label="Items in this document">
-        {items.map((item) => {
-          const meta = input.meta[item.signature] ?? DEFAULT_META;
-          return (
-            <GateItemRow
-              key={`${item.kind}-${item.screenId}-${item.signature}`}
-              item={item}
-              meta={meta}
-              onMeta={(next) => onMeta(item.signature, next)}
-            />
-          );
-        })}
-      </ul>
-      <GateNotes doc={doc} aiTitles={aiTitles} draftWarnings={draftWarnings} />
-      <p className={sheet.status} role="status">
         {status}
       </p>
-      <div className={sheet.actions}>
+      <div className={sheet.footer}>
         <button type="button" className={styles.button} onClick={onClose}>
-          Close
+          Back to edit
         </button>
         <button
           type="button"
-          className={styles.primary}
+          className={`${styles.primary} ${styles.withIcon}`}
           disabled={name.trim() === ""}
-          onClick={copy}
+          onClick={() => void copy()}
         >
-          Copy
+          <Copy size={16} aria-hidden="true" />
+          Finalize and copy
         </button>
       </div>
     </div>

@@ -44,10 +44,17 @@ export function useHandoff() {
       send({ type: "HANDOFF_META_SET", signature, meta, live }),
     []
   );
+  /** Selects the layers in the file and zooms to them, the same message Live Watch uses, nothing is written */
+  const showOnCanvas = useCallback((nodeIds: readonly string[]) => {
+    window.parent.postMessage(
+      { pluginMessage: { type: "SHOW_ON_CANVAS", nodeIds: [...nodeIds] } },
+      "*"
+    );
+  }, []);
   const setFileUrl = useCallback((url: string) => send({ type: "HANDOFF_FILE_URL_SET", url }), []);
   const setDrafts = useCallback(
     (drafts: DraftCache) => send({ type: "HANDOFF_DRAFTS_SET", drafts }),
     []
   );
-  return { data, refused, writeError, setNotes, setMeta, setFileUrl, setDrafts };
+  return { data, refused, writeError, setNotes, setMeta, setFileUrl, setDrafts, showOnCanvas };
 }
