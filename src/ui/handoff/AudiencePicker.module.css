@@ -68,23 +68,3 @@
   font-size: var(--font-size-helper);
   font-weight: var(--font-weight-medium);
 }
-
-.about {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-1);
-  margin: 0;
-  padding: var(--space-2);
-  border: var(--size-hairline) solid var(--color-line);
-  border-radius: var(--radius-button);
-  background: var(--color-background);
-  color: var(--color-muted);
-  font-family: var(--font-body);
-  font-size: var(--font-size-option-description);
-  line-height: var(--font-line-height-option-description);
-}
-
-.about svg {
-  flex: none;
-  margin-top: 2px;
-}

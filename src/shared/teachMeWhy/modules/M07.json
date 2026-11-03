@@ -1,6 +1,7 @@
 {
   "id": "M07",
   "title": "Dark Mode Challenges",
+  "category": "visual",
   "context": "Brand colors and reverse polarity",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

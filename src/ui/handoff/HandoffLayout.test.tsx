@@ -81,12 +81,16 @@ describe("who it is for", () => {
     expect(screen.getByRole("radio", { name: "Developers" })).toBeChecked();
   });
 
-  it("explains the chosen reader and changes the labels the preview describes", () => {
+  it("changes the labels the preview describes without an audience info box", () => {
     mount();
-    expect(screen.getByText(/Includes raw hex values, exact contrast ratios/)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Includes raw hex values, exact contrast ratios/)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/A clear report of what was checked and decided/)
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText("Cards for developers")).toHaveTextContent("Detected:");
     fireEvent.click(screen.getByRole("radio", { name: "Client" }));
-    expect(screen.getByText(/A clear report of what was checked and decided/)).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: "Client" })).toBeChecked();
     showText();
     expect(screen.getByLabelText("Document for client")).toHaveTextContent("Measured:");

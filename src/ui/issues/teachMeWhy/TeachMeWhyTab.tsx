@@ -1,45 +1,49 @@
+import { useState } from "react";
+
 import { rootName } from "../rootName";
 import type { TeachMeWhyState } from "./useTeachMeWhy";
 import { RoleQuestion } from "../../roles/RoleQuestion";
 import { DepthGroup } from "./DepthGroup";
 import { ExplanationCard } from "./ExplanationCard";
 import { ExplanationContextLine } from "./ExplanationContextLine";
+import { ModuleLibrary } from "./ModuleLibrary";
 import styles from "./TeachMeWhyTab.module.css";
 
-/** Only the explanation, in one highlighted box, with nothing chosen there is one plain line */
+/** Shows the selected issue explanation above the educational topic library */
 export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
+  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const { root, view } = state;
-  if (!root || !view) {
-    return (
-      <div className={styles.empty}>
-        <p className={styles.emptyText}>Pick an issue to see why it matters.</p>
-      </div>
-    );
-  }
-  const representative = root.instances.find((i) => i.issueId === root.representativeIssueId);
+  const representative = root?.instances.find((i) => i.issueId === root.representativeIssueId);
   return (
     <div className={styles.outer}>
-      <div className={styles.highlight}>
-        <ExplanationContextLine
-          name={rootName(root, representative?.backgroundBinding ?? null)}
-          role={view.key.role}
-          measured={view.measured}
-          required={view.required}
-          onBack={state.backToIssue}
-        />
-        {state.role?.view?.allowed && (
-          <RoleQuestion view={state.role.view} onAnswer={state.role.answer} />
-        )}
-        <div className={styles.body}>
-          <DepthGroup depth={state.depth} onChange={state.changeDepth} />
-          <ExplanationCard
-            view={view}
-            hidden={state.hidden}
-            onHide={state.hide}
-            onShowAgain={state.showAgain}
+      {!selectedModuleId && root && view && (
+        <div className={styles.highlight}>
+          <ExplanationContextLine
+            name={rootName(root, representative?.backgroundBinding ?? null)}
+            role={view.key.role}
+            measured={view.measured}
+            required={view.required}
+            onBack={state.backToIssue}
           />
+          {state.role?.view?.allowed && (
+            <RoleQuestion view={state.role.view} onAnswer={state.role.answer} />
+          )}
+          <div className={styles.body}>
+            <DepthGroup depth={state.depth} onChange={state.changeDepth} />
+            <ExplanationCard
+              view={view}
+              hidden={state.hidden}
+              onHide={state.hide}
+              onShowAgain={state.showAgain}
+              onDeepDive={() => setSelectedModuleId("M01")}
+            />
+          </div>
         </div>
-      </div>
+      )}
+      <ModuleLibrary
+        selectedModuleId={selectedModuleId}
+        onSelectModule={setSelectedModuleId}
+      />
     </div>
   );
 }

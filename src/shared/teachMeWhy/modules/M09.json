@@ -1,6 +1,7 @@
 {
   "id": "M09",
   "title": "Contrast for Interface Parts",
+  "category": "visual",
   "context": "Non-text contrast for inputs, borders, icons, and charts",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

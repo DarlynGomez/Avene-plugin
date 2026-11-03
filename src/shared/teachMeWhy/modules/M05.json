@@ -1,6 +1,7 @@
 {
   "id": "M05",
   "title": "Unmeasurable Backgrounds",
+  "category": "visual",
   "context": "Text over gradients, images, and overlays",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

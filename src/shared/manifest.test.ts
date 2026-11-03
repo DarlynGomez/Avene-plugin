@@ -10,8 +10,14 @@ const manifest = JSON.parse(readFileSync(path.join(HERE, "..", "..", "manifest.j
 };
 
 describe("manifest network access", () => {
-  it("keeps allowedDomains closed and opens only localhost on the server's port for development", () => {
-    expect(manifest.networkAccess.allowedDomains).toEqual(["none"]);
+  it("allows only YouTube media domains and the role server in development", () => {
+    expect(manifest.networkAccess.allowedDomains).toEqual([
+      "https://www.youtube-nocookie.com",
+      "https://www.youtube.com",
+      "https://*.youtube.com",
+      "https://*.ytimg.com",
+      "https://*.googlevideo.com"
+    ]);
     expect(manifest.networkAccess.devAllowedDomains).toEqual(["http://localhost:8750"]);
   });
   it("uses a name and not an address, Figma refuses an IP address here", () => {
@@ -20,6 +26,8 @@ describe("manifest network access", () => {
     }
   });
   it("says why, in the reasoning text", () => {
+    expect(manifest.networkAccess.reasoning).toMatch(/YouTube media domains/);
+    expect(manifest.networkAccess.reasoning).toMatch(/active study sessions/);
     expect(manifest.networkAccess.reasoning).toMatch(/role suggestion server/);
     expect(manifest.networkAccess.reasoning).toMatch(/RIT/);
   });

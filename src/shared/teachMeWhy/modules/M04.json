@@ -1,6 +1,7 @@
 {
   "id": "M04",
   "title": "Text Size and Weight",
+  "category": "visual",
   "context": "Why large and bold text has a lower contrast threshold",
   "estimatedMinutes": 4,
   "timeBudgetMinutes": { "reading": 2, "video": 1, "quiz": 1 },

@@ -1,6 +1,7 @@
 {
   "id": "M06",
   "title": "Placeholder and Decorative Text",
+  "category": "cognitive",
   "context": "Placeholder, disabled, and decorative text",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

@@ -1,6 +1,7 @@
 {
   "id": "M03",
   "title": "Beyond Just Color",
+  "category": "visual",
   "context": "Color vision differences and conveying meaning",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

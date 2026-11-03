@@ -1,6 +1,7 @@
 {
   "id": "M10",
   "title": "How Human Vision Sees Contrast",
+  "category": "visual",
   "context": "Perceptual contrast algorithms and APCA",
   "estimatedMinutes": 4,
   "timeBudgetMinutes": { "reading": 2, "video": 1, "quiz": 1 },

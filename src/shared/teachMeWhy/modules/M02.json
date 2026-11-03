@@ -1,6 +1,7 @@
 {
   "id": "M02",
   "title": "Designing for the Real World",
+  "category": "motor",
   "context": "Situational impairments, including glare, sunlight, fatigue, and motion",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

@@ -1,6 +1,7 @@
 {
   "id": "M08",
   "title": "Documenting a Tradeoff",
+  "category": "system",
   "context": "Recording a design decision when a color is intentionally kept",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },

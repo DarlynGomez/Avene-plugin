@@ -1,6 +1,7 @@
 {
   "id": "M01",
   "title": "Why Text Contrast Matters",
+  "category": "visual",
   "context": "Low vision, aging eyes, and everyday reading",
   "estimatedMinutes": 4.5,
   "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
@@ -29,13 +30,7 @@
     "embeddingAllowed": true,
     "license": "W3C License"
   },
-  "optionalArticle": {
-    "title": "Why Color Contrast is Non-Negotiable for Web Design",
-    "author": "Kareena P",
-    "published": "March 2026",
-    "url": "https://medium.com/@kareenap/why-color-contrast-is-non-negotiable-for-web-design-db6897f09b89",
-    "minutesToRead": 4
-  },
+  "optionalArticle": null,
   "keyTakeaways": [
     "Contrast defines the visual boundary between text and its background.",
     "Standard text has a 4.5:1 target.",
