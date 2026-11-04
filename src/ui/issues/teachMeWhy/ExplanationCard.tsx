@@ -1,3 +1,5 @@
+import { ArrowRight } from "lucide-react";
+
 import type { ExplanationView } from "../../../shared/teachMeWhy/explanationView";
 import styles from "./ExplanationCard.module.css";
 
@@ -8,17 +10,30 @@ interface ExplanationCardProps {
   hidden: boolean;
   onHide: () => void;
   onShowAgain: () => void;
+  onDeepDive: () => void;
 }
 
 /** The words, then the label and sources, with a quiet way to put it away */
-export function ExplanationCard({ view, hidden, onHide, onShowAgain }: ExplanationCardProps) {
+export function ExplanationCard({
+  view,
+  hidden,
+  onHide,
+  onShowAgain,
+  onDeepDive
+}: ExplanationCardProps) {
   if (hidden) {
     return (
       <section className={styles.card} aria-label="Explanation">
         <p className={styles.quiet}>This explanation is hidden.</p>
-        <button type="button" className={styles.action} onClick={onShowAgain}>
-          Show again
-        </button>
+        <div className={styles.actions}>
+          <button type="button" className={styles.action} onClick={onShowAgain}>
+            Show again
+          </button>
+          <button type="button" className={styles.deepDive} onClick={onDeepDive}>
+            <span>Deep dive into this rule</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        </div>
       </section>
     );
   }
@@ -35,11 +50,17 @@ export function ExplanationCard({ view, hidden, onHide, onShowAgain }: Explanati
           {view.basedOn.length > 0 && (
             <p className={styles.note}>Based on: {view.basedOn.join("; ")}</p>
           )}
-          <button type="button" className={styles.action} onClick={onHide}>
-            Hide this explanation
-          </button>
         </>
       )}
+      <div className={styles.actions}>
+        <button type="button" className={styles.action} onClick={onHide}>
+          Dismiss
+        </button>
+        <button type="button" className={styles.deepDive} onClick={onDeepDive}>
+          <span>Deep dive into this rule</span>
+          <ArrowRight size={16} aria-hidden="true" />
+        </button>
+      </div>
     </section>
   );
 }

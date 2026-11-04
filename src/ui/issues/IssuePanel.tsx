@@ -9,6 +9,7 @@ import { useMainTabs } from "./hooks/useMainTabs";
 import { useSheetGating } from "./hooks/useSheetGating";
 import { ExplanationLinkContext } from "./teachMeWhy/ExplanationLinkContext";
 import { TeachMeWhyTab } from "./teachMeWhy/TeachMeWhyTab";
+import { HandoffTab } from "../handoff/HandoffTab";
 import { StudyMessagePanel } from "../study/StudyMessagePanel";
 import { useParticipantVisibility } from "../study/useParticipantVisibility";
 import { usePanelView } from "./hooks/usePanelView";
@@ -59,7 +60,6 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   const canAdjust = (aiAssistanceLevel ?? 1) >= 2 && visibility.adjustSheet;
   const { endAdjustRequested } = useSheetGating(visibility, sheet, closeSheet);
   const tabs = useMainTabs(visibility, view.reviewRoots, view.decisionRoots, view.issuesById);
-
   useEscapePrecedence(sheet, closeSheet, showingCount, restoreShownSelection);
   const { handleToggleImportant, handleApplyDecisionOffer, handleRecordIgnore } = useRootHandlers({
     markRootImportant,
@@ -104,12 +104,15 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
           headline={view.headline}
           activeMainTab={tabs.activeTab}
           onMainTabChange={tabs.onMainTabChange}
+          handoffTab={tabs.handoffTab}
         />
         {showingCount !== null && visibility.showOnCanvas && (
           <SelectionBanner count={showingCount} onRestore={restoreShownSelection} />
         )}
         <div className={styles.scrollRegion}>
-          {tabs.activeTab === "teach-me-why" ? (
+          {tabs.activeTab === "handoff" ? (
+            <HandoffTab />
+          ) : tabs.activeTab === "teach-me-why" ? (
             <TeachMeWhyTab state={tabs.teachMeWhy} />
           ) : (
             <LiveWatchBody

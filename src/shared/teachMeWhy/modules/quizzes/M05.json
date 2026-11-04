@@ -1,0 +1,47 @@
+{
+  "moduleId": "M05",
+  "questions": [
+    {
+      "questionId": "M05Q1",
+      "prompt": "Why do automated contrast tools struggle to evaluate text over a photograph?",
+      "options": [
+        { "id": "A", "text": "Photographs use color profiles that tools cannot read." },
+        { "id": "B", "text": "Images contain many varying pixels, so one local color measurement may not represent the whole word." },
+        { "id": "C", "text": "Automated tools are programmed to ignore all image files." },
+        { "id": "D", "text": "Text over photographs is strictly forbidden." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "A photograph varies in lightness across its surface, so checking one point does not guarantee every letter is legible.",
+      "hint": "Think about how a photograph changes from dark corners to bright spots.",
+      "testedLearningPoint": "Understand why tools report indeterminate results on images."
+    },
+    {
+      "questionId": "M05Q2",
+      "prompt": "What is a scrim in user interface design?",
+      "options": [
+        { "id": "A", "text": "A tool used to measure precise contrast ratios." },
+        { "id": "B", "text": "A semi-transparent dark overlay placed between an image and text." },
+        { "id": "C", "text": "A type of heavily weighted font used for headlines." },
+        { "id": "D", "text": "An error state where text completely disappears." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "A scrim darkens the background image, creating a more stable boundary for light text.",
+      "hint": "It operates as an overlay that acts as a protective layer.",
+      "testedLearningPoint": "Apply protective overlays to secure text visibility."
+    },
+    {
+      "questionId": "M05Q3",
+      "prompt": "Why is a dynamic background image risky for text contrast?",
+      "options": [
+        { "id": "A", "text": "It forces the text to change color randomly." },
+        { "id": "B", "text": "It drains the battery of mobile devices too quickly." },
+        { "id": "C", "text": "A passing score today might fail tomorrow if the image changes to something lighter." },
+        { "id": "D", "text": "It prevents users from scrolling the page." }
+      ],
+      "correctOptionId": "C",
+      "explanation": "An unprotected text layer can become illegible if unpredictable background content changes.",
+      "hint": "Consider what happens when a dark image swaps to a bright image.",
+      "testedLearningPoint": "Recognize the risk of changing dynamic content."
+    }
+  ]
+}

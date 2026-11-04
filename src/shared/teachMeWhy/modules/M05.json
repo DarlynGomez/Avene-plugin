@@ -1,0 +1,43 @@
+{
+  "id": "M05",
+  "title": "Unmeasurable Backgrounds",
+  "category": "visual",
+  "context": "Text over gradients, images, and overlays",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "Complex or changing backgrounds can make a single contrast measurement unreliable, so the text needs a stable visual boundary.",
+  "learningObjectives": [
+    "Understand why tools can report indeterminate results for images.",
+    "Apply protective overlays to support text visibility.",
+    "Recognize risks from changing background content."
+  ],
+  "lessonParagraphs": [
+    "Contrast is easier to evaluate when text sits on a solid color. A photograph, video, or gradient contains many changing colors, so a tool can report an indeterminate result instead of guessing.",
+    "A measurement at one point does not guarantee that the rest of a word is readable. A bright area in an image can sit behind some letters, and a dynamic image can change after it has been checked.",
+    "A scrim is a semi-transparent dark overlay between an image and text. It can darken bright areas and provide a more stable background for light text.",
+    "Solid blocks behind text or a shadow that creates a boundary are other options. The goal is a resilient container that protects legibility over a complex background."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "qooOXNmdCH4",
+    "title": "5 Design Principles in Context: Stripe",
+    "publisher": "Nielsen Norman Group",
+    "startSeconds": 70,
+    "endSeconds": 145,
+    "durationSeconds": 75,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Complex photographs can vary too much for one local measurement to represent every letter.",
+    "Dynamic backgrounds can change and reduce legibility.",
+    "Scrims or solid blocks can protect the text boundary."
+  ],
+  "reviewFlags": [
+    "The document says Avene reports indeterminate for these backgrounds. Confirm this matches current product behavior before displaying it as a product fact."
+  ],
+  "internalNote": "The research also mentions drop shadows and the lightest or darkest pixel behind text."
+}

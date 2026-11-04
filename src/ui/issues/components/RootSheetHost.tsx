@@ -1,6 +1,7 @@
 import type { Root } from "../../../shared/grouping/groupingTypes";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { SheetTarget } from "../hooks/useRootSheet";
+import { CalendarLayer } from "../../calendar/CalendarLayer";
 import { AdjustPopup } from "../adjust/AdjustPopup";
 import { IgnoreSheet } from "./IgnoreSheet";
 import { SheetOverlay } from "./SheetOverlay";
@@ -23,11 +24,21 @@ interface RootSheetHostProps {
   onRecordIgnore: (root: Root, reason: string) => void;
 }
 
+/** The root sheets plus the calendar layer, which shows its own sheet when a deferral reaches the trigger */
+export function RootSheetHost(props: RootSheetHostProps) {
+  return (
+    <>
+      <OpenSheet {...props} />
+      <CalendarLayer roots={props.roots} issuesById={props.issuesById} />
+    </>
+  );
+}
+
 /**
  * Renders the open sheet as one overlay over the whole panel, found by signature
  * A card lives in the scrolling list but the sheet must cover the panel
  */
-export function RootSheetHost({
+function OpenSheet({
   sheet,
   roots,
   issuesById,

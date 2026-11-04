@@ -1,4 +1,4 @@
-"""The three endpoints, bound to this computer only, with the checks that keep it that way."""
+"""The four endpoints, bound to this computer only, with the checks that keep it that way."""
 
 from __future__ import annotations
 
@@ -14,12 +14,14 @@ from . import labels
 from .classify import RoleRequest, classify, unsure
 from .clock import Clock, RealClock
 from .config import Settings
+from .draft import DraftRequest, draft, failed
 from .model_call import ModelCaller
 from .provider import OpenAICompatibleProvider, Provider
 from .requestlog import RequestLog
 from .selftest import run_selftest, warm_up
+from .text_call import TextCaller
 
-PATHS = {"/v1/role", "/health", "/selftest"}
+PATHS = {"/v1/role", "/v1/draft", "/health", "/selftest"}
 LOOPBACK_NAMES = {"127.0.0.1", "localhost", "[::1]"}
 NULL_ORIGIN = "null"
 
@@ -41,6 +43,8 @@ def create_app(
     log = RequestLog(settings.log_path)
     provider = provider or OpenAICompatibleProvider(settings.base_url, settings.api_key, httpx.AsyncClient())
     caller = ModelCaller(settings, provider, clock)
+    # One window for the key: drafts reserve in the same pacer as the image calls
+    text_caller = TextCaller(settings, provider, clock, caller.pacer)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -69,13 +73,19 @@ def create_app(
         return response
 
     @app.exception_handler(RequestValidationError)
-    async def unreadable(_request: Request, _error: RequestValidationError) -> JSONResponse:
+    async def unreadable(request: Request, _error: RequestValidationError) -> JSONResponse:
         # A request the server cannot read is still answered, the plugin never sees an error
+        if request.url.path == "/v1/draft":
+            return JSONResponse(failed(labels.MALFORMED, settings.text_model))
         return JSONResponse(unsure(labels.MALFORMED, settings.model))
 
     @app.post("/v1/role")
     async def role(body: RoleRequest) -> dict[str, Any]:
         return await classify(body, settings, caller, log)
+
+    @app.post("/v1/draft")
+    async def draft_endpoint(body: DraftRequest) -> dict[str, Any]:
+        return await draft(body, settings, text_caller, log)
 
     @app.get("/health")
     async def health() -> dict[str, Any]:

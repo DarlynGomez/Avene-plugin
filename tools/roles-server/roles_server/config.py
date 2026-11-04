@@ -46,6 +46,10 @@ class Settings:
     min_image_prompt_tokens: int = 500
     log_path: str = "roles-server.log.jsonl"
     crop_dir: str | None = None
+    # The text model for drafts is its own setting, none means drafts are not available
+    text_model: str | None = None
+    text_timeout_seconds: float = 30.0
+    text_max_tokens: int = 1500
 
     @property
     def is_thinking(self) -> bool:
@@ -81,4 +85,7 @@ class Settings:
             min_image_prompt_tokens=int(_number(env, "GENAI_MIN_IMAGE_PROMPT_TOKENS", 500)),
             log_path=env.get("ROLES_LOG_PATH", "roles-server.log.jsonl"),
             crop_dir=env.get("ROLES_CROP_DIR") or None,
+            text_model=env.get("GENAI_TEXT_MODEL", "").strip() or None,
+            text_timeout_seconds=_number(env, "GENAI_TEXT_TIMEOUT_SECONDS", 30.0),
+            text_max_tokens=int(_number(env, "GENAI_TEXT_MAX_TOKENS", 1500)),
         )

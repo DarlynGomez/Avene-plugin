@@ -4,16 +4,24 @@ import type { Root } from "../../../shared/grouping/groupingTypes";
 import { readContrastEvidence } from "../../../shared/issues/contrastEvidenceView";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
+import { useHandoffAvailable } from "../../handoff/useHandoffAvailable";
 import type { MainTab } from "../components/Header";
 import { useTeachMeWhy } from "../teachMeWhy/useTeachMeWhy";
 
-/** The two main tabs, a hidden Teach Me Why tab can never be the active one */
+/** A hidden tab can never be the active one */
+function activeTabOf(tab: MainTab, teachMeWhyOn: boolean, handoffOn: boolean): MainTab {
+  if (tab === "handoff") return handoffOn ? "handoff" : "live-watch";
+  return teachMeWhyOn ? tab : "live-watch";
+}
+
+/** The main tabs, Teach Me Why and Handoff show only when their gates are open */
 export function useMainTabs(
   visibility: Pick<ParticipantVisibility, "teachMeWhyTab" | "elementRoleQuestions">,
   reviewRoots: readonly Root[],
   decisionRoots: readonly Root[],
   issuesById: ReadonlyMap<string, IssueSummary>
 ) {
+  const handoffOn = useHandoffAvailable();
   const [mainTab, setMainTab] = useState<MainTab>("live-watch");
   const roots = useMemo(() => [...reviewRoots, ...decisionRoots], [reviewRoots, decisionRoots]);
   // The font size sits in the evidence of the issue a root shows, a slot in the text asks for it
@@ -37,8 +45,9 @@ export function useMainTabs(
     [openFromTabBar]
   );
   return {
-    activeTab: visibility.teachMeWhyTab ? mainTab : ("live-watch" as MainTab),
+    activeTab: activeTabOf(mainTab, visibility.teachMeWhyTab, handoffOn),
     onMainTabChange,
+    handoffTab: handoffOn,
     teachMeWhy: state,
     openExplanation: visibility.teachMeWhyTab ? openFromCard : null
   };

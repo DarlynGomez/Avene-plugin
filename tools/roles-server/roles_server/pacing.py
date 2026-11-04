@@ -22,11 +22,24 @@ def estimate_tokens(width: int, height: int, patch_px: int, max_tokens: int) -> 
     return math.ceil(width / patch_px) * math.ceil(height / patch_px) + 150 + max_tokens
 
 
+# A rough count with no tokenizer to hand, a placeholder to tune from a measured run
+CHARS_PER_TOKEN = 4
+
+
+def estimate_text_tokens(chars: int, max_tokens: int) -> int:
+    """The worst case of a text call: the prompt by its length, plus the whole answer allowance."""
+    return math.ceil(chars / CHARS_PER_TOKEN) + max_tokens
+
+
 class Pacer:
     def __init__(self, tokens_per_minute: int, clock: Clock):
         self._limit = tokens_per_minute
         self._clock = clock
         self._used: deque[Hold] = deque()
+
+    @property
+    def limit(self) -> int:
+        return self._limit
 
     def _spent(self, now: float) -> int:
         while self._used and now - self._used[0].at >= WINDOW_SECONDS:

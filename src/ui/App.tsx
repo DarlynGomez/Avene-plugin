@@ -1,3 +1,4 @@
+import { CalendarProvider } from "./calendar/CalendarProvider";
 import { CalibrationFlow } from "./calibration/CalibrationFlow";
 import { useCalibrationPersistence } from "./hooks/useCalibrationPersistence";
 import { IssuePanel } from "./issues/IssuePanel";
@@ -51,7 +52,9 @@ function AppScreens() {
 export function App() {
   return (
     <StudyHost>
-      <AppScreens />
+      <CalendarProvider>
+        <AppScreens />
+      </CalendarProvider>
     </StudyHost>
   );
 }

@@ -2,10 +2,11 @@ import { BookOpen } from "lucide-react";
 
 import type { Headline } from "../../../shared/grouping/headline";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
+import { SettingsPill } from "../../calendar/SettingsPill";
 import { formatHeadline, openCountFromHeadline } from "../headlineText";
 import styles from "./Header.module.css";
 
-export type MainTab = "live-watch" | "teach-me-why";
+export type MainTab = "live-watch" | "teach-me-why" | "handoff";
 
 export type HeaderVisibility = Pick<
   ParticipantVisibility,
@@ -17,21 +18,30 @@ interface HeaderProps {
   headline: Headline;
   activeMainTab: MainTab;
   onMainTabChange: (tab: MainTab) => void;
+  /** The handoff tab, off in study and in builds that do not have it */
+  handoffTab?: boolean;
 }
 
 /**
  * Wordmark, live dot, tabs and the computed headline, no footer
  * The empty slot at the end is reserved for the markers toggle
  */
-export function Header({ visibility, headline, activeMainTab, onMainTabChange }: HeaderProps) {
+export function Header({
+  visibility,
+  headline,
+  activeMainTab,
+  onMainTabChange,
+  handoffTab = false
+}: HeaderProps) {
   const isLiveWatch = activeMainTab === "live-watch";
 
-  if (!visibility.liveWatchLabel && !visibility.teachMeWhyTab) {
+  if (!visibility.liveWatchLabel && !visibility.teachMeWhyTab && !handoffTab) {
     return null;
   }
 
   return (
     <header className={styles.header}>
+      <SettingsPill />
       {/* <div className={styles.topRow}>
         <span className={styles.wordmark}>CADT</span>
         <span className={styles.liveIndicator} aria-hidden="true" />
@@ -58,12 +68,23 @@ export function Header({ visibility, headline, activeMainTab, onMainTabChange }:
           <button
             type="button"
             role="tab"
-            aria-selected={!isLiveWatch}
-            className={`${styles.tab} ${!isLiveWatch ? styles.tabActive : ""}`}
+            aria-selected={activeMainTab === "teach-me-why"}
+            className={`${styles.tab} ${activeMainTab === "teach-me-why" ? styles.tabActive : ""}`}
             onClick={() => onMainTabChange("teach-me-why")}
           >
             <BookOpen size={14} aria-hidden="true" />
             <span>Teach Me Why</span>
+          </button>
+        )}
+        {handoffTab && (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeMainTab === "handoff"}
+            className={`${styles.tab} ${activeMainTab === "handoff" ? styles.tabActive : ""}`}
+            onClick={() => onMainTabChange("handoff")}
+          >
+            Handoff
           </button>
         )}
       </div>

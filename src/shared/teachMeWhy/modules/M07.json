@@ -1,0 +1,42 @@
+{
+  "id": "M07",
+  "title": "Dark Mode Challenges",
+  "category": "visual",
+  "context": "Brand colors and reverse polarity",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "A color chosen for a light background may lose its boundary on a dark surface, and extreme light-on-dark combinations can feel blurry.",
+  "learningObjectives": [
+    "Understand why brand colors can fail on dark backgrounds.",
+    "Recognize the visual effect called halation.",
+    "Adapt colors for readability on dark surfaces."
+  ],
+  "lessonParagraphs": [
+    "A light interface cannot always be converted to dark mode by simply reversing its colors. Brand colors designed for white backgrounds can lose contrast when placed on dark gray.",
+    "Dark mode may need a separate, less saturated version of brand colors. Dark text on a dark surface can also lose its boundary.",
+    "Halation describes the appearance of bright light bleeding into a dark area. The research discusses how pure white text on pure black can look fuzzy for people with astigmatism.",
+    "Off-white text on dark gray can soften the extremes and reduce glare while remaining above the stated minimum. Dark mode involves balancing measured contrast with visual comfort."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "muFMJedikys",
+    "title": "Dark Mode Readability Tips: How to Make Dark Mode UI More Accessible",
+    "publisher": "TemplateMonster",
+    "startSeconds": 25,
+    "endSeconds": 95,
+    "durationSeconds": 70,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Colors designed for light backgrounds may not work on dark backgrounds.",
+    "Halation can make pure white text on pure black appear blurry.",
+    "Dark mode may need its own color palette."
+  ],
+  "reviewFlags": [
+    "The source notes that perceptual algorithms handle dark-mode contrast differently and that the optimal levels remain debated."
+  ]
+}

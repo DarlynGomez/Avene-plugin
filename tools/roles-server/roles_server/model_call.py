@@ -38,6 +38,11 @@ class ModelCaller:
         self._clock = clock
         self._pacer = Pacer(settings.tokens_per_minute, clock)
 
+    @property
+    def pacer(self) -> Pacer:
+        """Drafts reserve in the same window, the limit belongs to the key and not to a kind of call."""
+        return self._pacer
+
     def _timeout(self, mode: str) -> float:
         if mode == "warmup":
             return self._s.warmup_timeout_seconds

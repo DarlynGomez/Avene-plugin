@@ -13,6 +13,9 @@ EMPTY = "empty"
 LABEL_OUTSIDE_LIST = "label-outside-list"
 TOO_SMALL_TO_SEND = "too-small-to-send"
 MIXED_SIZE = "mixed-size"
+# Reasons only a draft request can end in
+NOT_CONFIGURED = "not-configured"
+TOO_LARGE = "too-large"
 
 SCHEMA = {
     "type": "object",

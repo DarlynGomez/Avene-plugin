@@ -1,0 +1,41 @@
+{
+  "id": "M03",
+  "title": "Beyond Just Color",
+  "category": "visual",
+  "context": "Color vision differences and conveying meaning",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "Color is a useful design signal, but relying on one hue alone can leave some people without the information it carries.",
+  "learningObjectives": [
+    "Understand why color alone is not enough to convey information.",
+    "Identify lightness contrast as a secondary visual cue.",
+    "Pair color changes with other indicators."
+  ],
+  "lessonParagraphs": [
+    "Color often acts as shorthand in an interface. A red outline can imply an error, and a green button can suggest success. If color is the only signal, people who perceive those hues differently may miss the meaning.",
+    "Lightness contrast provides another cue that does not depend on hue. Even when two colors appear similar, a difference between light and dark can help keep elements distinct.",
+    "Pair a color change with a shape or text cue. An error field can use an icon or a strong underline, and a text link can use an underline or heavier weight as well as color.",
+    "Treating color as a supporting signal helps an interface remain understandable across different ways of seeing."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "gdohlUn7fVQ",
+    "title": "FIX Color Contrast - Accessibility in Web & UI Design",
+    "publisher": "Pimp my Type",
+    "startSeconds": 303,
+    "endSeconds": 370,
+    "durationSeconds": 67,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Color alone may not communicate an error or interactive state to everyone.",
+    "Lightness contrast can provide a cue independent of hue.",
+    "Pair color changes with shapes, underlines, or icons."
+  ],
+  "reviewFlags": [],
+  "internalNote": "Supports the research document's discussion of color use and text contrast."
+}

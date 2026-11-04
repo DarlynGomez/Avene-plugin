@@ -34,6 +34,10 @@
       "command": "reset-study"
     },
     {
+      "name": "Detection check (debug)",
+      "command": "detection-check"
+    },
+    {
       "name": "Export issues JSON (dev, temporary)",
       "command": "export-issues"
     }
@@ -41,8 +45,14 @@
   "documentAccess": "dynamic-page",
   "permissions": ["currentuser"],
   "networkAccess": {
-    "allowedDomains": ["none"],
+    "allowedDomains": [
+      "https://www.youtube-nocookie.com",
+      "https://www.youtube.com",
+      "https://*.youtube.com",
+      "https://*.ytimg.com",
+      "https://*.googlevideo.com"
+    ],
     "devAllowedDomains": ["http://localhost:8750"],
-    "reasoning": "The study sends a cropped image of one text element to a role suggestion server that the research team runs on the same computer, which asks a model hosted by RIT. Nothing leaves RIT and no other address is reachable."
+    "reasoning": "The study sends a cropped image of one text element to the role suggestion server run locally by the research team, which asks a model hosted by RIT. Nothing leaves RIT. YouTube media domains are allowed only for Teach Me Why video embeds outside active study sessions. Active study sessions do not load external embeds or enable article links."
   }
 }

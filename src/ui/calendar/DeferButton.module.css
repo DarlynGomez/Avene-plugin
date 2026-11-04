@@ -1,0 +1,13 @@
+.count {
+  padding: 1px 6px;
+  border-radius: calc(var(--radius-button) / 2);
+  background: var(--color-severity-medium-bg);
+  color: var(--color-severity-medium-text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-severity-label);
+  font-weight: var(--font-weight-regular);
+}
+
+.muted {
+  color: var(--color-muted);
+}

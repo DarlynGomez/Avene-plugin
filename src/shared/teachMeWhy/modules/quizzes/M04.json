@@ -1,0 +1,47 @@
+{
+  "moduleId": "M04",
+  "questions": [
+    {
+      "questionId": "M04Q1",
+      "prompt": "Why are the contrast rules for large text more forgiving?",
+      "options": [
+        { "id": "A", "text": "Large text is only used for decorative purposes." },
+        { "id": "B", "text": "Large, thick letterforms provide more surface area for the eye to track." },
+        { "id": "C", "text": "Large text cannot be rendered in low-contrast colors." },
+        { "id": "D", "text": "Users automatically zoom out when reading large text." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "The physical weight and size of large text make it easier to resolve, lowering the need for high contrast.",
+      "hint": "Think about how physical size affects how easily the eye catches a shape.",
+      "testedLearningPoint": "Recognize how physical size impacts visual perception."
+    },
+    {
+      "questionId": "M04Q2",
+      "prompt": "What is the minimum contrast ratio for text that qualifies as large?",
+      "options": [
+        { "id": "A", "text": "2.5 to 1" },
+        { "id": "B", "text": "3 to 1" },
+        { "id": "C", "text": "4.5 to 1" },
+        { "id": "D", "text": "7 to 1" }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Large text has a threshold of 3, lower than the 4.5 target for standard text.",
+      "hint": "It is the lower of the two standard thresholds.",
+      "testedLearningPoint": "Identify the 3 ratio threshold for large text."
+    },
+    {
+      "questionId": "M04Q3",
+      "prompt": "At what pixel size does bold text qualify as large in the research?",
+      "options": [
+        { "id": "A", "text": "12 pixels" },
+        { "id": "B", "text": "16 pixels" },
+        { "id": "C", "text": "18.5 pixels" },
+        { "id": "D", "text": "24 pixels" }
+      ],
+      "correctOptionId": "C",
+      "explanation": "The research gives 24 pixels in a regular weight or about 18.5 pixels in a bold weight.",
+      "hint": "Bold text requires fewer pixels than regular text to reach the size threshold.",
+      "testedLearningPoint": "Define the specific pixel sizes that qualify text as large."
+    }
+  ]
+}

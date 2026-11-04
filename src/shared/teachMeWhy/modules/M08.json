@@ -1,0 +1,41 @@
+{
+  "id": "M08",
+  "title": "Documenting a Tradeoff",
+  "category": "system",
+  "context": "Recording a design decision when a color is intentionally kept",
+  "estimatedMinutes": 4.5,
+  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
+  "whyItMatters": "When a lower-contrast color is kept intentionally, recording the reason makes the decision clear to the people who work with the design next.",
+  "learningObjectives": [
+    "Recognize when contrast constraints can conflict with brand requirements.",
+    "Record intentional decisions for development handoff.",
+    "Differentiate a documented tradeoff from an ignored issue."
+  ],
+  "lessonParagraphs": [
+    "A contrast tool can identify a measured issue, but it cannot know every project constraint. A brand palette or visual hierarchy may shape a decision to keep a color.",
+    "Silently ignoring a flagged issue can leave developers unsure whether it was seen or missed. It can also be raised again in a later review.",
+    "A documented tradeoff records the issue and the reason for keeping it. In Avene, the accountability loop lets a designer acknowledge an issue and capture a justification for the decision.",
+    "Documentation does not change the measured contrast. It makes the choice visible and helps the team understand what was evaluated."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "n-L7mCih5Yg",
+    "title": "Gestalt Principles in Design: 7 Simple Rules for Better UI",
+    "publisher": "Eleken",
+    "startSeconds": 90,
+    "endSeconds": 168,
+    "durationSeconds": 78,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "Standard YouTube"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Brand requirements and visual hierarchy can create design tradeoffs.",
+    "A silent failure can leave the next person unsure what happened.",
+    "A written decision records that an issue was considered."
+  ],
+  "reviewFlags": [],
+  "internalNote": "A documented decision does not change the underlying contrast measurement."
+}

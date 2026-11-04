@@ -143,7 +143,7 @@ describe("Teach Me Why tab", () => {
     expect(screen.getByText("Fallback quick 2.17:1 needs 4.5:1.")).toBeInTheDocument();
     expect(screen.queryByText(AI_LABEL)).not.toBeInTheDocument();
     expect(screen.queryByText(/Based on:/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Hide this explanation" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
   });
 
   it("carries the AI label with every AI explanation, and Based on only when facts were used", async () => {
@@ -165,6 +165,21 @@ describe("Teach Me Why tab", () => {
     expect(screen.getByText("Deep words with no facts.")).toBeInTheDocument();
     expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
     expect(screen.queryByText(/Based on:/)).not.toBeInTheDocument();
+  });
+
+  it("opens the contrast module from the deep dive action", async () => {
+    const user = userEvent.setup();
+    open();
+    await goToExplanation(user);
+    await user.click(screen.getByRole("button", { name: "Deep dive into this rule" }));
+
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
+    expect(screen.getByRole("heading", { name: "Why Text Contrast Matters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Lesson" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Back to issue" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "All topics" }));
+    expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Back to issue" })).toBeInTheDocument();
   });
 
   it("shows the contrast label and the ratio at opposite ends of the box", async () => {
@@ -209,12 +224,12 @@ describe("Teach Me Why tab", () => {
     expect(screen.getByRole("radio", { name: "Why it matters" })).toBeChecked();
   });
 
-  it("hides an AI explanation and its label, and brings them back", async () => {
+  it("dismisses an AI explanation and its label, and brings them back", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
     await user.click(screen.getByRole("radio", { name: "The idea behind it" }));
-    await user.click(screen.getByRole("button", { name: "Hide this explanation" }));
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByText("Deep words with no facts.")).not.toBeInTheDocument();
     expect(screen.queryByText(AI_LABEL)).not.toBeInTheDocument();
     expect(screen.getByText("This explanation is hidden.")).toBeInTheDocument();
@@ -223,16 +238,17 @@ describe("Teach Me Why tab", () => {
     expect(events("dismissed")).toHaveLength(1);
   });
 
-  it("shows one plain line, not a library, when opened with nothing chosen", async () => {
+  it("shows the topic library without an empty issue prompt", async () => {
     const user = userEvent.setup();
     open();
     await user.click(screen.getByRole("tab", { name: /Teach Me Why/ }));
-    expect(screen.getByText("Pick an issue to see why it matters.")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Accessibility topics" })).toBeInTheDocument();
+    expect(screen.queryByText("Pick an issue to see why it matters.")).not.toBeInTheDocument();
     expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
     expect(events("opened")).toHaveLength(0);
   });
 
-  it("logs the key and source on open, the depth after a change, and each hide", async () => {
+  it("logs the key and source on open, the depth after a change, and each dismissal", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
@@ -248,7 +264,7 @@ describe("Teach Me Why tab", () => {
     await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     expect(events("depth_changed")).toHaveLength(1);
 
-    await user.click(screen.getByRole("button", { name: "Hide this explanation" }));
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(events("dismissed")).toEqual([
       { type: "EXPLANATION_EVENT", event: { kind: "dismissed", key: { ...key, depth: 2 } } }
     ]);

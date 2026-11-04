@@ -82,6 +82,8 @@ export default tseslint.config(
       "src/plugin/markers/adapter/**/*.{ts,tsx}",
       "src/plugin/study/adapter/**/*.{ts,tsx}",
       "src/plugin/roles/adapter/**/*.{ts,tsx}",
+      "src/plugin/handoff/adapter/**/*.{ts,tsx}",
+      "src/plugin/calendar/adapter/**/*.{ts,tsx}",
       "src/plugin/storage/**/*.{ts,tsx}",
       "src/plugin/lifecycle/**/*.{ts,tsx}",
       "src/plugin/accountability/issueStore.ts",

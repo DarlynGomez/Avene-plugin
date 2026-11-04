@@ -1,0 +1,47 @@
+{
+  "moduleId": "M10",
+  "questions": [
+    {
+      "questionId": "M10Q1",
+      "prompt": "What is a major flaw described in current contrast mathematics?",
+      "options": [
+        { "id": "A", "text": "It requires text to be extremely small to pass." },
+        { "id": "B", "text": "It treats light text on a dark background the same as dark text on a light background." },
+        { "id": "C", "text": "It only measures the color red." },
+        { "id": "D", "text": "It automatically fails any design that uses brand colors." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "The research says current math is not polarity-aware and does not model reverse polarity differently.",
+      "hint": "Think about how the method handles inverted colors.",
+      "testedLearningPoint": "Recognize the flaws in current contrast mathematics."
+    },
+    {
+      "questionId": "M10Q2",
+      "prompt": "What does it mean for a contrast algorithm to be polarity-aware?",
+      "options": [
+        { "id": "A", "text": "It only works in freezing temperatures." },
+        { "id": "B", "text": "It uses different math depending on whether text is lighter or darker than the background." },
+        { "id": "C", "text": "It evaluates the emotional impact of a color palette." },
+        { "id": "D", "text": "It only evaluates black and white designs." }
+      ],
+      "correctOptionId": "B",
+      "explanation": "A polarity-aware model treats light-on-dark differently from dark-on-light to better model perception.",
+      "hint": "It relates to which color is on top and which is on the bottom.",
+      "testedLearningPoint": "Understand how color polarity affects human perception."
+    },
+    {
+      "questionId": "M10Q3",
+      "prompt": "How does the proposed APCA account for font size?",
+      "options": [
+        { "id": "A", "text": "It completely ignores font size." },
+        { "id": "B", "text": "It dictates that all fonts must be 12 pixels." },
+        { "id": "C", "text": "It generates scores that relate the color pair to the needed font size or thickness." },
+        { "id": "D", "text": "It forces mobile devices to zoom in automatically." }
+      ],
+      "correctOptionId": "C",
+      "explanation": "The research describes APCA as spatially aware, tying contrast scores to typography details.",
+      "hint": "Think about how it pairs color scores with typography details.",
+      "testedLearningPoint": "Prepare for future, perceptually uniform contrast standards."
+    }
+  ]
+}
