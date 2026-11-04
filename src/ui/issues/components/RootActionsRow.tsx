@@ -1,6 +1,7 @@
-import { Clock, EyeOff, Pin, Sliders } from "lucide-react";
+import { EyeOff, Pin, Sliders } from "lucide-react";
 
 import type { Root } from "../../../shared/grouping/groupingTypes";
+import { DeferButton } from "../../calendar/DeferButton";
 import styles from "./RootActionsRow.module.css";
 
 interface RootActionsRowProps {
@@ -29,7 +30,6 @@ export function RootActionsRow({
   }
 
   const isImportant = root.displayState === "important";
-  const canDefer = (root.stateBreakdown.open ?? 0) > 0;
 
   return (
     <div className={styles.actions}>
@@ -46,12 +46,7 @@ export function RootActionsRow({
         </button>
       </div>
       <div className={styles.rightGroup}>
-        {canDefer && (
-          <button type="button" className={styles.secondaryButton} onClick={onDefer}>
-            <Clock size={14} aria-hidden="true" />
-            <span>Defer</span>
-          </button>
-        )}
+        <DeferButton root={root} onDefer={onDefer} className={styles.secondaryButton} />
         <button
           type="button"
           className={`${styles.importantToggle} ${isImportant ? styles.importantActive : ""}`}

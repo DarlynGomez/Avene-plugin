@@ -1,0 +1,40 @@
+.levels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.level {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.levelOn {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-accent-text);
+}
+
+.levelOff {
+  color: var(--color-muted);
+}
+
+.levelName {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.levelRatios {
+  font-size: var(--font-size-severity-label);
+  opacity: 0.8;
+}

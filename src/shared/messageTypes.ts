@@ -4,6 +4,7 @@ import type { CalibrationScope } from "./calibrationScope";
 import type { RootDecision } from "./grouping/groupingTypes";
 import type { IssueSummary } from "./issues/issueTypes";
 import type { ExplanationEventMessage } from "./study/explanationMessageTypes";
+import type { CalendarPluginMessage, CalendarUiMessage } from "./calendar/calendarMessages";
 import type { HandoffPluginMessage, HandoffUiMessage } from "./handoff/handoffMessages";
 import type { RolePluginMessage, RoleUiMessage } from "./roles/roleMessages";
 import type { MarkerMessage } from "./markers/markerMessageTypes";
@@ -117,7 +118,8 @@ export type UiToPluginMessage =
   | StudyMessage
   | ExplanationEventMessage
   | RoleUiMessage
-  | HandoffUiMessage;
+  | HandoffUiMessage
+  | CalendarUiMessage;
 
 /** Sandbox to UI messages */
 export type PluginToUiMessage =
@@ -132,7 +134,8 @@ export type PluginToUiMessage =
   | StudyExportReadyMessage
   | MarkerMessage
   | RolePluginMessage
-  | HandoffPluginMessage;
+  | HandoffPluginMessage
+  | CalendarPluginMessage;
 
 /** Every message that crosses the plugin boundary */
 export type PluginMessage = UiToPluginMessage | PluginToUiMessage;

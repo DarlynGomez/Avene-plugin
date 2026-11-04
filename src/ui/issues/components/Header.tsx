@@ -2,6 +2,7 @@ import { BookOpen } from "lucide-react";
 
 import type { Headline } from "../../../shared/grouping/headline";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
+import { SettingsPill } from "../../calendar/SettingsPill";
 import { formatHeadline, openCountFromHeadline } from "../headlineText";
 import styles from "./Header.module.css";
 
@@ -40,6 +41,7 @@ export function Header({
 
   return (
     <header className={styles.header}>
+      <SettingsPill />
       {/* <div className={styles.topRow}>
         <span className={styles.wordmark}>CADT</span>
         <span className={styles.liveIndicator} aria-hidden="true" />
