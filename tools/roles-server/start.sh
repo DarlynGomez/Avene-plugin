@@ -1,5 +1,5 @@
 #!/bin/sh
-# Starts the role server on this computer only
+# Starts the role server on this computer only. Run from anywhere.
 cd "$(dirname "$0")" || exit 1
 if [ ! -f .env ]; then
   echo "There is no .env here. Copy .env.example to .env and fill in the values." >&2
