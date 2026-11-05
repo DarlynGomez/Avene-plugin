@@ -2,6 +2,10 @@ import type { Root, RootDecision } from "../../../shared/grouping/groupingTypes"
 import type { GroupBy, RootSection } from "../../../shared/grouping/sectionRoots";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
+import { AltCheckSelect } from "../../handoff/alt/AltCheckSelect";
+import { useAltChecks } from "../../handoff/alt/AltChecksContext";
+import { AltGroupBar } from "../../handoff/alt/AltGroupBar";
+import { AltPanel } from "../../handoff/alt/AltPanel";
 import type { ActionError } from "../hooks/useIssues";
 import { useMarkerSignals } from "../hooks/useMarkerSignals";
 import { DecisionsView } from "./DecisionsView";
@@ -44,6 +48,9 @@ interface LiveWatchBodyProps {
 /** Body of the Live Watch tab, error, filters and the active list */
 export function LiveWatchBody(props: LiveWatchBodyProps) {
   const { notice } = useMarkerSignals();
+  const alt = useAltChecks();
+  const altOnly = alt.available && alt.check === "alt";
+  const showContrast = !altOnly;
 
   return (
     <>
@@ -57,7 +64,8 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           {props.actionError.message}
         </p>
       )}
-      {props.visibility.filterAndGrouping && (
+      {altOnly && <AltGroupBar />}
+      {props.visibility.filterAndGrouping && !altOnly && (
         <FilterBar
           groupBy={props.groupBy}
           onGroupByChange={props.onGroupByChange}
@@ -66,7 +74,12 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           counts={props.counts}
         />
       )}
-      {!props.visibility.issueList ? null : props.stateFilter === "ignored" &&
+      {alt.available && (
+        <AltCheckSelect
+          contrast={{ roots: props.counts.openRoots ?? 0, issues: props.counts.openIssues ?? 0 }}
+        />
+      )}
+      {!showContrast || !props.visibility.issueList ? null : props.stateFilter === "ignored" &&
         props.visibility.ignoredTrayAndDecisions ? (
         <DecisionsView
           roots={props.decisionRoots}
@@ -97,6 +110,7 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           onRestoreDeferred={props.onRestoreDeferred}
         />
       )}
+      {alt.available && alt.check !== "contrast" && <AltPanel heading={alt.check === "all"} />}
     </>
   );
 }

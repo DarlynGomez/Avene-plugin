@@ -1,4 +1,5 @@
 import { CalendarProvider } from "./calendar/CalendarProvider";
+import { AltChecksProvider } from "./handoff/alt/AltChecksProvider";
 import { CalibrationFlow } from "./calibration/CalibrationFlow";
 import { useCalibrationPersistence } from "./hooks/useCalibrationPersistence";
 import { IssuePanel } from "./issues/IssuePanel";
@@ -53,7 +54,9 @@ export function App() {
   return (
     <StudyHost>
       <CalendarProvider>
-        <AppScreens />
+        <AltChecksProvider>
+          <AppScreens />
+        </AltChecksProvider>
       </CalendarProvider>
     </StudyHost>
   );

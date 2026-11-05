@@ -8,6 +8,9 @@ export interface FilterCounts {
   pinned: number;
   deferred: number;
   ignored: number;
+  /** Roots with a layer open and the issues in them, for the check dropdown */
+  openRoots?: number;
+  openIssues?: number;
 }
 
 const GROUP_BY_OPTIONS: readonly { value: GroupBy; label: string }[] = [

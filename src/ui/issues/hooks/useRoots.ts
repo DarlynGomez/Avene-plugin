@@ -54,7 +54,12 @@ export function useRoots(
       all: reviewRoots.length,
       pinned: allRoots.filter((root) => root.displayState === "important").length,
       deferred: allRoots.filter((root) => root.displayState === "deferred").length,
-      ignored: allRoots.filter((root) => root.displayState === "decided").length
+      ignored: allRoots.filter((root) => root.displayState === "decided").length,
+      openRoots: allRoots.filter((root) => root.instances.some((i) => i.state === "open")).length,
+      openIssues: allRoots.reduce(
+        (sum, root) => sum + root.instances.filter((i) => i.state === "open").length,
+        0
+      )
     }),
     [allRoots, reviewRoots]
   );

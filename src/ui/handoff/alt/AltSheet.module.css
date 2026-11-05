@@ -1,0 +1,117 @@
+.decorativeCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.decorativeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.checkLine input {
+  flex: none;
+  width: var(--space-3);
+  height: var(--space-3);
+  margin-top: 2px;
+}
+
+.sub {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+  line-height: var(--font-line-height-option-description);
+}
+
+.fieldHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.counter {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-severity-label);
+}
+
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(var(--size-target-min) * 2);
+  padding: var(--space-2);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  resize: vertical;
+}
+
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.hintTitle {
+  margin: 0 0 4px;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.annotation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.annotationStatus {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.annotationButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.checkLine input:focus-visible,
+.textarea:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-offset);
+}
