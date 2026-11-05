@@ -1,3 +1,4 @@
+import { applyAlt, type AltAnswer } from "../../../shared/handoff/alt/altNote";
 import { fits } from "../../../shared/handoff/limits";
 import {
   parseIndex,
@@ -51,4 +52,13 @@ export async function setNodeNotes(
   if (!fits(index)) return { saved: false, error: "Too many layers have notes" };
   const written = writeEntry(node, KEY_NODE_NOTES, value);
   return written.saved ? writeEntry(figma.root, KEY_NOTES_INDEX, index) : written;
+}
+
+/** Reads the layer's notes, puts the alt answer in and writes them back, other categories are kept */
+export async function setAltNote(nodeId: string, answer: AltAnswer): Promise<StoreResult> {
+  const node = await figma.getNodeByIdAsync(nodeId);
+  if (node === null || isGone(node))
+    return { saved: false, error: "That layer is no longer in the file" };
+  const current = parseNodeNotes(node.getPluginData(KEY_NODE_NOTES));
+  return setNodeNotes(nodeId, applyAlt(current, answer, new Date().toISOString()));
 }

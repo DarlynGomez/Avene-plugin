@@ -48,6 +48,16 @@ const ALL: HandoffUiMessage[] = [
   },
   { type: "HANDOFF_FILE_URL_SET", url: "https://www.figma.com/design/KEY/Checkout" }
 ];
+const ALT: HandoffUiMessage[] = [
+  { type: "HANDOFF_ALT_INVENTORY_REQUEST" },
+  {
+    type: "HANDOFF_ALT_SET",
+    nodeId: "t1",
+    text: "A cafe sign",
+    decorative: false,
+    source: "designer"
+  }
+];
 const DRAFTS_MESSAGE: HandoffUiMessage = {
   type: "HANDOFF_DRAFTS_SET",
   drafts: {
@@ -70,8 +80,10 @@ interface Spies {
 let spies: Spies;
 let replies: HandoffPluginMessage[];
 
+let tree: ReturnType<typeof buildTree>;
+
 function spyOnFigma(): Spies {
-  const tree = buildTree();
+  tree = buildTree();
   addCafeTexts(tree);
   const root = figma.root as unknown as {
     name: string;
@@ -104,7 +116,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("while a study session is active", () => {
   beforeEach(() => vi.mocked(activeStudySession).mockReturnValue(SESSION));
 
-  it.each([...ALL, DRAFTS_MESSAGE].map((message) => [message.type, message] as const))(
+  it.each([...ALL, ...ALT, DRAFTS_MESSAGE].map((message) => [message.type, message] as const))(
     "refuses %s with no read and no write",
     async (_name, message) => {
       await run(message);
@@ -217,6 +229,93 @@ describe("with no study session", () => {
     expect(emitStudy).not.toHaveBeenCalled();
     const keys = spies.sets.mock.calls.map(([key]) => String(key));
     expect(keys.filter((key) => key.startsWith("cadt.study"))).toEqual([]);
+  });
+});
+
+describe("alt text messages with no study session", () => {
+  it("answers an inventory request with the image layers and writes nothing", async () => {
+    tree.frame("i1", "Hero", { fills: [{ type: "IMAGE", imageHash: "h1" }] });
+    await run(ALT[0]);
+    expect(replies).toEqual([
+      {
+        type: "HANDOFF_ALT_INVENTORY",
+        layers: [
+          {
+            nodeId: "i1",
+            name: "Hero",
+            screenId: "s1",
+            screenName: "A1",
+            width: 200,
+            height: 100,
+            imageHash: "h1"
+          }
+        ]
+      }
+    ]);
+    expect(spies.sets).not.toHaveBeenCalled();
+  });
+
+  it("writes an alt note with its source and keeps the layer's other notes", async () => {
+    await run(ALL[1]);
+    await run({
+      type: "HANDOFF_ALT_SET",
+      nodeId: "t1",
+      text: "  A cafe sign ",
+      decorative: false,
+      source: "ai_edited"
+    });
+    expect(replies[1]).toEqual({
+      type: "HANDOFF_WRITE_RESULT",
+      target: "notes",
+      nodeId: "t1",
+      saved: true
+    });
+    await run({ type: "HANDOFF_DATA_REQUEST" });
+    expect(replies[2]).toMatchObject({
+      notes: {
+        t1: [
+          { category: "alt", text: "A cafe sign", source: "ai_edited" },
+          { category: "name", text: "Open menu" }
+        ]
+      }
+    });
+  });
+
+  it("marks a layer decorative and clears the alt note when the answer is empty", async () => {
+    await run({
+      type: "HANDOFF_ALT_SET",
+      nodeId: "t1",
+      text: "ignored",
+      decorative: true,
+      source: "ai"
+    });
+    await run({ type: "HANDOFF_DATA_REQUEST" });
+    expect(replies[1]).toMatchObject({
+      notes: { t1: [{ category: "alt", text: "", decorative: true }] }
+    });
+    expect(
+      (replies[1] as unknown as { notes: { t1: { source?: string }[] } }).notes.t1[0].source
+    ).toBeUndefined();
+    await run({
+      type: "HANDOFF_ALT_SET",
+      nodeId: "t1",
+      text: " ",
+      decorative: false,
+      source: "designer"
+    });
+    await run({ type: "HANDOFF_DATA_REQUEST" });
+    expect(replies[3]).toMatchObject({ notes: {} });
+  });
+
+  it("reports a layer that is gone as not saved", async () => {
+    await run({
+      type: "HANDOFF_ALT_SET",
+      nodeId: "gone",
+      text: "x",
+      decorative: false,
+      source: "designer"
+    });
+    expect(replies[0]).toMatchObject({ saved: false });
   });
 });
 

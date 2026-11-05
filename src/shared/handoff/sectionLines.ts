@@ -39,27 +39,25 @@ export function advisorySection(
 }
 
 const NOTE_WORDS: Record<string, string> = {
-  alt: "Alt text for",
   heading: "Heading level",
   name: "Accessible name for",
   state: "Missing state for"
 };
 
-/** What the designer says about layers, never checked by Avene, so every line is a Decision */
+/** What the designer says about layers, never checked by Avene, so every line is a Decision; alt notes are in altLines */
 export function noteLines(notes: readonly HandoffNote[], slots: SlotBuilder): string[] {
-  return notes.map(({ nodeName, link, note }) => {
-    const layer = `"${slots.auto("L", nodeName)}"`;
-    const who =
-      note.contact && note.category !== "question"
-        ? ` Owner: ${slots.auto("p", oneLine(note.contact))}.`
-        : "";
-    const tail = `${who}${link ? ` Link: ${slots.auto("k", link)}` : ""}`;
-    if (note.category === "alt" && note.decorative) {
-      return `${LABEL_DECISION}: ${layer} is decorative, so the alt text is empty.${tail}`;
-    }
-    const word = NOTE_WORDS[note.category] ?? "Note on";
-    const level =
-      note.category === "heading" ? ` ${slots.auto("n", note.headingLevel ?? 0)} for` : "";
-    return `${LABEL_DECISION}: ${word}${level} ${layer}: ${slots.auto("w", oneLine(note.text))}${tail}`;
-  });
+  return notes
+    .filter(({ note }) => note.category !== "alt")
+    .map(({ nodeName, link, note }) => {
+      const layer = `"${slots.auto("L", nodeName)}"`;
+      const who =
+        note.contact && note.category !== "question"
+          ? ` Owner: ${slots.auto("p", oneLine(note.contact))}.`
+          : "";
+      const tail = `${who}${link ? ` Link: ${slots.auto("k", link)}` : ""}`;
+      const word = NOTE_WORDS[note.category] ?? "Note on";
+      const level =
+        note.category === "heading" ? ` ${slots.auto("n", note.headingLevel ?? 0)} for` : "";
+      return `${LABEL_DECISION}: ${word}${level} ${layer}: ${slots.auto("w", oneLine(note.text))}${tail}`;
+    });
 }

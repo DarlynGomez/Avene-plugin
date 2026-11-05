@@ -130,7 +130,7 @@ describe("inputFromData", () => {
     const text = renderDoc(buildDoc(input));
     expect(text).toContain('Decision: Alt text for "Hero": A cafe sign');
     expect(text).toContain('Decision: Heading level 1 for "Hero": Payment');
-    expect(text).toContain('Decision: "Logo" is decorative, so the alt text is empty.');
+    expect(text).toContain('Decision: "Logo" is decorative, alt is empty');
     expect(text).toContain("Needs check (owner: Dev): Where does focus go?");
   });
 

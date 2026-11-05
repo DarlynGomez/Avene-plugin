@@ -5,7 +5,8 @@ import { isStudyActive } from "../../shared/study/studyActive";
 import { saveDraftCache } from "../handoff/adapter/draftCacheStore";
 import { saveFileUrl, loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta, saveHandoffMeta } from "../handoff/adapter/metaStore";
-import { setNodeNotes } from "../handoff/adapter/notesStore";
+import { listImageLayers } from "../handoff/adapter/imageInventory";
+import { setAltNote, setNodeNotes } from "../handoff/adapter/notesStore";
 import { activeStudySession } from "../study/adapter/studySessionStore";
 import { buildHandoffData } from "./handoffData";
 
@@ -21,6 +22,15 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
     case "HANDOFF_DATA_REQUEST":
       reply(await buildHandoffData());
       return;
+    case "HANDOFF_ALT_INVENTORY_REQUEST":
+      reply({ type: "HANDOFF_ALT_INVENTORY", layers: listImageLayers() });
+      return;
+    case "HANDOFF_ALT_SET": {
+      const { nodeId, ...answer } = message;
+      const result = await setAltNote(nodeId, answer);
+      reply({ type: "HANDOFF_WRITE_RESULT", target: "notes", nodeId, ...result });
+      return;
+    }
     case "HANDOFF_NOTES_SET": {
       const result = await setNodeNotes(message.nodeId, message.notes);
       reply({ type: "HANDOFF_WRITE_RESULT", target: "notes", nodeId: message.nodeId, ...result });

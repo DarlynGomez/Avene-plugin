@@ -25,6 +25,7 @@ export function useHandoff() {
       if (!isHandoffPluginMessage(message)) return;
       if (message.type === "HANDOFF_REFUSED") setRefused(true);
       else if (message.type === "HANDOFF_DATA") setData(message);
+      else if (message.type === "HANDOFF_ALT_INVENTORY") return;
       else if (message.saved) {
         setWriteError(null);
         send({ type: "HANDOFF_DATA_REQUEST" });

@@ -5,6 +5,7 @@ import { structureHash } from "./hash";
 import { CLIENT_LINE, HIGHER_UP_LINE, NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { pmSummaryLines } from "./pmSummary";
+import { altLines } from "./alt/altLines";
 import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
 import { group, groupedSection } from "./sections";
 import { createSlots } from "./slots";
@@ -68,6 +69,7 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
       ...part("summary", "Summary", summary),
       ...groupedSection("action", "Needs developer action", action),
       ...part("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
+      ...part("alt", "Alt text", altLines(input.notes ?? [], input.imageLayers ?? [], slots)),
       ...part("changes", "Changes made in this file", changeLines(input.changes, slots)),
       ...part("questions", "Open questions", questionLines(questions, slots)),
       ...tail
