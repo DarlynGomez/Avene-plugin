@@ -1,4 +1,4 @@
-import { applyAlt, type AltAnswer } from "../../../shared/handoff/alt/altNote";
+import { applyAlt, clearsAnnotatedNote, type AltAnswer } from "../../../shared/handoff/alt/altNote";
 import { fits } from "../../../shared/handoff/limits";
 import {
   parseIndex,
@@ -8,6 +8,7 @@ import {
   type NodeNote
 } from "../../../shared/handoff/noteStorage";
 import { KEY_NODE_NOTES, KEY_NOTES_INDEX } from "../handoffKeys";
+import { nodeById } from "./nodeLookup";
 import { writeEntry, type StoreResult } from "./storeResult";
 
 export type NotesByNode = Record<string, NodeNote[]>;
@@ -29,7 +30,7 @@ export async function loadAllNotes(): Promise<NotesByNode> {
   const ids = loadNotesIndex();
   const notes: NotesByNode = {};
   for (const id of ids) {
-    const node = await figma.getNodeByIdAsync(id);
+    const node = await nodeById(id);
     if (node === null || isGone(node)) continue;
     const found = parseNodeNotes(node.getPluginData(KEY_NODE_NOTES));
     if (found.length > 0) notes[id] = found;
@@ -43,7 +44,7 @@ export async function setNodeNotes(
   nodeId: string,
   notes: readonly NodeNote[]
 ): Promise<StoreResult> {
-  const node = await figma.getNodeByIdAsync(nodeId);
+  const node = await nodeById(nodeId);
   if (node === null || isGone(node))
     return { saved: false, error: "That layer is no longer in the file" };
   const value = serializeNodeNotes(notes);
@@ -56,9 +57,11 @@ export async function setNodeNotes(
 
 /** Reads the layer's notes, puts the alt answer in and writes them back, other categories are kept */
 export async function setAltNote(nodeId: string, answer: AltAnswer): Promise<StoreResult> {
-  const node = await figma.getNodeByIdAsync(nodeId);
+  const node = await nodeById(nodeId);
   if (node === null || isGone(node))
     return { saved: false, error: "That layer is no longer in the file" };
   const current = parseNodeNotes(node.getPluginData(KEY_NODE_NOTES));
+  if (clearsAnnotatedNote(current, answer))
+    return { saved: false, error: "Remove the annotation first, then clear the alt text" };
   return setNodeNotes(nodeId, applyAlt(current, answer, new Date().toISOString()));
 }

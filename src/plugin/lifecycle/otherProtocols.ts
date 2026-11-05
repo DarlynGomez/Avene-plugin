@@ -1,4 +1,8 @@
 import {
+  isAnnotationUiMessage,
+  type AnnotationPluginMessage
+} from "../../shared/handoff/alt/annotationMessages";
+import {
   isCalendarUiMessage,
   type CalendarPluginMessage
 } from "../../shared/calendar/calendarMessages";
@@ -9,6 +13,7 @@ import {
 import { isRoleUiMessage, type RolePluginMessage } from "../../shared/roles/roleMessages";
 import { isExplanationMessage } from "../../shared/study/explanationMessageTypes";
 import { handleExplanationMessage } from "./explanationProtocol";
+import { handleAnnotationMessage } from "./annotationProtocol";
 import { handleCalendarMessage } from "./calendarProtocol";
 import { handleHandoffMessage } from "./handoffProtocol";
 import { handleRoleMessage } from "./roleProtocol";
@@ -19,6 +24,7 @@ export function isExplanationOrRole(message: Record<string, unknown>): boolean {
     isRoleUiMessage(message) ||
     isExplanationMessage(message) ||
     isHandoffUiMessage(message) ||
+    isAnnotationUiMessage(message) ||
     isCalendarUiMessage(message)
   );
 }
@@ -26,9 +32,13 @@ export function isExplanationOrRole(message: Record<string, unknown>): boolean {
 /** The panel's explanation and role messages */
 export async function handleExplanationOrRole(
   message: Record<string, unknown>,
-  reply: (message: RolePluginMessage | HandoffPluginMessage | CalendarPluginMessage) => void
+  reply: (
+    message:
+      RolePluginMessage | HandoffPluginMessage | AnnotationPluginMessage | CalendarPluginMessage
+  ) => void
 ): Promise<void> {
   if (isRoleUiMessage(message)) await handleRoleMessage(message, reply);
+  else if (isAnnotationUiMessage(message)) await handleAnnotationMessage(message, reply);
   else if (isHandoffUiMessage(message)) await handleHandoffMessage(message, reply);
   else if (isCalendarUiMessage(message)) await handleCalendarMessage(message, reply);
   else if (isExplanationMessage(message)) handleExplanationMessage(message);
