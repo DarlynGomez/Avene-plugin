@@ -9,6 +9,7 @@ import {
 import { sectionAltRoots } from "../../../shared/handoff/alt/altRoots";
 import { useAltChecks } from "./AltChecksContext";
 import { AltCard } from "./AltCard";
+import { AltSuggestBar } from "./AltSuggestBar";
 import styles from "./Alt.module.css";
 
 interface AltPanelProps {
@@ -35,6 +36,7 @@ export function AltPanel({ heading = false }: AltPanelProps) {
       <p className={styles.line} role="status">
         {line}
       </p>
+      {views.length > 0 && <AltSuggestBar />}
       {error && (
         <p className={styles.error} role="alert">
           {error}

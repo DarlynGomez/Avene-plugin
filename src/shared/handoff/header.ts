@@ -1,3 +1,4 @@
+import { aiAltCount } from "./alt/altLines";
 import { CHECKS_LINE } from "./fixedLines";
 import { parseFileUrl } from "./links";
 import { dateOnly } from "./text";
@@ -14,6 +15,10 @@ export function buildHeader(input: HandoffInput, hash: string): string[] {
     lines.push(`Reviewed by ${input.reviewer.name}, ${dateOnly(input.reviewer.date)}`);
   }
   lines.push(CHECKS_LINE);
+  const drafted = aiAltCount(input.notes ?? []);
+  if (drafted > 0) {
+    lines.push(`Includes AI-drafted alt text: ${drafted} ${drafted === 1 ? "note" : "notes"}`);
+  }
   if (!parseFileUrl(input.fileUrl)) lines.push("Links: off, no file address has been pasted");
   return lines;
 }

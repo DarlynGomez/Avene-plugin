@@ -17,3 +17,17 @@ export function annotationsAllowed(
 ): boolean {
   return annotationFlag && handoffAllowed(handoffFlag, studyActive);
 }
+
+/**
+ * Live alt text suggestions from the local server stay off until the model gate has passed and the server is approved
+ * With it off the suggestions already saved in the file still work, and nothing is sent anywhere
+ */
+export const FEATURE_ALT_SUGGEST_LIVE = false;
+
+export function altLiveAllowed(
+  liveFlag: boolean,
+  handoffFlag: boolean,
+  studyActive: boolean
+): boolean {
+  return liveFlag && handoffAllowed(handoffFlag, studyActive);
+}

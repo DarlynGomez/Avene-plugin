@@ -69,7 +69,11 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
       ...part("summary", "Summary", summary),
       ...groupedSection("action", "Needs developer action", action),
       ...part("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
-      ...part("alt", "Alt text", altLines(input.notes ?? [], input.imageLayers ?? [], slots)),
+      ...part(
+        "alt",
+        "Alt text",
+        altLines(input.notes ?? [], input.imageLayers ?? [], slots, input.reviewer)
+      ),
       ...part("changes", "Changes made in this file", changeLines(input.changes, slots)),
       ...part("questions", "Open questions", questionLines(questions, slots)),
       ...tail

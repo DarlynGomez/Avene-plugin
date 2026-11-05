@@ -5,6 +5,8 @@ import { isStudyActive } from "../../shared/study/studyActive";
 import { saveDraftCache } from "../handoff/adapter/draftCacheStore";
 import { saveFileUrl, loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta, saveHandoffMeta } from "../handoff/adapter/metaStore";
+import { exportAltCrop } from "../handoff/adapter/altCrop";
+import { loadSuggestions, saveSuggestions } from "../handoff/adapter/altSuggestStore";
 import { listImageLayers } from "../handoff/adapter/imageInventory";
 import { setAltNote, setNodeNotes } from "../handoff/adapter/notesStore";
 import { activeStudySession } from "../study/adapter/studySessionStore";
@@ -25,6 +27,17 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
     case "HANDOFF_ALT_INVENTORY_REQUEST":
       reply({ type: "HANDOFF_ALT_INVENTORY", layers: listImageLayers() });
       return;
+    case "HANDOFF_ALT_CROP_REQUEST":
+      reply(await exportAltCrop(message.nodeId));
+      return;
+    case "HANDOFF_ALT_CACHE_REQUEST":
+      reply({ type: "HANDOFF_ALT_CACHE", entries: loadSuggestions() });
+      return;
+    case "HANDOFF_ALT_CACHE_SET": {
+      const { entries, ...result } = saveSuggestions(message.entries);
+      reply({ type: "HANDOFF_ALT_CACHE", entries, ...result });
+      return;
+    }
     case "HANDOFF_ALT_SET": {
       const { nodeId, ...answer } = message;
       const result = await setAltNote(nodeId, answer);

@@ -2,6 +2,7 @@ import { Copy } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 
 import { buildAudienceDoc } from "../../shared/handoff/audiences";
+import { aiAltCount } from "../../shared/handoff/alt/altLines";
 import { buildItems } from "../../shared/handoff/buildItems";
 import { composeCopy } from "../../shared/handoff/compose";
 import type { Audience, HandoffInput, HandoffItemMeta } from "../../shared/handoff/types";
@@ -89,7 +90,11 @@ export function ReviewGate({ input, audience, drafts, onMeta, onClose }: ReviewG
         onMeta={onMeta}
       />
       <DraftsSection audience={audience} doc={doc} drafts={drafts} />
-      <GateNotes doc={doc} draftWarnings={drafts.draftWarnings} />
+      <GateNotes
+        doc={doc}
+        draftWarnings={drafts.draftWarnings}
+        aiAltNotes={aiAltCount(input.notes ?? [])}
+      />
       <p className={styles.helper} role="status">
         {status}
       </p>

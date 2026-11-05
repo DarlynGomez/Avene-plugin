@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 
+import { FEATURE_ALT_SUGGEST_LIVE } from "../../../shared/handoffFlags";
 import { altCounts, altLayerViews, type AltGroupBy } from "../../../shared/handoff/alt/altRoots";
 import { useHandoffAvailable } from "../useHandoffAvailable";
 import {
@@ -9,6 +10,7 @@ import {
   type CheckChoice
 } from "./AltChecksContext";
 import { useAltMessages } from "./useAltMessages";
+import { useAltSuggest } from "./useAltSuggest";
 import { useAnnotationsAvailable } from "./useAnnotationsAvailable";
 
 /**
@@ -20,6 +22,8 @@ export function AltChecksProvider({ children }: { children: ReactNode }) {
   const annotationsOn = useAnnotationsAvailable();
   const messages = useAltMessages(available, annotationsOn);
   const { layers, notes, refresh } = messages;
+  // The live path also needs handoff to be available, which is false in a study
+  const suggest = useAltSuggest(available, available && FEATURE_ALT_SUGGEST_LIVE);
   const [check, setCheckState] = useState<CheckChoice>("all");
   const [groupBy, setGroupBy] = useState<AltGroupBy>("root-cause");
   const [sheet, setSheet] = useState<AltSheetTarget | null>(null);
@@ -55,6 +59,7 @@ export function AltChecksProvider({ children }: { children: ReactNode }) {
     setCheck,
     groupBy,
     setGroupBy,
+    suggest,
     sheet,
     openSheet,
     closeSheet,

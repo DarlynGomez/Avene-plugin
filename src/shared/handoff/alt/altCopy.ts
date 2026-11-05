@@ -49,3 +49,22 @@ export function annotationFailureText(reason: AnnotationFailure, error?: string)
       return "The annotation could not be recorded, so nothing was added.";
   }
 }
+
+/** One plain line for a suggestion that is not there, with no model text in it and no code */
+export function suggestionNoneLine(reason: string): string {
+  const why: Record<string, string> = {
+    "live-off": "Live suggestions are not turned on, so write the note yourself.",
+    unsure: "The model could not tell what this image shows.",
+    rejected: "",
+    "rate-limited": "The service is busy. Try again in a minute.",
+    timeout: "That took too long.",
+    unavailable: "The suggestion service is not reachable right now. You can still write notes yourself.",
+    "no-picture": "A picture of this layer could not be read."
+  };
+  const extra = why[reason] ?? "";
+  return extra === "" ? "No suggestion available." : `No suggestion available. ${extra}`;
+}
+
+export const SUGGEST_CAPPED = (done: number) =>
+  `Stopped after ${done} images. Run it again for the rest.`;
+

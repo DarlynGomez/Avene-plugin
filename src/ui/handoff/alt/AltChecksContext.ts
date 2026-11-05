@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 import type { AnnotationStatus } from "../../../shared/handoff/alt/annotationStatus";
 import type { AltCounts, AltGroupBy, AltLayerView } from "../../../shared/handoff/alt/altRoots";
 import type { NoteSource } from "../../../shared/handoff/noteStorage";
+import { INERT_SUGGEST, type SuggestApi } from "./suggestTypes";
 
 /** Which checks the Live Watch list shows, kept for the session and not stored */
 export type CheckChoice = "all" | "contrast" | "alt";
@@ -35,6 +36,7 @@ export interface AltChecksValue {
   setCheck: (check: CheckChoice) => void;
   groupBy: AltGroupBy;
   setGroupBy: (groupBy: AltGroupBy) => void;
+  suggest: SuggestApi;
   sheet: AltSheetTarget | null;
   openSheet: (nodeId: string, decorative?: boolean) => void;
   closeSheet: () => void;
@@ -63,6 +65,7 @@ export const INERT_ALT: AltChecksValue = {
   setCheck: nothing,
   groupBy: "root-cause",
   setGroupBy: nothing,
+  suggest: INERT_SUGGEST,
   sheet: null,
   openSheet: nothing,
   closeSheet: nothing,

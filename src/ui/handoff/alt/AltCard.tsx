@@ -10,7 +10,7 @@ const plural = (count: number, one: string, many: string) => (count === 1 ? one 
 
 /** One picture as a card, the thumbnail is a placeholder because the inventory carries no image */
 export function AltCard({ root }: { root: AltRoot }) {
-  const { openSheet, locate, statuses, annotationsOn } = useAltChecks();
+  const { openSheet, locate, statuses, annotationsOn, suggest } = useAltChecks();
   const target = targetLayer(root);
   const hasNote = target.status !== "unanswered";
   const annotated =
@@ -35,6 +35,15 @@ export function AltCard({ root }: { root: AltRoot }) {
         <span className={`${styles.status} ${needs ? styles.statusNeeds : ""}`}>
           {rootStatusText(root)}
         </span>
+        {target.source !== "designer" && target.status === "answered" && (
+          <span className={styles.chip}>
+            {target.source === "ai" ? "AI-drafted" : "AI-drafted, edited"}
+          </span>
+        )}
+        {(suggest.states[target.nodeId]?.status === "ready" ||
+          suggest.states[target.nodeId]?.status === "decorative") && (
+          <span className={styles.status}>AI suggestion ready</span>
+        )}
         {annotated && <span className={styles.chip}>Annotated</span>}
       </p>
       {target.status === "answered" && <p className={styles.preview}>{target.text}</p>}

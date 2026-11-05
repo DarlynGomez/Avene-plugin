@@ -1,14 +1,16 @@
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useRef, type KeyboardEvent } from "react";
 
-import { sourceAfterEdit, type AltLayerView } from "../../../shared/handoff/alt/altRoots";
+import { type AltLayerView } from "../../../shared/handoff/alt/altRoots";
 import { useAltChecks } from "./AltChecksContext";
 import { AltNoteFields } from "./AltNoteFields";
+import { AltSuggestBox } from "./AltSuggestBox";
 import { AnnotationControl } from "./AnnotationControl";
 import handoff from "../Handoff.module.css";
 import sheet from "../HandoffSheet.module.css";
 import { SheetHeader } from "../SheetHeader";
 import { useSheetFocus } from "../useSheetFocus";
 import styles from "./AltSheet.module.css";
+import { useAltNoteForm } from "./useAltNoteForm";
 
 interface AltNoteSheetProps {
   layer: AltLayerView;
@@ -22,25 +24,14 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
   const alt = useAltChecks();
-  const [text, setText] = useState(layer.text);
-  const [decorative, setDecorative] = useState(startDecorative || layer.status === "decorative");
-  const [applyAll, setApplyAll] = useState(false);
+  const form = useAltNoteForm(layer, group, startDecorative);
   useSheetFocus(ref, alt.closeSheet);
 
   const hadNote = layer.status !== "unanswered";
-  const valid = decorative || text.trim() !== "" || hadNote;
-  const dirty = text.trim() !== layer.text.trim() || decorative !== (layer.status === "decorative");
+  const valid = form.decorative || form.text.trim() !== "" || hadNote;
+  const dirty =
+    form.text.trim() !== layer.text.trim() || form.decorative !== (layer.status === "decorative");
   const status = alt.statuses[layer.nodeId] ?? "none";
-
-  function save() {
-    const answer = {
-      text: decorative ? "" : text,
-      decorative,
-      source: sourceAfterEdit(layer.source, layer.text, text)
-    };
-    alt.saveNote(applyAll ? group.map((item) => item.nodeId) : [layer.nodeId], answer);
-    alt.closeSheet();
-  }
 
   // Escape closes only this sheet, so it does not also put a canvas selection back
   function onKeyDown(event: KeyboardEvent) {
@@ -59,19 +50,32 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
       onKeyDown={onKeyDown}
     >
       <SheetHeader id={`${id}-t`} title="Alt text" subtitle={layer.name} onClose={alt.closeSheet} />
+      {layer.source !== "designer" && (
+        <p className={styles.aiLabel}>
+          {layer.source === "ai" ? "AI-drafted" : "AI-drafted, edited"}
+        </p>
+      )}
       <AltNoteFields
-        text={text}
-        decorative={decorative}
-        onText={setText}
-        onDecorative={setDecorative}
+        text={form.text}
+        decorative={form.decorative}
+        onText={form.setText}
+        onDecorative={form.setDecorative}
+      />
+      <AltSuggestBox
+        state={alt.suggest.states[layer.nodeId]}
+        onSuggest={() => alt.suggest.suggest(layer)}
+        onUse={form.useSuggestion}
+        onEdit={form.editSuggestion}
+        onDecorative={form.markDecorative}
+        onDismiss={() => alt.suggest.dismiss(layer.nodeId)}
       />
       {group.length > 1 && (
         <label className={styles.checkLine} htmlFor={`${id}-all`}>
           <input
             id={`${id}-all`}
             type="checkbox"
-            checked={applyAll}
-            onChange={(event) => setApplyAll(event.target.checked)}
+            checked={form.applyAll}
+            onChange={(event) => form.setApplyAll(event.target.checked)}
           />
           <span className={styles.decorativeText}>
             Apply this note to all {group.length} layers
@@ -105,7 +109,7 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
           <button type="button" className={handoff.button} onClick={alt.closeSheet}>
             Cancel
           </button>
-          <button type="button" className={handoff.primary} disabled={!valid} onClick={save}>
+          <button type="button" className={handoff.primary} disabled={!valid} onClick={form.save}>
             Save alt text
           </button>
         </span>

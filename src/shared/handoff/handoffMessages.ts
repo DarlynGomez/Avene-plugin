@@ -2,9 +2,9 @@ import type { RootDecision } from "../grouping/groupingTypes";
 import type { IssueSummary } from "../issues/issueTypes";
 import { parseRootSignature } from "../issues/rootSignature";
 import {
-  isAltInventoryMessage,
+  isAltPluginMessage,
   isAltUiMessage,
-  type AltInventoryMessage,
+  type AltPluginMessage,
   type AltUiMessage
 } from "./alt/altMessages";
 import { normalizeMeta, type HandoffMetaMap } from "./metaStorage";
@@ -68,7 +68,7 @@ export interface HandoffRefused {
 }
 
 export type HandoffPluginMessage =
-  HandoffDataMessage | HandoffWriteResult | HandoffRefused | AltInventoryMessage;
+  HandoffDataMessage | HandoffWriteResult | HandoffRefused | AltPluginMessage;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -105,7 +105,7 @@ export function isHandoffPluginMessage(value: unknown): value is HandoffPluginMe
     case "HANDOFF_REFUSED":
       return true;
     case "HANDOFF_ALT_INVENTORY":
-      return isAltInventoryMessage(value);
+      return isAltPluginMessage(value);
     case "HANDOFF_WRITE_RESULT":
       return typeof value.saved === "boolean";
     case "HANDOFF_DATA":

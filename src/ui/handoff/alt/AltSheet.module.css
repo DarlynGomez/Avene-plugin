@@ -115,3 +115,34 @@
   outline: var(--size-focus-ring) solid var(--color-focus-ring);
   outline-offset: var(--size-focus-offset);
 }
+
+.suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.suggestion {
+  align-self: stretch;
+  padding: var(--space-3);
+  border: var(--size-focus-ring) solid var(--color-ink);
+  border-radius: var(--radius-tile);
+  background: var(--color-card);
+}
+
+.suggestionText {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  line-height: var(--font-line-height-helper);
+  overflow-wrap: anywhere;
+}
+
+.aiLabel {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-severity-label);
+}

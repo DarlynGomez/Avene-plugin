@@ -9,6 +9,7 @@ import type { StudySession } from "../../../shared/study/studyTypes";
 import { IssuePanel } from "../../issues/IssuePanel";
 import { StudyStateContext } from "../../study/StudyStateContext";
 import { AltChecksProvider } from "./AltChecksProvider";
+import { emit } from "./altServers";
 
 export const SESSION: StudySession = {
   schemaVersion: 1,
@@ -62,9 +63,7 @@ export const issue = (): IssueSummary => ({
   }
 });
 
-export function emit(message: unknown) {
-  window.dispatchEvent(new MessageEvent("message", { data: { pluginMessage: message } }));
-}
+export { emit } from "./altServers";
 
 export const dataMessage = (notes: Record<string, NodeNote[]> = {}) => ({
   type: "HANDOFF_DATA",
@@ -81,14 +80,17 @@ export const dataMessage = (notes: Record<string, NodeNote[]> = {}) => ({
 });
 
 /** Records what the panel posts to the plugin */
-export function capturePosts() {
+export function capturePosts(onPost?: (message: { type: string; [key: string]: unknown }) => void) {
   const posted: { type: string; [key: string]: unknown }[] = [];
   vi.spyOn(window.parent, "postMessage").mockImplementation((message: unknown) => {
-    posted.push((message as { pluginMessage: (typeof posted)[number] }).pluginMessage);
+    const sent = (message as { pluginMessage: (typeof posted)[number] }).pluginMessage;
+    posted.push(sent);
+    onPost?.(sent);
   });
   return posted;
 }
 
+/** The Live Watch panel inside the provider, fed the way the plugin would feed it */
 interface Options {
   study?: boolean;
   layers?: ImageLayer[];
@@ -96,7 +98,6 @@ interface Options {
   issues?: IssueSummary[];
 }
 
-/** The Live Watch panel inside the provider, fed the way the plugin would feed it */
 export async function mountPanel({
   study = false,
   layers = LAYERS,

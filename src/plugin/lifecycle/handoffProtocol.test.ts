@@ -58,6 +58,22 @@ const ALT: HandoffUiMessage[] = [
     source: "designer"
   }
 ];
+const SUGGEST: HandoffUiMessage[] = [
+  { type: "HANDOFF_ALT_CROP_REQUEST", nodeId: "t1" },
+  { type: "HANDOFF_ALT_CACHE_REQUEST" },
+  {
+    type: "HANDOFF_ALT_CACHE_SET",
+    entries: [
+      {
+        imageHash: "h",
+        modelId: "m",
+        kind: "describe",
+        text: "Order summary icon",
+        at: "2026-11-05T10:00:00.000Z"
+      }
+    ]
+  }
+];
 const DRAFTS_MESSAGE: HandoffUiMessage = {
   type: "HANDOFF_DRAFTS_SET",
   drafts: {
@@ -116,16 +132,15 @@ afterEach(() => vi.unstubAllGlobals());
 describe("while a study session is active", () => {
   beforeEach(() => vi.mocked(activeStudySession).mockReturnValue(SESSION));
 
-  it.each([...ALL, ...ALT, DRAFTS_MESSAGE].map((message) => [message.type, message] as const))(
-    "refuses %s with no read and no write",
-    async (_name, message) => {
-      await run(message);
-      expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }]);
-      expect(spies.gets).not.toHaveBeenCalled();
-      expect(spies.sets).not.toHaveBeenCalled();
-      expect(spies.node).not.toHaveBeenCalled();
-    }
-  );
+  it.each(
+    [...ALL, ...ALT, ...SUGGEST, DRAFTS_MESSAGE].map((message) => [message.type, message] as const)
+  )("refuses %s with no read and no write", async (_name, message) => {
+    await run(message);
+    expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }]);
+    expect(spies.gets).not.toHaveBeenCalled();
+    expect(spies.sets).not.toHaveBeenCalled();
+    expect(spies.node).not.toHaveBeenCalled();
+  });
 
   it("still refuses once the block has ended, until the researcher exits", async () => {
     vi.mocked(activeStudySession).mockReturnValue({ ...SESSION, phase: "ended" });
@@ -316,6 +331,36 @@ describe("alt text messages with no study session", () => {
       source: "designer"
     });
     expect(replies[0]).toMatchObject({ saved: false });
+  });
+});
+
+describe("alt text suggestion messages with no study session", () => {
+  it("sends a crop of one layer, and a reason when it cannot", async () => {
+    await run(SUGGEST[0]);
+    await run({ type: "HANDOFF_ALT_CROP_REQUEST", nodeId: "nope" });
+    expect(replies[0]).toMatchObject({ type: "HANDOFF_ALT_CROP", nodeId: "t1" });
+    expect(replies[1]).toEqual({
+      type: "HANDOFF_ALT_CROP",
+      nodeId: "nope",
+      ok: false,
+      reason: "layer-gone"
+    });
+  });
+
+  it("saves the suggestions in the file and sends them back, and an empty request reads them", async () => {
+    await run(SUGGEST[1]);
+    await run(SUGGEST[2]);
+    await run(SUGGEST[1]);
+    expect(replies[0]).toEqual({ type: "HANDOFF_ALT_CACHE", entries: [] });
+    expect(replies[1]).toMatchObject({ type: "HANDOFF_ALT_CACHE", saved: true });
+    expect(
+      (replies[2] as { entries: { imageHash: string }[] }).entries.map((e) => e.imageHash)
+    ).toEqual(["h"]);
+  });
+
+  it("emits nothing to the study log", async () => {
+    for (const message of SUGGEST) await run(message);
+    expect(emitStudy).not.toHaveBeenCalled();
   });
 });
 
