@@ -27,7 +27,12 @@ def property_lines(inputs: dict[str, Any]) -> str:
 
 
 def build_payload(
-    settings: Settings, png: bytes, instruction: str, inputs: dict[str, Any] | None = None
+    settings: Settings,
+    png: bytes,
+    instruction: str,
+    inputs: dict[str, Any] | None = None,
+    schema_name: str = "role",
+    schema: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     extra = property_lines(inputs or {})
     text = instruction if extra == "" else f"{instruction}\n\nProperties:\n{extra}"
@@ -47,7 +52,11 @@ def build_payload(
         "seed": settings.seed,
         "response_format": {
             "type": "json_schema",
-            "json_schema": {"name": "role", "strict": True, "schema": labels.SCHEMA},
+            "json_schema": {
+                "name": schema_name,
+                "strict": True,
+                "schema": labels.SCHEMA if schema is None else schema,
+            },
         },
     }
     if settings.is_thinking:
