@@ -39,19 +39,23 @@ class AltCaller:
         # The service is asked about one image at a time, so a long batch cannot crowd out a role question
         self._one_at_a_time = asyncio.Lock()
 
-    def _payload(self, png: bytes, width: int, height: int) -> dict:
+    def _payload(self, png: bytes, width: int, height: int, style: str) -> dict:
         payload = build_payload(
-            self._s, png, instruction_for(width, height), schema_name="alt", schema=SCHEMA
+            self._s, png, instruction_for(width, height, style), schema_name="alt", schema=SCHEMA
         )
         if not self._s.is_thinking:
             payload["max_tokens"] = self._s.alt_max_tokens
         return payload
 
-    async def describe(self, png: bytes, size: tuple[int, int], layer: tuple[int, int]) -> AltAnswer:
+    async def describe(
+        self, png: bytes, size: tuple[int, int], layer: tuple[int, int], style: str = "concise"
+    ) -> AltAnswer:
         async with self._one_at_a_time:
-            return await self._describe(png, size, layer)
+            return await self._describe(png, size, layer, style)
 
-    async def _describe(self, png: bytes, size: tuple[int, int], layer: tuple[int, int]) -> AltAnswer:
+    async def _describe(
+        self, png: bytes, size: tuple[int, int], layer: tuple[int, int], style: str
+    ) -> AltAnswer:
         started = self._clock.now()
         answer = AltAnswer(model=self._s.model)
 
@@ -60,7 +64,7 @@ class AltCaller:
             answer.ms = round((self._clock.now() - started) * 1000)
             return answer
 
-        payload = self._payload(png, *layer)
+        payload = self._payload(png, *layer, style)
         estimate = estimate_tokens(*size, self._s.image_patch_px, payload["max_tokens"])
         # A call that could never fit in one window is not sent, nothing is reserved for it
         if estimate > self._pacer.limit:

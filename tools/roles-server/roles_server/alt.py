@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,6 +22,8 @@ class AltRequest(BaseModel):
     # The layer's size in the design, in pixels, which tells an icon from a banner
     width: int = Field(gt=0, le=100_000)
     height: int = Field(gt=0, le=100_000)
+    # How the description is worded, one of three settings
+    style: Literal["concise", "descriptive", "functional"] = "concise"
 
 
 def failed(reason: str, model: str | None, ms: int = 0) -> dict[str, Any]:
@@ -43,7 +45,7 @@ async def describe(
     except ImageRefused as refused:
         return refuse(refused.reason)
     answer = await caller.describe(
-        prepared.png, (prepared.width, prepared.height), (request.width, request.height)
+        prepared.png, (prepared.width, prepared.height), (request.width, request.height), request.style
     )
     ok = answer.reason == labels.OK
     # The log gets how long the answer was and what happened, never the image or a word of it

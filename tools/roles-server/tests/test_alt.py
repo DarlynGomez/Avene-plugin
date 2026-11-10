@@ -263,3 +263,39 @@ class TestLog:
         [line] = log_lines(tmp_path)
         assert line["reason"] == "malformed" and line["imageSha256"] is None
         assert "definitely" not in (tmp_path / "roles.log.jsonl").read_text()
+
+
+class TestStyle:
+    @pytest.mark.parametrize(
+        "style,phrase",
+        [
+            ("concise", "Style: concise."),
+            ("descriptive", "Style: descriptive."),
+            ("functional", "Style: functional."),
+        ],
+    )
+    def test_each_setting_adds_its_own_line_to_what_the_model_is_asked(self, tmp_path, style, phrase):
+        manager = Manager(lambda _r: reply())
+        with client_for(tmp_path, manager) as client:
+            client.post("/v1/alt", json=body(style=style))
+        text = manager.payloads()[0]["messages"][0]["content"][0]["text"]
+        assert phrase in text
+        assert text.count("Style:") == 1
+
+    def test_no_setting_means_concise(self, tmp_path):
+        manager = Manager(lambda _r: reply())
+        with client_for(tmp_path, manager) as client:
+            client.post("/v1/alt", json=body())
+        assert "Style: concise." in manager.payloads()[0]["messages"][0]["content"][0]["text"]
+
+    def test_a_setting_that_is_not_one_of_the_three_is_answered_as_malformed_and_never_sent(self, tmp_path):
+        manager = Manager(lambda _r: reply())
+        with client_for(tmp_path, manager) as client:
+            result = client.post("/v1/alt", json=body(style="poetic")).json()
+        assert (result["kind"], result["reason"]) == ("unsure", "malformed")
+        assert manager.requests == []
+
+    def test_the_setting_is_not_written_to_the_log(self, tmp_path):
+        with client_for(tmp_path, Manager(lambda _r: reply())) as client:
+            client.post("/v1/alt", json=body(style="functional"))
+        assert "functional" not in (tmp_path / "roles.log.jsonl").read_text()

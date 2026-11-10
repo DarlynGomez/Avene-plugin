@@ -9,6 +9,10 @@ from . import labels
 
 KINDS = ["describe", "decorative", "unsure"]
 
+# The three settings a designer can choose, each one line of wording in a data file next to this one
+STYLES: dict[str, str] = json.loads(Path(__file__).with_name("alt_styles.json").read_text(encoding="utf-8"))
+DEFAULT_STYLE = "concise"
+
 SCHEMA = {
     "type": "object",
     "properties": {"kind": {"type": "string", "enum": KINDS}, "text": {"type": "string"}},
@@ -20,9 +24,9 @@ SCHEMA = {
 INSTRUCTION = (Path(__file__).with_name("alt_instructions.txt")).read_text(encoding="utf-8").strip()
 
 
-def instruction_for(width: int, height: int) -> str:
-    """Only two plain numbers are added, so nothing the file holds can write into the prompt."""
-    return f"{INSTRUCTION}\n\nLayer size: {width} by {height} pixels."
+def instruction_for(width: int, height: int, style: str = DEFAULT_STYLE) -> str:
+    """Two plain numbers and one of three fixed lines are added, so nothing the file holds can write into the prompt."""
+    return f"{INSTRUCTION}\n\n{STYLES[style]}\n\nLayer size: {width} by {height} pixels."
 
 
 def parse_alt(content: str) -> tuple[str | None, str, str]:
