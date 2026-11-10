@@ -1,5 +1,6 @@
 import type { GroupableFinding, RootDecision } from "../grouping/groupingTypes";
 import type { Severity } from "../issues/issueTypes";
+import type { ImageLayer } from "./alt/altTypes";
 import type { NodeNote } from "./noteStorage";
 
 export type Label = "Detected" | "Decision" | "Needs check";
@@ -45,6 +46,8 @@ export interface HandoffChange {
 
 /** A designer note on one layer, the layer name comes from the file as it is now */
 export interface HandoffNote {
+  /** Absent in older data, an alt note needs it to be matched with an image layer */
+  nodeId?: string;
   nodeName: string;
   link?: string;
   note: NodeNote;
@@ -68,8 +71,10 @@ export interface HandoffInput {
   meta: Readonly<Record<string, HandoffItemMeta>>;
   changes: readonly HandoffChange[];
   questions: readonly HandoffQuestion[];
-  /** Notes that are not questions, which print under Designer notes */
+  /** Notes that are not questions, which print under Designer notes, or Alt text for an alt note */
   notes?: readonly HandoffNote[];
+  /** The image layers of the chosen screens, from the inventory, absent when it was never asked for */
+  imageLayers?: readonly ImageLayer[];
   reviewer?: { name: string; date: string };
 }
 

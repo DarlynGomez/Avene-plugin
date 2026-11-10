@@ -1,3 +1,4 @@
+import { readAnnotationFields } from "./alt/annotationFields";
 import { cutChars, META_SHORT_MAX_CHARS, NOTE_TEXT_MAX_CHARS } from "./limits";
 import type { Owner } from "./types";
 
@@ -5,6 +6,10 @@ export const NOTE_CATEGORIES = ["alt", "heading", "name", "state", "question"] a
 export type NoteCategory = (typeof NOTE_CATEGORIES)[number];
 
 const OWNERS: readonly Owner[] = ["Dev", "PM", "Design"];
+
+export const NOTE_SOURCES = ["designer", "ai", "ai_edited"] as const;
+/** Where an alt text came from, a suggestion kept as it was, a suggestion the designer changed, or the designer */
+export type NoteSource = (typeof NOTE_SOURCES)[number];
 
 /** What a designer says about one layer, one note per category */
 export interface NodeNote {
@@ -18,6 +23,13 @@ export interface NodeNote {
   owner?: Owner;
   /** Who to ask about it, in the designer's own words, a name and a role */
   contact?: string;
+  /** Alt only, left out when the designer wrote it, which is also what a note without it reads as */
+  source?: Exclude<NoteSource, "designer">;
+  /** Alt only, set while an annotation we wrote is recorded for this note */
+  annotated?: true;
+  annotatedAt?: string;
+  /** The hash of the text we wrote, with the annotation category it finds our annotation */
+  annotatedHash?: string;
   updatedAt: string;
 }
 
@@ -42,7 +54,11 @@ export function normalizeNote(value: unknown): NodeNote | null {
     updatedAt: raw.updatedAt,
     ...(contact ? { contact } : {})
   };
+  if (category === "alt") Object.assign(note, readAnnotationFields(raw));
   if (category === "alt" && raw.decorative === true) return { ...note, text: "", decorative: true };
+  if (category === "alt" && (raw.source === "ai" || raw.source === "ai_edited")) {
+    note.source = raw.source;
+  }
   if (category === "heading") {
     const level = raw.headingLevel;
     if (typeof level !== "number" || !Number.isInteger(level) || level < 1 || level > 6)
@@ -55,6 +71,11 @@ export function normalizeNote(value: unknown): NodeNote | null {
     note.owner = owner;
   }
   return text === "" ? null : note;
+}
+
+/** A note with no source was written by the designer */
+export function noteSource(note: NodeNote): NoteSource {
+  return note.source ?? "designer";
 }
 
 /** The last note of a category wins, bad entries are dropped */

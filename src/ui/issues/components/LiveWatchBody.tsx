@@ -2,9 +2,12 @@ import type { Root, RootDecision } from "../../../shared/grouping/groupingTypes"
 import type { GroupBy, RootSection } from "../../../shared/grouping/sectionRoots";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { ParticipantVisibility } from "../../../shared/study/participantVisibility";
+import { useAltChecks } from "../../handoff/alt/AltChecksContext";
+import { AltPanel } from "../../handoff/alt/AltPanel";
 import type { ActionError } from "../hooks/useIssues";
 import { useMarkerSignals } from "../hooks/useMarkerSignals";
 import { DecisionsView } from "./DecisionsView";
+import { SectionAccordion } from "./SectionAccordion";
 import { FilterBar, type FilterCounts, type StateFilter } from "./FilterBar";
 import styles from "./LiveWatchBody.module.css";
 import { ToReviewList } from "./ToReviewList";
@@ -44,6 +47,39 @@ interface LiveWatchBodyProps {
 /** Body of the Live Watch tab, error, filters and the active list */
 export function LiveWatchBody(props: LiveWatchBodyProps) {
   const { notice } = useMarkerSignals();
+  const alt = useAltChecks();
+
+  const contrastBody = !props.visibility.issueList ? null : props.stateFilter === "ignored" &&
+    props.visibility.ignoredTrayAndDecisions ? (
+    <DecisionsView
+      roots={props.decisionRoots}
+      decisions={props.decisions}
+      issuesById={props.issuesById}
+      onReopen={props.onReopen}
+    />
+  ) : (
+    <ToReviewList
+      sections={props.filteredSections}
+      issuesById={props.issuesById}
+      decisions={props.decisions}
+      ignoredRoots={props.decisionRoots.filter((root) => root.stateBreakdown.ignored)}
+      onRestoreIgnored={props.onReopen}
+      showOffers={props.visibility.decisionOffers}
+      showTray={props.visibility.ignoredTrayAndDecisions}
+      canAdjust={props.canAdjust}
+      selectedInstances={props.selectedInstances}
+      onToggleInstanceSelected={props.onToggleInstanceSelected}
+      onSelectAllInstances={props.onSelectAllInstances}
+      onShowOnCanvas={props.onShowOnCanvas}
+      onLocate={props.onLocate}
+      onAdjust={props.onAdjust}
+      onIgnore={props.onIgnore}
+      onDefer={props.onDefer}
+      onToggleImportant={props.onToggleImportant}
+      onApplyDecisionOffer={props.onApplyDecisionOffer}
+      onRestoreDeferred={props.onRestoreDeferred}
+    />
+  );
 
   return (
     <>
@@ -66,36 +102,31 @@ export function LiveWatchBody(props: LiveWatchBodyProps) {
           counts={props.counts}
         />
       )}
-      {!props.visibility.issueList ? null : props.stateFilter === "ignored" &&
-        props.visibility.ignoredTrayAndDecisions ? (
-        <DecisionsView
-          roots={props.decisionRoots}
-          decisions={props.decisions}
-          issuesById={props.issuesById}
-          onReopen={props.onReopen}
-        />
+      {alt.available ? (
+        <>
+          <SectionAccordion
+            level="top"
+            title="Color & Contrast"
+            roots={props.counts.openRoots ?? 0}
+            issues={props.counts.openIssues ?? 0}
+            open={alt.sections.contrast}
+            onToggle={() => alt.toggleSection("contrast")}
+          >
+            {contrastBody}
+          </SectionAccordion>
+          <SectionAccordion
+            level="top"
+            title="Alt Text & Media Descriptions"
+            roots={alt.counts.roots}
+            issues={alt.counts.layers}
+            open={alt.sections.alt}
+            onToggle={() => alt.toggleSection("alt")}
+          >
+            <AltPanel groupBy={props.groupBy} />
+          </SectionAccordion>
+        </>
       ) : (
-        <ToReviewList
-          sections={props.filteredSections}
-          issuesById={props.issuesById}
-          decisions={props.decisions}
-          ignoredRoots={props.decisionRoots.filter((root) => root.stateBreakdown.ignored)}
-          onRestoreIgnored={props.onReopen}
-          showOffers={props.visibility.decisionOffers}
-          showTray={props.visibility.ignoredTrayAndDecisions}
-          canAdjust={props.canAdjust}
-          selectedInstances={props.selectedInstances}
-          onToggleInstanceSelected={props.onToggleInstanceSelected}
-          onSelectAllInstances={props.onSelectAllInstances}
-          onShowOnCanvas={props.onShowOnCanvas}
-          onLocate={props.onLocate}
-          onAdjust={props.onAdjust}
-          onIgnore={props.onIgnore}
-          onDefer={props.onDefer}
-          onToggleImportant={props.onToggleImportant}
-          onApplyDecisionOffer={props.onApplyDecisionOffer}
-          onRestoreDeferred={props.onRestoreDeferred}
-        />
+        contrastBody
       )}
     </>
   );

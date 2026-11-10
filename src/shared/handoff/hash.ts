@@ -17,6 +17,11 @@ function tableText(table: Readonly<Record<string, string>>): string {
     .join("\n");
 }
 
+/** A short identity for one piece of text, an identity check and not security */
+export function textHash(text: string): string {
+  return fnv1a(text);
+}
+
 /** Over the sorted slot table: the values in a document, an identity check and not security */
 export function findingsHash(table: Readonly<Record<string, string>>): string {
   return fnv1a(tableText(table));

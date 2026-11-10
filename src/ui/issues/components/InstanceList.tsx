@@ -46,7 +46,7 @@ export function InstanceList({
     <div className={styles.wrapper}>
       <div className={styles.toolbar}>
         <span className={styles.count}>
-          {selectedIds.size} of {instances.length} selected for Adjust
+          {selectedIds.size} of {instances.length} selected
         </span>
         <div className={styles.toolbarActions}>
           <button type="button" className={styles.toolbarButton} onClick={onShowOnCanvas}>

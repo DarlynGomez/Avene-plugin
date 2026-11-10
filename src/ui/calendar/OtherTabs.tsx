@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { useState } from "react";
 
+import { DevelopmentCard } from "./DevelopmentCard";
 import levels from "./Levels.module.css";
 import styles from "./Settings.module.css";
 import { SettingsCard, SettingsRow } from "./SettingsRow";
@@ -24,17 +25,6 @@ export function StandardsTab() {
           </div>
         </div>
       </SettingsCard>
-      <SettingsCard title="Audit scope" sub="What the live check looks at on your canvas">
-        <SettingsRow label="Text contrast" hint="Every visible text layer">
-          <span className={`${styles.value} ${styles.valueOn}`}>On</span>
-        </SettingsRow>
-        <SettingsRow label="Non-text UI components" hint="Borders and icons at 3.0:1">
-          <span className={styles.value}>Not available yet</span>
-        </SettingsRow>
-        <SettingsRow label="Hidden layers" hint="A hidden layer is never measured">
-          <span className={styles.value}>Skipped</span>
-        </SettingsRow>
-      </SettingsCard>
     </>
   );
 }
@@ -43,22 +33,28 @@ export function StandardsTab() {
 export function PreferencesTab({ onReset }: { onReset: () => void }) {
   const [cleared, setCleared] = useState(false);
   return (
-    <SettingsCard title="Deferral counts" sub="How often each color pair in this file was deferred">
-      <SettingsRow label="Reset deferral counts" hint="Your calendar choices stay as they are">
-        <button
-          type="button"
-          className={styles.small}
-          onClick={() => {
-            onReset();
-            setCleared(true);
-          }}
-        >
-          Reset
-        </button>
-      </SettingsRow>
-      <p className={styles.hint} role="status">
-        {cleared ? "Counts cleared." : ""}
-      </p>
-    </SettingsCard>
+    <>
+      <SettingsCard
+        title="Deferral counts"
+        sub="How often each color pair in this file was deferred"
+      >
+        <SettingsRow label="Reset deferral counts" hint="Your calendar choices stay as they are">
+          <button
+            type="button"
+            className={styles.small}
+            onClick={() => {
+              onReset();
+              setCleared(true);
+            }}
+          >
+            Reset
+          </button>
+        </SettingsRow>
+        <p className={styles.hint} role="status">
+          {cleared ? "Counts cleared." : ""}
+        </p>
+      </SettingsCard>
+      <DevelopmentCard />
+    </>
   );
 }

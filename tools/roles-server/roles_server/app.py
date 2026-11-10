@@ -1,4 +1,4 @@
-"""The four endpoints, bound to this computer only, with the checks that keep it that way."""
+"""The five endpoints, bound to this computer only, with the checks that keep it that way."""
 
 from __future__ import annotations
 
@@ -11,6 +11,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 
 from . import labels
+from .alt import AltRequest, describe
+from .alt import failed as alt_failed
+from .alt_call import AltCaller
 from .classify import RoleRequest, classify, unsure
 from .clock import Clock, RealClock
 from .config import Settings
@@ -21,7 +24,7 @@ from .requestlog import RequestLog
 from .selftest import run_selftest, warm_up
 from .text_call import TextCaller
 
-PATHS = {"/v1/role", "/v1/draft", "/health", "/selftest"}
+PATHS = {"/v1/role", "/v1/draft", "/v1/alt", "/health", "/selftest"}
 LOOPBACK_NAMES = {"127.0.0.1", "localhost", "[::1]"}
 NULL_ORIGIN = "null"
 
@@ -45,6 +48,7 @@ def create_app(
     caller = ModelCaller(settings, provider, clock)
     # One window for the key: drafts reserve in the same pacer as the image calls
     text_caller = TextCaller(settings, provider, clock, caller.pacer)
+    alt_caller = AltCaller(settings, provider, clock, caller.pacer)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -77,6 +81,8 @@ def create_app(
         # A request the server cannot read is still answered, the plugin never sees an error
         if request.url.path == "/v1/draft":
             return JSONResponse(failed(labels.MALFORMED, settings.text_model))
+        if request.url.path == "/v1/alt":
+            return JSONResponse(alt_failed(labels.MALFORMED, settings.model))
         return JSONResponse(unsure(labels.MALFORMED, settings.model))
 
     @app.post("/v1/role")
@@ -86,6 +92,10 @@ def create_app(
     @app.post("/v1/draft")
     async def draft_endpoint(body: DraftRequest) -> dict[str, Any]:
         return await draft(body, settings, text_caller, log)
+
+    @app.post("/v1/alt")
+    async def alt_endpoint(body: AltRequest) -> dict[str, Any]:
+        return await describe(body, settings, alt_caller, log)
 
     @app.get("/health")
     async def health() -> dict[str, Any]:

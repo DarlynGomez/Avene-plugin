@@ -55,4 +55,22 @@ describe("groupBySeverity", () => {
     expect(groups.find((g) => g.key === "high")?.instances).toHaveLength(2);
     expect(groups.find((g) => g.key === "low")?.instances).toHaveLength(1);
   });
+
+  it("puts high first, then medium, then low, whatever order the findings arrive in", () => {
+    const groups = groupBySeverity([
+      finding({ issueId: "a", severity: "low" }),
+      finding({ issueId: "b", severity: "medium" }),
+      finding({ issueId: "c", severity: "high" }),
+      finding({ issueId: "d", severity: "low" })
+    ]);
+    expect(groups.map((g) => g.key)).toEqual(["high", "medium", "low"]);
+  });
+
+  it("leaves out a band that has nothing in it", () => {
+    const groups = groupBySeverity([
+      finding({ issueId: "a", severity: "low" }),
+      finding({ issueId: "b", severity: "high" })
+    ]);
+    expect(groups.map((g) => g.key)).toEqual(["high", "low"]);
+  });
 });

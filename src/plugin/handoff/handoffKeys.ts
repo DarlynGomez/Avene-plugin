@@ -3,3 +3,4 @@ export const KEY_NOTES_INDEX = "cadt.notes.index.v1";
 export const KEY_HANDOFF_META = "cadt.handoff.meta.v1";
 export const KEY_HANDOFF_FILE = "cadt.handoff.file.v1";
 export const KEY_HANDOFF_DRAFTS = "cadt.handoff.drafts.v1";
+export const KEY_ALT_SUGGEST = "cadt.alt.suggest.v1";

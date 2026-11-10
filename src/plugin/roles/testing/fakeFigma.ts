@@ -37,7 +37,8 @@ export function buildTree(): Tree {
     id: "0:1",
     type: "PAGE",
     name: "Page",
-    backgrounds: [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]
+    backgrounds: [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }],
+    findAll: (test: (n: Fake) => boolean) => find(test)
   });
   const find = (test: (n: Fake) => boolean) => [...nodes.values()].filter(test);
   const screen = withData({
@@ -103,6 +104,7 @@ export function buildTree(): Tree {
   };
   vi.stubGlobal("figma", {
     mixed: MIXED,
+    currentPage: page,
     root: withData({
       id: "0:0",
       type: "DOCUMENT",

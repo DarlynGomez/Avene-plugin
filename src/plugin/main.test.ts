@@ -63,7 +63,11 @@ describe("plugin entry routing", () => {
     stubFigma("open");
     await import("./main");
 
-    expect(showUI).toHaveBeenCalledWith("<html>calibration</html>", { width: 460, height: 680 });
+    expect(showUI).toHaveBeenCalledWith("<html>calibration</html>", {
+      width: 460,
+      height: 680,
+      title: "Avene"
+    });
     expect(closePlugin).not.toHaveBeenCalled();
   });
 
@@ -71,7 +75,11 @@ describe("plugin entry routing", () => {
     stubFigma(undefined);
     await import("./main");
 
-    expect(showUI).toHaveBeenCalledWith("<html>calibration</html>", { width: 460, height: 680 });
+    expect(showUI).toHaveBeenCalledWith("<html>calibration</html>", {
+      width: 460,
+      height: 680,
+      title: "Avene"
+    });
   });
 
   it("starts the detection lifecycle alongside the calibration UI on normal startup", async () => {

@@ -34,7 +34,8 @@ export interface LearningModule {
   whyItMatters: string;
   learningObjectives: string[];
   lessonParagraphs: string[];
-  video: ModuleVideoData;
+  /** A lesson with no video says so with null and shows text only */
+  video: ModuleVideoData | null;
   optionalArticle: OptionalArticleData | null;
   keyTakeaways: string[];
   reviewFlags: string[];

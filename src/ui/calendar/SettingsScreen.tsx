@@ -70,9 +70,6 @@ function SettingsBody({ onTest }: { onTest: () => void }) {
             {userName}
           </span>
         )}
-        <button type="button" className={styles.done} onClick={closeSettings}>
-          Done
-        </button>
       </header>
       <div className={styles.tabsWrap}>
         <div className={styles.tabs} role="group" aria-label="Settings sections">
@@ -97,12 +94,6 @@ function SettingsBody({ onTest }: { onTest: () => void }) {
         {tab === "standards" && <StandardsTab />}
         {tab === "preferences" && <PreferencesTab onReset={reset} />}
       </div>
-      <footer className={styles.footer}>
-        <span>Avene</span>
-        <button type="button" className={styles.footerLink} onClick={closeSettings}>
-          Return to Plugin
-        </button>
-      </footer>
     </div>
   );
 }

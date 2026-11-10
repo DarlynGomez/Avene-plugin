@@ -37,4 +37,14 @@ describe("manifest network access", () => {
   it("has the researcher command that precomputes roles", () => {
     expect(manifest.menu.map((item) => item.command)).toContain("precompute-roles");
   });
+
+  it("is named Avene, in the plugin list and on the menu, and no longer CADT", () => {
+    const named = manifest as unknown as {
+      name: string;
+      menu: { command?: string; name?: string }[];
+    };
+    expect(named.name).toBe("Avene");
+    expect(named.menu.find((item) => item.command === "open")?.name).toBe("Open Avene");
+    expect(JSON.stringify(manifest)).not.toContain("CADT");
+  });
 });

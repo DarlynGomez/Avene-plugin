@@ -2,9 +2,11 @@ import { buildDoc } from "./buildDoc";
 import { buildItems } from "./buildItems";
 import { findDesignerTextHits } from "./designerText";
 import { structureHash } from "./hash";
+import { AI_ALT_HEADER } from "./header";
 import { CLIENT_LINE, HIGHER_UP_LINE, NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { pmSummaryLines } from "./pmSummary";
+import { altLines } from "./alt/altLines";
 import { advisorySection, changeLines, noteLines, questionLines } from "./sectionLines";
 import { group, groupedSection } from "./sections";
 import { createSlots } from "./slots";
@@ -68,6 +70,11 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
       ...part("summary", "Summary", summary),
       ...groupedSection("action", "Needs developer action", action),
       ...part("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
+      ...part(
+        "alt",
+        "Alt text",
+        altLines(input.notes ?? [], input.imageLayers ?? [], slots, input.reviewer)
+      ),
       ...part("changes", "Changes made in this file", changeLines(input.changes, slots)),
       ...part("questions", "Open questions", questionLines(questions, slots)),
       ...tail
@@ -94,7 +101,11 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
   ];
   return {
     audience,
-    header: base.header,
+    // Only the version that prints alt notes says it holds AI-drafted ones
+    header:
+      audience === "developer"
+        ? base.header
+        : base.header.filter((line) => !line.startsWith(AI_ALT_HEADER)),
     hash: base.hash,
     structureHash: structureHash(sections[audience], slots.table()),
     sections: sections[audience],

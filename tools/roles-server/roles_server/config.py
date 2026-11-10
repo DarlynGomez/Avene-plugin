@@ -50,6 +50,9 @@ class Settings:
     text_model: str | None = None
     text_timeout_seconds: float = 30.0
     text_max_tokens: int = 1500
+    # Alt text for a picture, its own allowance because a description is longer than a role label
+    alt_timeout_seconds: float = 30.0
+    alt_max_tokens: int = 200
 
     @property
     def is_thinking(self) -> bool:
@@ -88,4 +91,6 @@ class Settings:
             text_model=env.get("GENAI_TEXT_MODEL", "").strip() or None,
             text_timeout_seconds=_number(env, "GENAI_TEXT_TIMEOUT_SECONDS", 30.0),
             text_max_tokens=int(_number(env, "GENAI_TEXT_MAX_TOKENS", 1500)),
+            alt_timeout_seconds=_number(env, "GENAI_ALT_TIMEOUT_SECONDS", 30.0),
+            alt_max_tokens=int(_number(env, "GENAI_ALT_MAX_TOKENS", 200)),
         )

@@ -1,3 +1,4 @@
+import type { ImageLayer } from "./alt/altTypes";
 import { deriveRoots } from "../grouping/deriveRoots";
 import { assembleGroupableFindings } from "../grouping/assembleFinding";
 import type { IssueSummary } from "../issues/issueTypes";
@@ -16,6 +17,8 @@ export interface InputChoices {
   /** Screens to include, all of them when absent */
   screenIds?: readonly string[];
   reviewer?: { name: string; date: string };
+  /** From the image layer inventory, the layers of the chosen screens are the ones counted */
+  imageLayers?: readonly ImageLayer[];
 }
 
 function screensOf(findings: readonly HandoffFinding[]): HandoffScreen[] {
@@ -58,7 +61,12 @@ function notesOf(data: HandoffDataMessage, linkOf: (id: string) => string | unde
       if (note.category === "question" && note.owner) {
         questions.push({ text: note.text, owner: note.owner, ...(link ? { link } : {}) });
       } else if (note.category !== "question") {
-        notes.push({ nodeName: data.noteNames[nodeId] ?? "", note, ...(link ? { link } : {}) });
+        notes.push({
+          nodeId,
+          nodeName: data.noteNames[nodeId] ?? "",
+          note,
+          ...(link ? { link } : {})
+        });
       }
     }
   }
@@ -96,6 +104,13 @@ export function inputFromData(data: HandoffDataMessage, choices: InputChoices = 
     changes: changesOf(data, byId),
     questions,
     notes,
+    ...(choices.imageLayers
+      ? {
+          imageLayers: choices.imageLayers.filter(
+            (layer) => !choices.screenIds || choices.screenIds.includes(layer.screenId)
+          )
+        }
+      : {}),
     ...(choices.reviewer ? { reviewer: choices.reviewer } : {})
   };
 }

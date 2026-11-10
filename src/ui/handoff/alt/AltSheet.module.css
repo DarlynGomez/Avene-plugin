@@ -1,0 +1,282 @@
+.decorativeCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.decorativeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkLine {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.checkLine input {
+  flex: none;
+  width: var(--space-3);
+  height: var(--space-3);
+  margin-top: 2px;
+}
+
+.sub {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+  line-height: var(--font-line-height-option-description);
+}
+
+.fieldHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.counter {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-severity-label);
+}
+
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(var(--size-target-min) * 2);
+  padding: var(--space-2);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  resize: vertical;
+}
+
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.hintTitle {
+  margin: 0 0 4px;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.annotation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-tile);
+  background: var(--color-background);
+}
+
+.annotationStatus {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+}
+
+.annotationButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.checkLine input:focus-visible,
+.textarea:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-offset);
+}
+
+.suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.suggestion {
+  align-self: stretch;
+  padding: var(--space-3);
+  border: var(--size-focus-ring) solid var(--color-ink);
+  border-radius: var(--radius-tile);
+  background: var(--color-card);
+}
+
+.suggestionText {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  line-height: var(--font-line-height-helper);
+  overflow-wrap: anywhere;
+}
+
+.aiLabel {
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-severity-label);
+}
+
+.cardTitle {
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-label);
+  font-weight: var(--font-weight-medium);
+}
+
+.switch {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: calc(var(--space-5) + var(--space-1));
+  height: var(--space-4);
+  margin: 0;
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-severity-low-bg);
+  cursor: pointer;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(var(--space-4) - 6px);
+  height: calc(var(--space-4) - 6px);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  box-shadow: 0 0 0 var(--size-hairline) var(--color-line);
+  transition: transform var(--motion-base) var(--ease-entrance);
+}
+
+.switch:checked {
+  background: var(--color-ink);
+}
+
+.switch:checked::after {
+  transform: translateX(var(--space-3));
+}
+
+.switch:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-offset);
+}
+
+.generateRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.styleTabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-background);
+}
+
+.styleTab {
+  min-height: calc(var(--space-5) - 2px);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: calc(var(--radius-button) - 3px);
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+  cursor: pointer;
+}
+
+.styleTabOn {
+  background: var(--color-ink);
+  color: var(--color-accent-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.generate {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-target-min);
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius-button);
+  background: var(--color-ink);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.generate[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fieldTools {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--space-5);
+  padding: 0 var(--space-1);
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+  cursor: pointer;
+}
+
+.tool:disabled,
+.tool[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.styleTab:focus-visible,
+.generate:focus-visible,
+.tool:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-offset);
+}

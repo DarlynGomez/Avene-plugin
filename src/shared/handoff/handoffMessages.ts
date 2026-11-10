@@ -1,6 +1,12 @@
 import type { RootDecision } from "../grouping/groupingTypes";
 import type { IssueSummary } from "../issues/issueTypes";
 import { parseRootSignature } from "../issues/rootSignature";
+import {
+  isAltPluginMessage,
+  isAltUiMessage,
+  type AltPluginMessage,
+  type AltUiMessage
+} from "./alt/altMessages";
 import { normalizeMeta, type HandoffMetaMap } from "./metaStorage";
 import type { DraftCache } from "./draftCache";
 import type { NodeNote } from "./noteStorage";
@@ -26,7 +32,8 @@ export type HandoffUiMessage =
   | { type: "HANDOFF_META_SET"; signature: string; meta: HandoffItemMeta; live?: string[] }
   | { type: "HANDOFF_FILE_URL_SET"; url: string }
   /** Drafts the panel made, kept in the file so a demo file carries them */
-  | { type: "HANDOFF_DRAFTS_SET"; drafts: DraftCache };
+  | { type: "HANDOFF_DRAFTS_SET"; drafts: DraftCache }
+  | AltUiMessage;
 
 export interface HandoffDataMessage {
   type: "HANDOFF_DATA";
@@ -60,7 +67,8 @@ export interface HandoffRefused {
   type: "HANDOFF_REFUSED";
 }
 
-export type HandoffPluginMessage = HandoffDataMessage | HandoffWriteResult | HandoffRefused;
+export type HandoffPluginMessage =
+  HandoffDataMessage | HandoffWriteResult | HandoffRefused | AltPluginMessage;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -86,7 +94,7 @@ export function isHandoffUiMessage(value: unknown): value is HandoffUiMessage {
     case "HANDOFF_DRAFTS_SET":
       return isRecord(value.drafts);
     default:
-      return false;
+      return isAltUiMessage(value);
   }
 }
 
@@ -96,6 +104,8 @@ export function isHandoffPluginMessage(value: unknown): value is HandoffPluginMe
   switch (value.type) {
     case "HANDOFF_REFUSED":
       return true;
+    case "HANDOFF_ALT_INVENTORY":
+      return isAltPluginMessage(value);
     case "HANDOFF_WRITE_RESULT":
       return typeof value.saved === "boolean";
     case "HANDOFF_DATA":

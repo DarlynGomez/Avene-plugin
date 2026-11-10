@@ -8,6 +8,7 @@ import module07 from "./M07.json";
 import module08 from "./M08.json";
 import module09 from "./M09.json";
 import module10 from "./M10.json";
+import { module11 } from "./M11";
 import type { LearningModule } from "./moduleTypes";
 
 export const LEARNING_MODULES = [
@@ -20,5 +21,6 @@ export const LEARNING_MODULES = [
   module07,
   module08,
   module09,
-  module10
+  module10,
+  module11
 ] satisfies LearningModule[];

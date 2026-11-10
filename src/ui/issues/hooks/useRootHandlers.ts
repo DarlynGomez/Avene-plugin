@@ -35,8 +35,9 @@ export function useRootHandlers({
     ignoreRoot(instanceIds(root), decision.reason, root.signature, true);
   }
 
-  function handleRecordIgnore(root: Root, reason: string) {
-    ignoreRoot(instanceIds(root), reason, root.signature, false);
+  /** Ignores the layers that were ticked, or every layer of the root when none were */
+  function handleRecordIgnore(root: Root, reason: string, issueIds?: string[]) {
+    ignoreRoot(issueIds ?? instanceIds(root), reason, root.signature, false);
     closeSheet();
   }
 

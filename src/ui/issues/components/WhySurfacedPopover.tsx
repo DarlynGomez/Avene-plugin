@@ -25,7 +25,7 @@ export function WhySurfacedPopover({
   severity
 }: WhySurfacedPopoverProps) {
   const [open, setOpen] = useState(false);
-  const openExplanation = useExplanationLink();
+  const links = useExplanationLink();
 
   return (
     <div className={styles.wrapper}>
@@ -58,13 +58,13 @@ export function WhySurfacedPopover({
             </span>
           </p>
           <p className={styles.context}>{whySurfacedContext(severity)}</p>
-          {openExplanation && (
+          {links && (
             <button
               type="button"
               className={styles.why}
               onClick={() => {
                 setOpen(false);
-                openExplanation(signature);
+                links.openRoot(signature);
               }}
             >
               <span>Why this matters</span>

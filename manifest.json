@@ -1,5 +1,5 @@
 {
-  "name": "CADT",
+  "name": "Avene",
   "id": "1451800000000000000",
   "api": "1.0.0",
   "main": "dist/code.js",
@@ -7,7 +7,7 @@
   "editorType": ["figma"],
   "menu": [
     {
-      "name": "Open CADT",
+      "name": "Open Avene",
       "command": "open"
     },
     {

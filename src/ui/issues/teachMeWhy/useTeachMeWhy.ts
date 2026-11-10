@@ -24,6 +24,8 @@ export interface TeachMeWhyState {
   hide: () => void;
   showAgain: () => void;
   backToIssue: () => void;
+  /** A lesson asked for from a card, the tab opens on it */
+  requestedModule?: { id: string; count: number } | null;
   /** The question about what kind of text the shown issue is, null when it may not be shown */
   role: RoleQuestionState | null;
 }

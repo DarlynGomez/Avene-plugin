@@ -23,6 +23,10 @@ export function useMainTabs(
 ) {
   const handoffOn = useHandoffAvailable();
   const [mainTab, setMainTab] = useState<MainTab>("live-watch");
+  // A lesson asked for from outside the tab, the count makes asking for the same one again count
+  const [requestedModule, setRequestedModule] = useState<{ id: string; count: number } | null>(
+    null
+  );
   const roots = useMemo(() => [...reviewRoots, ...decisionRoots], [reviewRoots, decisionRoots]);
   // The font size sits in the evidence of the issue a root shows, a slot in the text asks for it
   const fontSizeOf = useCallback(
@@ -44,11 +48,19 @@ export function useMainTabs(
     (tab: MainTab) => (tab === "teach-me-why" ? openFromTabBar() : setMainTab(tab)),
     [openFromTabBar]
   );
+  const openModule = useCallback((id: string) => {
+    setRequestedModule((previous) => ({ id, count: (previous?.count ?? 0) + 1 }));
+    setMainTab("teach-me-why");
+  }, []);
+  const links = useMemo(
+    () => (visibility.teachMeWhyTab ? { openRoot: openFromCard, openModule } : null),
+    [visibility.teachMeWhyTab, openFromCard, openModule]
+  );
   return {
     activeTab: activeTabOf(mainTab, visibility.teachMeWhyTab, handoffOn),
     onMainTabChange,
     handoffTab: handoffOn,
-    teachMeWhy: state,
-    openExplanation: visibility.teachMeWhyTab ? openFromCard : null
+    teachMeWhy: { ...state, requestedModule },
+    openExplanation: links
   };
 }

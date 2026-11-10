@@ -55,6 +55,27 @@ def _decode(data: str) -> Image.Image:
     return image
 
 
+WHITE = (255, 255, 255)
+
+
+def prepare_picture(data: str, max_side: int) -> PreparedImage:
+    """A picture for a description: flattened onto white and shrunk to the cap, with no text size to keep legible."""
+    image = _decode(data).convert("RGBA")
+    flat = Image.new("RGBA", image.size, (*WHITE, 255))
+    flat.alpha_composite(image)
+    picture = flat.convert("RGB")
+    longest = max(picture.size)
+    if longest > max_side:
+        shrink = max_side / longest
+        picture = picture.resize(
+            (max(1, round(picture.width * shrink)), max(1, round(picture.height * shrink))),
+            Image.Resampling.LANCZOS,
+        )
+    out = io.BytesIO()
+    picture.save(out, format="PNG")
+    return PreparedImage(out.getvalue(), picture.width, picture.height, 0.0)
+
+
 def prepare_image(
     data: str,
     background_hex: str | None,

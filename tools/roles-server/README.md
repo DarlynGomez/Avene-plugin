@@ -46,3 +46,13 @@ with any other address. It warms the model once before it accepts requests.
 ## Tests
 
 `.venv/bin/python -m pytest` runs with a mocked GenAI Manager and needs no key.
+
+## Alt text suggestions
+
+`POST /v1/alt` takes `{requestId, image, width, height}`, one cropped image as base64 PNG and the layer's size in
+pixels, and returns `{kind, text, reason, model, ms}` where `kind` is `describe`, `decorative` or `unsure`. It uses the
+same vision model and shares the same tokens per minute window as `/v1/role` and `/v1/draft`, one call at a time. The
+wording it sends is in `roles_server/alt_instructions.txt`. `GENAI_ALT_MAX_TOKENS` (200) and
+`GENAI_ALT_TIMEOUT_SECONDS` (30) are its own settings. The request log holds lengths, status and token counts only,
+never the image or a word of the text.
+

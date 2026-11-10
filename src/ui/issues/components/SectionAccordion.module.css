@@ -1,0 +1,60 @@
+.section {
+  border-bottom: var(--size-hairline) solid var(--color-line);
+}
+
+.heading {
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--size-target-min);
+  padding: var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-label);
+  font-weight: var(--font-weight-medium);
+}
+
+.top .title {
+  font-size: calc(var(--font-size-issue-title) * 1.2);
+}
+
+.bubble {
+  flex: none;
+  padding: 4px var(--space-2);
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-description);
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: none;
+  color: var(--color-ink);
+}
+
+.body {
+  padding: 0 0 var(--space-2);
+}
+
+.header:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: calc(var(--size-focus-offset) * -1);
+}

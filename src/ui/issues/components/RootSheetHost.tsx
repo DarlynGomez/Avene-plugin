@@ -2,6 +2,7 @@ import type { Root } from "../../../shared/grouping/groupingTypes";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { SheetTarget } from "../hooks/useRootSheet";
 import { CalendarLayer } from "../../calendar/CalendarLayer";
+import { AltSheetHost } from "../../handoff/alt/AltSheetHost";
 import { AdjustPopup } from "../adjust/AdjustPopup";
 import { IgnoreSheet } from "./IgnoreSheet";
 import { SheetOverlay } from "./SheetOverlay";
@@ -21,7 +22,7 @@ interface RootSheetHostProps {
   endAdjustRequested: boolean;
   onCloseAdjust: () => void;
   onCancelIgnore: () => void;
-  onRecordIgnore: (root: Root, reason: string) => void;
+  onRecordIgnore: (root: Root, reason: string, issueIds?: string[]) => void;
 }
 
 /** The root sheets plus the calendar layer, which shows its own sheet when a deferral reaches the trigger */
@@ -30,6 +31,7 @@ export function RootSheetHost(props: RootSheetHostProps) {
     <>
       <OpenSheet {...props} />
       <CalendarLayer roots={props.roots} issuesById={props.issuesById} />
+      <AltSheetHost />
     </>
   );
 }
@@ -76,11 +78,16 @@ function OpenSheet({
     );
   }
 
+  // Only the ticked layers are ignored, and every layer when none are ticked
+  const picked = selectedInstances[root.signature];
+  const chosen = picked ? root.instances.filter((i) => picked.has(i.issueId)) : [];
+  const ids = chosen.length > 0 ? chosen.map((i) => i.issueId) : undefined;
+
   return (
     <SheetOverlay>
       <IgnoreSheet
-        instanceCount={root.instances.length}
-        onRecord={(reason) => onRecordIgnore(root, reason)}
+        instanceCount={ids?.length ?? root.instances.length}
+        onRecord={(reason) => onRecordIgnore(root, reason, ids)}
         onCancel={onCancelIgnore}
       />
     </SheetOverlay>

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -76,10 +76,41 @@ describe("SettingsScreen", () => {
     expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
   });
 
-  it("closes from Done and Return to plugin", () => {
+  it("has one way out, the back arrow, and no Done, Return to Plugin or footer text", () => {
     const value = mount();
-    fireEvent.click(screen.getByRole("button", { name: "Done" }));
-    fireEvent.click(screen.getByRole("button", { name: "Return to Plugin" }));
-    expect(value.closeSettings).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole("button", { name: "Done" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Return to Plugin/i })).toBeNull();
+    expect(within(screen.getByRole("dialog")).queryByText("Avene")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    expect(value.closeSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes with Escape", () => {
+    const value = mount();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(value.closeSettings).toHaveBeenCalled();
+  });
+
+  it("leaves out the audit scope card from the accessibility tab", () => {
+    mount();
+    fireEvent.click(screen.getByRole("button", { name: /Accessibility/ }));
+    expect(screen.getByText(/4\.5:1/)).toBeInTheDocument();
+    for (const text of [
+      "Audit scope",
+      "Text contrast",
+      "Non-text UI components",
+      "Hidden layers"
+    ]) {
+      expect(screen.queryByText(text)).toBeNull();
+    }
+  });
+});
+
+describe("the profile pill", () => {
+  it("is only the initials in a circle, with no word beside it", () => {
+    mount({ settingsOpen: false });
+    const pill = screen.getByRole("button", { name: "Settings" });
+    expect(pill).toHaveTextContent(/^DG$/);
+    expect(pill.textContent).not.toMatch(/Settings/);
   });
 });

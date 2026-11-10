@@ -1,7 +1,11 @@
+import { aiAltCount } from "./alt/altLines";
 import { CHECKS_LINE } from "./fixedLines";
 import { parseFileUrl } from "./links";
 import { dateOnly } from "./text";
 import type { HandoffInput } from "./types";
+
+/** The header line that says AI-drafted alt text is in this document, kept apart so a version without alt notes can leave it out */
+export const AI_ALT_HEADER = "Includes AI-drafted alt text";
 
 /** Metadata lines, the reviewer line waits for the review gate */
 export function buildHeader(input: HandoffInput, hash: string): string[] {
@@ -14,6 +18,10 @@ export function buildHeader(input: HandoffInput, hash: string): string[] {
     lines.push(`Reviewed by ${input.reviewer.name}, ${dateOnly(input.reviewer.date)}`);
   }
   lines.push(CHECKS_LINE);
+  const drafted = aiAltCount(input.notes ?? []);
+  if (drafted > 0) {
+    lines.push(`${AI_ALT_HEADER}: ${drafted} ${drafted === 1 ? "note" : "notes"}`);
+  }
   if (!parseFileUrl(input.fileUrl)) lines.push("Links: off, no file address has been pasted");
   return lines;
 }

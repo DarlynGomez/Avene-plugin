@@ -1,3 +1,4 @@
+import { altLines } from "./alt/altLines";
 import { buildItems } from "./buildItems";
 import { findingsHash, structureHash } from "./hash";
 import { buildHeader } from "./header";
@@ -39,6 +40,11 @@ export function buildDoc(input: HandoffInput): HandoffDoc {
     ),
     ...section("changes", "Changes made in this file", changeLines(input.changes, slots)),
     ...section("notes", "Designer notes", noteLines(input.notes ?? [], slots)),
+    ...section(
+      "alt",
+      "Alt text",
+      altLines(input.notes ?? [], input.imageLayers ?? [], slots, input.reviewer)
+    ),
     ...section("questions", "Open questions", questionLines(input.questions, slots)),
     ...(advisory ? [advisory] : []),
     { id: "notCovered", title: "Not covered", lines: [NOT_COVERED_LINE] }
