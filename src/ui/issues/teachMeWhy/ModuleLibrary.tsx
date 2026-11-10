@@ -31,7 +31,7 @@ export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibrar
         ...module.learningObjectives,
         ...module.lessonParagraphs,
         ...module.keyTakeaways,
-        module.video.title,
+        module.video?.title ?? "",
         module.optionalArticle?.title ?? ""
       ]
         .join(" ")

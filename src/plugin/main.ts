@@ -123,7 +123,8 @@ function runResetStudy(): void {
 /** Normal startup: wire the message router and open the calibration UI */
 export function startCalibrationUi(): void {
   figma.ui.onmessage = handleUiMessage;
-  figma.showUI(__html__, { width: UI_WIDTH, height: UI_HEIGHT });
+  // The title is set here as well as in the manifest, so a rebuild is enough to change the frame name
+  figma.showUI(__html__, { width: UI_WIDTH, height: UI_HEIGHT, title: "Avene" });
 }
 
 if (figma.command === RESET_COMMAND) {

@@ -26,11 +26,13 @@ export function ModuleLessonView({ module }: { module: LearningModule }) {
           </p>
         ))}
       </section>
-      <section className={styles.section} aria-label="Video">
-        <h4 className={styles.heading}>Watch</h4>
-        <p className={styles.publisher}>{module.video.publisher}</p>
-        <ModuleVideo video={module.video} />
-      </section>
+      {module.video && (
+        <section className={styles.section} aria-label="Video">
+          <h4 className={styles.heading}>Watch</h4>
+          <p className={styles.publisher}>{module.video.publisher}</p>
+          <ModuleVideo video={module.video} />
+        </section>
+      )}
       <section className={styles.section} aria-label="What you will learn">
         <h4 className={styles.heading}>What you will learn</h4>
         <ul className={styles.list}>
