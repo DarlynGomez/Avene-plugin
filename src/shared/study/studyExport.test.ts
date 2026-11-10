@@ -11,6 +11,8 @@ import {
   hasCurrentExport
 } from "./studyExport";
 
+const BUILD = { commit: "abc1234", dirty: false, builtAt: "2026-11-10T13:45:21.718Z" };
+
 const rows = (count: number): SnapshotRow[] =>
   Array.from({ length: count }, (_, i) => ({
     id: `contrast:1:${i}`,
@@ -57,6 +59,7 @@ describe("buildStudyExport", () => {
     const events = buildBlockEnded(LIVE_CTX, T, rows(3));
     const file = buildStudyExport({
       exportedAt: T,
+      build: BUILD,
       session,
       events,
       adjustLog: [{ issueId: "contrast:1:1" }],
@@ -66,6 +69,7 @@ describe("buildStudyExport", () => {
     expect(file).toEqual({
       schemaVersion: STUDY_EXPORT_SCHEMA_VERSION,
       exportedAt: T,
+      build: BUILD,
       session,
       events,
       adjustLog: [{ issueId: "contrast:1:1" }],
@@ -74,9 +78,27 @@ describe("buildStudyExport", () => {
     });
   });
 
+  it("keeps the schema version at 1 with the build added beside the old fields", () => {
+    const file = buildStudyExport({
+      exportedAt: T,
+      build: BUILD,
+      session: sessionFor(LIVE_CTX),
+      events: [],
+      adjustLog: [],
+      droppedWrites: {}
+    });
+
+    expect(STUDY_EXPORT_SCHEMA_VERSION).toBe(1);
+    expect(Object.keys(file)).toEqual(
+      expect.arrayContaining(["schemaVersion", "exportedAt", "session", "events", "adjustLog"])
+    );
+    expect(file.build).toEqual(BUILD);
+  });
+
   it("has no final snapshot when taken mid block, and survives JSON", () => {
     const file = buildStudyExport({
       exportedAt: T,
+      build: BUILD,
       session: sessionFor(LIVE_CTX),
       events: [],
       adjustLog: [],

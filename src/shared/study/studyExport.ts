@@ -6,8 +6,16 @@ export const STUDY_EXPORT_SCHEMA_VERSION = 1;
 /** The Adjust log entries are stored by a plugin module and stay opaque here */
 export type AdjustLogRecord = Record<string, unknown>;
 
+/** The bundle that wrote the file, stamped when the plugin was built */
+export interface BuildStamp {
+  commit: string;
+  dirty: boolean | null;
+  builtAt: string;
+}
+
 export interface StudyExportInput {
   exportedAt: string;
+  build: BuildStamp;
   session: StudySession;
   events: readonly StudyEvent[];
   adjustLog: readonly AdjustLogRecord[];
@@ -18,6 +26,7 @@ export interface StudyExportInput {
 export interface StudyExportFile {
   schemaVersion: number;
   exportedAt: string;
+  build: BuildStamp;
   session: StudySession;
   events: readonly StudyEvent[];
   adjustLog: readonly AdjustLogRecord[];
@@ -44,6 +53,7 @@ export function buildStudyExport(input: StudyExportInput): StudyExportFile {
   return {
     schemaVersion: STUDY_EXPORT_SCHEMA_VERSION,
     exportedAt: input.exportedAt,
+    build: input.build,
     session: input.session,
     events: input.events,
     adjustLog: input.adjustLog,

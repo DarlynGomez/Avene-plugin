@@ -2,6 +2,7 @@ import type { PluginToUiMessage } from "../../shared/messageTypes";
 import { recordExport, type Clock } from "../../shared/study/sessionTransitions";
 import { buildStudyExport, exportFileName } from "../../shared/study/studyExport";
 import { loadAdjustLog } from "../adjust/adapter/adjustLogging";
+import { BUILD_INFO } from "../buildInfo";
 import { loadPersistedDropCounts } from "../study/adapter/studyLogDrops";
 import { loadStudyEvents } from "../study/adapter/studyLogStore";
 import { loadStudySession, saveStudySession } from "../study/adapter/studySessionStore";
@@ -36,6 +37,7 @@ export function exportBlock(reply: Reply, clock: Clock): void {
   const events = loadStudyEvents();
   const file = buildStudyExport({
     exportedAt: noted.session.exports.at(-1) ?? clock(),
+    build: BUILD_INFO,
     session: noted.session,
     events,
     adjustLog: loadAdjustLog() as unknown as Record<string, unknown>[],

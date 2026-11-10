@@ -396,6 +396,31 @@ describe("exporting a block through the real handlers", () => {
     expect(file.droppedWrites).toBeDefined();
   });
 
+  it("records which build wrote the file, unknown when the bundle carries no stamp", async () => {
+    const m = await modules(true);
+    await runBlock(m);
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    const ready = exportReply(replies);
+    const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
+    expect(file.build).toEqual({ commit: "unknown", dirty: null, builtAt: "unknown" });
+    expect(file.schemaVersion).toBe(1);
+  });
+
+  it("records the commit, dirty flag and build time from the bundle stamp", async () => {
+    const stamp = { commit: "223fd02", dirty: false, builtAt: "2026-11-10T13:45:21.718Z" };
+    vi.stubGlobal("__CADT_BUILD__", stamp);
+    const m = await modules(true);
+    await runBlock(m);
+    const replies: PluginToUiMessage[] = [];
+    m.study.handleStudyMessage({ type: "STUDY_EXPORT" }, (reply) => replies.push(reply));
+
+    const ready = exportReply(replies);
+    const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
+    expect(file.build).toEqual(stamp);
+  });
+
   it("notes the export on the session and lists that time in the file itself", async () => {
     const m = await modules(true);
     await runBlock(m);
