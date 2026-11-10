@@ -4,9 +4,14 @@ import type { RootSection } from "../../../shared/grouping/sectionRoots";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import { IgnoredTray } from "./IgnoredTray";
 import { RootCard } from "./RootCard";
+import { SectionAccordion } from "./SectionAccordion";
 import styles from "./ToReviewList.module.css";
 
 const EMPTY_SELECTION: ReadonlySet<string> = new Set();
+/** Issues that are open in these roots, which is what the bubble counts */
+const openIssuesIn = (roots: readonly Root[]): number =>
+  roots.reduce((sum, root) => sum + root.instances.filter((i) => i.state === "open").length, 0);
+
 const NO_OFFER: DecisionMatch = { offered: false, decision: null, reason: "no-match" };
 
 interface ToReviewListProps {
@@ -55,54 +60,65 @@ export function ToReviewList(props: ToReviewListProps) {
     );
   }
 
+  const cardList = (roots: readonly Root[]) => (
+    <ul className={styles.list}>
+      {roots.map((root) => {
+        // Ignored instances mean a decision still covers part of this root
+        const decisionOffer =
+          root.stateBreakdown.ignored || props.showOffers === false
+            ? NO_OFFER
+            : matchRootDecision(root, decisions);
+        // A partly reopened root can still hold its old decision on some instances
+        // The offer banner is for new matches, this note is for a decision already made on part of it
+        const recordedReason =
+          root.stateBreakdown.ignored && props.showOffers !== false
+            ? (decisions[root.signature]?.reason ?? null)
+            : null;
+        return (
+          <RootCard
+            key={root.signature}
+            root={root}
+            representativeIssue={issuesById.get(root.representativeIssueId)}
+            canAdjust={props.canAdjust}
+            decisionOffer={decisionOffer}
+            recordedReason={recordedReason}
+            selectedInstanceIds={props.selectedInstances[root.signature] ?? EMPTY_SELECTION}
+            onToggleInstanceSelected={(issueId) =>
+              props.onToggleInstanceSelected(root.signature, issueId)
+            }
+            onSelectAllInstances={() => props.onSelectAllInstances(root)}
+            onShowOnCanvas={() => props.onShowOnCanvas(root)}
+            onLocate={props.onLocate}
+            onAdjust={() => props.onAdjust(root.signature)}
+            onIgnore={() => props.onIgnore(root.signature)}
+            onDefer={() => props.onDefer(root)}
+            onToggleImportant={() => props.onToggleImportant(root)}
+            onApplyDecisionOffer={() =>
+              decisionOffer.decision && props.onApplyDecisionOffer(root, decisionOffer.decision)
+            }
+            onRestoreDeferred={() => props.onRestoreDeferred(root)}
+          />
+        );
+      })}
+    </ul>
+  );
+
   return (
     <div className={styles.sections}>
-      {sections.map((section) => (
-        <section key={section.key}>
-          {section.label && <h3 className={styles.sectionLabel}>{section.label}</h3>}
-          <ul className={styles.list}>
-            {section.roots.map((root) => {
-              // Ignored instances mean a decision still covers part of this root
-              const decisionOffer =
-                root.stateBreakdown.ignored || props.showOffers === false
-                  ? NO_OFFER
-                  : matchRootDecision(root, decisions);
-              // A partly reopened root can still hold its old decision on some instances
-              // The offer banner is for new matches, this note is for a decision already made on part of it
-              const recordedReason =
-                root.stateBreakdown.ignored && props.showOffers !== false
-                  ? (decisions[root.signature]?.reason ?? null)
-                  : null;
-              return (
-                <RootCard
-                  key={root.signature}
-                  root={root}
-                  representativeIssue={issuesById.get(root.representativeIssueId)}
-                  canAdjust={props.canAdjust}
-                  decisionOffer={decisionOffer}
-                  recordedReason={recordedReason}
-                  selectedInstanceIds={props.selectedInstances[root.signature] ?? EMPTY_SELECTION}
-                  onToggleInstanceSelected={(issueId) =>
-                    props.onToggleInstanceSelected(root.signature, issueId)
-                  }
-                  onSelectAllInstances={() => props.onSelectAllInstances(root)}
-                  onShowOnCanvas={() => props.onShowOnCanvas(root)}
-                  onLocate={props.onLocate}
-                  onAdjust={() => props.onAdjust(root.signature)}
-                  onIgnore={() => props.onIgnore(root.signature)}
-                  onDefer={() => props.onDefer(root)}
-                  onToggleImportant={() => props.onToggleImportant(root)}
-                  onApplyDecisionOffer={() =>
-                    decisionOffer.decision &&
-                    props.onApplyDecisionOffer(root, decisionOffer.decision)
-                  }
-                  onRestoreDeferred={() => props.onRestoreDeferred(root)}
-                />
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      {sections.map((section) =>
+        section.label ? (
+          <SectionAccordion
+            key={section.key}
+            title={section.label}
+            roots={section.roots.length}
+            issues={openIssuesIn(section.roots)}
+          >
+            {cardList(section.roots)}
+          </SectionAccordion>
+        ) : (
+          <section key={section.key}>{cardList(section.roots)}</section>
+        )
+      )}
       {(props.showTray ?? true) && (
         <IgnoredTray
           roots={props.ignoredRoots}

@@ -151,6 +151,46 @@ describe("IssuePanel", () => {
     expect(ignore?.fromDecisionOffer).toBe(false);
   });
 
+  describe("Ignore with some of the related issues ticked", () => {
+    async function open() {
+      render(<IssuePanel aiAssistanceLevel={1} />);
+      await act(async () => {
+        emit({
+          type: "ISSUES_UPDATED",
+          issues: [openIssue(), secondInstanceOfSameRoot()],
+          decisions: {}
+        });
+      });
+      fireEvent.click(screen.getByText("Related grouped issues"));
+    }
+    const record = () => {
+      fireEvent.click(screen.getByRole("button", { name: "Ignore" }));
+      fireEvent.change(screen.getByPlaceholderText("Type your reason"), {
+        target: { value: "Brand color" }
+      });
+      fireEvent.click(screen.getByRole("button", { name: "Ignore issue" }));
+      return postedMessages(posted).find((m) => m.type === "ROOT_IGNORE");
+    };
+
+    it("ignores only the ticked issues", async () => {
+      await open();
+      fireEvent.click(screen.getByRole("checkbox", { name: /Footer copy/ }));
+      expect(record()?.issueIds).toEqual(["contrast:1:2"]);
+    });
+
+    it("ignores every related issue when none are ticked, as before", async () => {
+      await open();
+      expect(record()?.issueIds).toEqual(["contrast:1:1", "contrast:1:2"]);
+    });
+
+    it("says how many it will ignore in the sheet", async () => {
+      await open();
+      fireEvent.click(screen.getByRole("checkbox", { name: /Footer copy/ }));
+      fireEvent.click(screen.getByRole("button", { name: "Ignore" }));
+      expect(screen.getByRole("dialog")).toHaveTextContent("1 layer");
+    });
+  });
+
   it("surfaces a root action failure as an alert without losing the current list", async () => {
     render(<IssuePanel aiAssistanceLevel={1} />);
     await act(async () => {

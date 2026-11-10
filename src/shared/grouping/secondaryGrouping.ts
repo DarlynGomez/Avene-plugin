@@ -27,7 +27,13 @@ export function groupByScreen(findings: readonly GroupableFinding[]): SecondaryG
   return groupBy(findings, (finding) => finding.screenId);
 }
 
-/** Buckets by severity band */
+const SEVERITY_ORDER: readonly string[] = ["high", "medium", "low"];
+
+/** Buckets by severity band, high first and low last whatever order the findings arrived in */
 export function groupBySeverity(findings: readonly GroupableFinding[]): SecondaryGroup[] {
-  return groupBy(findings, (finding) => finding.severity);
+  const rank = (key: string) => {
+    const at = SEVERITY_ORDER.indexOf(key);
+    return at === -1 ? SEVERITY_ORDER.length : at;
+  };
+  return groupBy(findings, (finding) => finding.severity).sort((a, b) => rank(a.key) - rank(b.key));
 }
