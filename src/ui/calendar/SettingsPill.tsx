@@ -11,11 +11,8 @@ export function SettingsPill() {
     <>
       <div className={styles.topRow}>
         <span className={styles.wordmark}>Avene</span>
-        <button type="button" className={styles.pill} onClick={openSettings}>
-          <span className={styles.initials} aria-hidden="true">
-            {initialsOf(userName) || "?"}
-          </span>
-          Settings
+        <button type="button" className={styles.pill} aria-label="Settings" onClick={openSettings}>
+          {initialsOf(userName) || "?"}
         </button>
       </div>
       {settingsOpen && <SettingsScreen />}
