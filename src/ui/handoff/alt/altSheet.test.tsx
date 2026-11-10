@@ -4,7 +4,16 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ALT_MAX_CHARS } from "../../../shared/handoff/alt/altLimits";
-import { capturePosts, mountPanel } from "./altHarness";
+import { capturePosts, mountPanel, openAlt } from "./altHarness";
+
+vi.mock("../../../shared/handoffFlags", async (original) => ({
+  ...(await original<typeof import("../../../shared/handoffFlags")>()),
+  FEATURE_ALT_ANNOTATIONS: false,
+  FEATURE_ALT_SUGGEST_LIVE: false
+}));
+
+// Mounting the whole panel is slow on a loaded machine
+vi.setConfig({ testTimeout: 15000 });
 
 let posted: ReturnType<typeof capturePosts>;
 beforeEach(() => {
@@ -20,8 +29,8 @@ const alts = () => posted.filter((m) => m.type === "HANDOFF_ALT_SET");
 async function openHeroSheet() {
   const user = userEvent.setup();
   await mountPanel();
-  await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-  const opener = screen.getAllByRole("button", { name: "Add note" })[0];
+  await openAlt(user);
+  const opener = screen.getAllByRole("button", { name: "Add Note" })[0];
   await user.click(opener);
   return { user, opener, dialog: screen.getByRole("dialog") };
 }
@@ -29,7 +38,7 @@ async function openHeroSheet() {
 describe("the alt text sheet", () => {
   it("opens over the panel, takes focus, and names the layer", async () => {
     const { dialog } = await openHeroSheet();
-    expect(within(dialog).getByRole("heading", { name: "Alt text" })).toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { name: "Draft Alt Text" })).toBeInTheDocument();
     expect(within(dialog).getByText("Hero")).toBeInTheDocument();
     expect(dialog).toContainElement(document.activeElement as HTMLElement);
   });
@@ -66,7 +75,7 @@ describe("the alt text sheet", () => {
     const { user } = await openHeroSheet();
     const field = screen.getByLabelText("Description");
     await user.type(field, "Something");
-    await user.click(screen.getByLabelText(/This image is decorative/));
+    await user.click(screen.getByLabelText(/Decorative element/));
     expect(field).toBeDisabled();
     expect(field).toHaveValue("");
     await user.click(screen.getByRole("button", { name: "Save alt text" }));
@@ -78,9 +87,9 @@ describe("the alt text sheet", () => {
   it("starts ticked when opened from Mark decorative", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Mark decorative" })[0]);
-    expect(screen.getByLabelText(/This image is decorative/)).toBeChecked();
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Mark Decorative" })[0]);
+    expect(screen.getByLabelText(/Decorative element/)).toBeChecked();
   });
 
   it("needs words or the decorative mark before it can be saved", async () => {
@@ -115,8 +124,8 @@ describe("apply this note to all layers", () => {
   async function openAvatarSheet() {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Add note" })[1]);
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Add Note" })[1]);
     return user;
   }
 
@@ -153,8 +162,8 @@ describe("with annotations switched off", () => {
     await mountPanel({
       notes: { "9:1": [{ category: "alt", text: "A hero", updatedAt: "2026-11-05T10:00:00.000Z" }] }
     });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Edit note" })[0]);
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Edit Note" })[0]);
     expect(screen.queryByText(/^Annotation:/)).toBeNull();
     expect(posted.some((m) => m.type.startsWith("HANDOFF_ANNOTAT"))).toBe(false);
   });

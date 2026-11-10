@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { capturePosts, layer, mountPanel } from "./altHarness";
+import { capturePosts, layer, mountPanel, openAlt } from "./altHarness";
 
 let posted: ReturnType<typeof capturePosts>;
 beforeEach(() => {
@@ -14,45 +14,56 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const checkSelect = () => screen.getByRole("combobox", { name: "Check" });
+const header = (name: RegExp) => screen.getByRole("button", { name });
+const contrastHeader = () => header(/Color & Contrast/);
+const altHeader = () => header(/Alt Text & Media Descriptions/);
+const altBody = () =>
+  document.getElementById(altHeader().getAttribute("aria-controls") ?? "") as HTMLElement;
 
-describe("the check dropdown", () => {
-  it("is there when handoff is on, with a count for each check", async () => {
+describe("the two sections", () => {
+  it("are rows with a name, a bubble that holds the count, and an arrow", async () => {
     await mountPanel();
-    expect(within(checkSelect()).getByRole("option", { name: "All checks" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("option", { name: "Color & Contrast (1 root • 1 issue)" })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("option", { name: "Alt text & Media Descriptions (2 roots • 3 issues)" })
-    ).toBeInTheDocument();
+    expect(within(contrastHeader()).getByText("1 root • 1 issue")).toBeInTheDocument();
+    expect(within(altHeader()).getByText("2 roots • 3 issues")).toBeInTheDocument();
+    expect(contrastHeader()).toHaveAttribute("aria-expanded", "true");
+    expect(altHeader()).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("is not in the page while a study session is running", async () => {
+  it("are not in the page while a study session is running", async () => {
     await mountPanel({ study: true });
-    expect(screen.queryByRole("combobox", { name: "Check" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Alt Text & Media Descriptions/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Color & Contrast/ })).toBeNull();
     expect(posted.filter((m) => m.type.startsWith("HANDOFF"))).toEqual([]);
   });
 
-  it("is a native select, reached by Tab and changed with the keyboard", async () => {
+  it("open and close with a click or the keyboard, each on its own", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    checkSelect().focus();
-    await user.keyboard("{ArrowDown}");
-    expect(checkSelect()).toHaveFocus();
-    await user.selectOptions(checkSelect(), "alt");
-    expect(
-      screen.getByText("3 image layers need an alt text note across 2 screens.")
-    ).toBeInTheDocument();
+    altHeader().focus();
+    await user.keyboard("{Enter}");
+    expect(altHeader()).toHaveAttribute("aria-expanded", "true");
+    expect(contrastHeader()).toHaveAttribute("aria-expanded", "true");
+    await user.click(contrastHeader());
+    expect(contrastHeader()).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("sage/muted on #FFFFFF")).toBeNull();
+    await user.keyboard(" ");
+    expect(contrastHeader()).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
   });
 
-  it("forgets the choice when the panel is closed, it is kept for the session only", async () => {
+  it("keep what is open for the session only, so a new panel starts as it did", async () => {
     const user = userEvent.setup();
     const { unmount } = await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     unmount();
     await mountPanel();
-    expect(checkSelect()).toHaveValue("all");
+    expect(altHeader()).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("show the contrast list as it was, inside their section", async () => {
+    await mountPanel();
+    expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "View All (1)" })).toBeInTheDocument();
   });
 });
 
@@ -63,27 +74,14 @@ describe("the counts", () => {
     expect(screen.getByRole("tab", { name: /Live Watch/ })).toHaveTextContent("4");
   });
 
-  it("stay apart in All checks, with the alt text section under the contrast list", async () => {
+  it("stay apart in the two bubbles and under the two names", async () => {
+    const user = userEvent.setup();
     await mountPanel();
-    const alt = screen.getByRole("heading", { name: "Alt text & Media Descriptions" });
-    const contrast = screen.getByText("sage/muted on #FFFFFF");
-    expect(contrast.compareDocumentPosition(alt) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByRole("option", { name: "View All (1)" })).toBeInTheDocument();
+    await openAlt(user);
     expect(
       screen.getByText("3 image layers need an alt text note across 2 screens.")
     ).toBeInTheDocument();
-  });
-
-  it("show only the contrast list for Contrast and only the alt text list for Alt text", async () => {
-    const user = userEvent.setup();
-    await mountPanel();
-    await user.selectOptions(checkSelect(), "contrast");
-    expect(screen.queryByRole("heading", { name: /Alt text/ })).toBeNull();
-    expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
-    await user.selectOptions(checkSelect(), "alt");
-    expect(screen.queryByText("sage/muted on #FFFFFF")).toBeNull();
-    expect(screen.getByRole("radiogroup", { name: "Group image layers by" })).toBeInTheDocument();
-    expect(screen.queryByRole("radiogroup", { name: "Group issues by" })).toBeNull();
+    expect(within(contrastHeader()).queryByText(/3 issues/)).toBeNull();
   });
 
   it("leave the headline as it was when no image layer needs a note", async () => {
@@ -92,11 +90,11 @@ describe("the counts", () => {
   });
 });
 
-describe("the alt text view", () => {
+describe("the alt text section", () => {
   it("says what is left in plain words, in the singular too", async () => {
     const user = userEvent.setup();
     await mountPanel({ layers: [layer("9:1", "a", "Hero")] });
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     expect(
       screen.getByText("1 image layer needs an alt text note across 1 screen.")
     ).toBeInTheDocument();
@@ -109,21 +107,21 @@ describe("the alt text view", () => {
       layers: [layer("9:1", "a", "Hero")],
       notes: { "9:1": [{ category: "alt", text: "A hero", updatedAt: at }] }
     });
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     expect(
       screen.getByText("Every image layer has a note or is marked decorative. Nice work.")
     ).toBeInTheDocument();
     cleanup();
     await mountPanel({ layers: [] });
-    await userEvent.setup().selectOptions(checkSelect(), "alt");
+    await openAlt(userEvent.setup());
     expect(screen.getByText("No image layers on this page yet.")).toBeInTheDocument();
   });
 
   it("makes one card for each picture, listing the layers and screens it is used on", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
-    const cards = screen.getAllByRole("heading", { level: 3 });
+    await openAlt(user);
+    const cards = within(altBody()).getAllByRole("heading", { level: 3 });
     expect(cards.map((c) => c.textContent)).toEqual(["Hero", "Avatar"]);
     const card = cards[1].closest("li") as HTMLElement;
     expect(card).toHaveTextContent("2 layers");
@@ -131,22 +129,28 @@ describe("the alt text view", () => {
     expect(within(card).getByText("Avatar copy")).toBeInTheDocument();
   });
 
-  it("groups by screen with the same control", async () => {
+  it("follows the one Group control: by screen it makes a section for each screen, by severity it lists by picture", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     await user.click(screen.getByRole("radio", { name: "Screen" }));
-    expect(screen.getByRole("heading", { name: "Home" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Cart" })).toBeInTheDocument();
+    expect(within(altBody()).getByRole("button", { name: /^Home/ })).toBeInTheDocument();
+    expect(within(altBody()).getByRole("button", { name: /^Cart/ })).toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "Severity" }));
+    expect(within(altBody()).queryByRole("button", { name: /^Cart/ })).toBeNull();
+    expect(
+      within(altBody())
+        .getAllByRole("heading", { level: 3 })
+        .map((c) => c.textContent)
+    ).toEqual(["Hero", "Avatar"]);
   });
 
-  it("never calls an image layer failed, missing or a violation", async () => {
+  it("never calls an image layer failed or a violation, and cites no criterion in its own lines", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     const text = document.body.textContent ?? "";
     expect(text).not.toMatch(/failed|violation/i);
-    expect(text).not.toMatch(/WCAG|\b1\.1\.1\b/);
     expect(screen.queryByText(/missing/i)).toBeNull();
   });
 });
@@ -155,7 +159,7 @@ describe("Locate", () => {
   it("selects through the plugin's own selection adapter and is not a re-encounter", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     posted.length = 0;
     await user.click(
       screen.getByRole("button", { name: "Locate all 2 layers using Avatar on the canvas" })
@@ -167,7 +171,7 @@ describe("Locate", () => {
   it("locates one layer from its own row", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(checkSelect(), "alt");
+    await openAlt(user);
     posted.length = 0;
     await user.click(screen.getByRole("button", { name: "Locate Avatar copy on the canvas" }));
     expect(posted).toEqual([{ type: "SHOW_ON_CANVAS", nodeIds: ["9:3"] }]);

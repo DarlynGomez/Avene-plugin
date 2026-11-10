@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { isAltInventoryMessage } from "../../../shared/handoff/alt/altMessages";
+import {
+  isAltPluginMessage,
+  isAltInventoryMessage,
+  type AiResetResult
+} from "../../../shared/handoff/alt/altMessages";
 import type { ImageLayer } from "../../../shared/handoff/alt/altTypes";
 import { annotationFailureText } from "../../../shared/handoff/alt/altCopy";
 import {
@@ -33,6 +37,7 @@ export function useAltMessages(available: boolean, annotationsOn: boolean) {
   const [error, setError] = useState<string | null>(null);
   const [annotationError, setAnnotationError] = useState<string | null>(null);
   const [annotationBusy, setAnnotationBusy] = useState(false);
+  const [resetResult, setResetResult] = useState<AiResetResult | null>(null);
 
   const refresh = useCallback(() => {
     if (!available) return;
@@ -56,7 +61,13 @@ export function useAltMessages(available: boolean, annotationsOn: boolean) {
     if (!available) return undefined;
     function onMessage(event: MessageEvent) {
       const message = event.data?.pluginMessage;
-      if (isAltInventoryMessage(message)) {
+      if (isAltPluginMessage(message) && message.type === "HANDOFF_AI_RESET_RESULT") {
+        // Everything a model wrote is gone, so the notes, the statuses and the saved suggestions are read again
+        setResetResult(message);
+        setStatuses({});
+        send({ type: "HANDOFF_DATA_REQUEST" });
+        send({ type: "HANDOFF_ALT_CACHE_REQUEST" });
+      } else if (isAltInventoryMessage(message)) {
         setLayers(message.layers);
       } else if (isAnnotationPluginMessage(message)) {
         if (message.type === "HANDOFF_ANNOTATION_STATUSES") {
@@ -105,6 +116,9 @@ export function useAltMessages(available: boolean, annotationsOn: boolean) {
       },
     [available, annotationsOn]
   );
+  const resetAi = useCallback(() => {
+    if (available) send({ type: "HANDOFF_AI_RESET" });
+  }, [available]);
   const locate = useCallback(
     (nodeIds: readonly string[]) => {
       if (available) send({ type: "SHOW_ON_CANVAS", nodeIds: [...nodeIds] });
@@ -120,6 +134,8 @@ export function useAltMessages(available: boolean, annotationsOn: boolean) {
     annotationError,
     annotationBusy,
     refresh,
+    resetResult,
+    resetAi,
     saveNote,
     annotate: annotationAction("HANDOFF_ANNOTATE"),
     updateAnnotation: annotationAction("HANDOFF_ANNOTATION_UPDATE"),

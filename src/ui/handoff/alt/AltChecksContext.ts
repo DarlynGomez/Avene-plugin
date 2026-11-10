@@ -1,12 +1,13 @@
 import { createContext, useContext } from "react";
 
 import type { AnnotationStatus } from "../../../shared/handoff/alt/annotationStatus";
-import type { AltCounts, AltGroupBy, AltLayerView } from "../../../shared/handoff/alt/altRoots";
+import type { AltCounts, AltLayerView } from "../../../shared/handoff/alt/altRoots";
+import type { AiResetResult } from "../../../shared/handoff/alt/altMessages";
 import type { NoteSource } from "../../../shared/handoff/noteStorage";
 import { INERT_SUGGEST, type SuggestApi } from "./suggestTypes";
 
-/** Which checks the Live Watch list shows, kept for the session and not stored */
-export type CheckChoice = "all" | "contrast" | "alt";
+/** The two big sections of the Live Watch list, which are open is kept for the session and not stored */
+export type SectionName = "contrast" | "alt";
 
 export interface AltAnswer {
   text: string;
@@ -32,10 +33,11 @@ export interface AltChecksValue {
   error: string | null;
   annotationError: string | null;
   annotationBusy: boolean;
-  check: CheckChoice;
-  setCheck: (check: CheckChoice) => void;
-  groupBy: AltGroupBy;
-  setGroupBy: (groupBy: AltGroupBy) => void;
+  /** Pictures flagged as important for this session, which are listed first */
+  pinned: ReadonlySet<string>;
+  togglePin: (imageHash: string) => void;
+  sections: Readonly<Record<SectionName, boolean>>;
+  toggleSection: (section: SectionName) => void;
   suggest: SuggestApi;
   sheet: AltSheetTarget | null;
   openSheet: (nodeId: string, decorative?: boolean) => void;
@@ -45,6 +47,9 @@ export interface AltChecksValue {
   annotate: (nodeId: string) => void;
   updateAnnotation: (nodeId: string) => void;
   removeAnnotation: (nodeId: string) => void;
+  /** Development only: clears what a model wrote, and what it cleared once it has */
+  resetAi: () => void;
+  resetResult: AiResetResult | null;
   /** Selects and zooms through the same adapter as Show on canvas, so it is not a re-encounter */
   locate: (nodeIds: readonly string[]) => void;
 }
@@ -61,10 +66,10 @@ export const INERT_ALT: AltChecksValue = {
   error: null,
   annotationError: null,
   annotationBusy: false,
-  check: "all",
-  setCheck: nothing,
-  groupBy: "root-cause",
-  setGroupBy: nothing,
+  pinned: new Set(),
+  togglePin: nothing,
+  sections: { contrast: true, alt: false },
+  toggleSection: nothing,
   suggest: INERT_SUGGEST,
   sheet: null,
   openSheet: nothing,
@@ -73,6 +78,8 @@ export const INERT_ALT: AltChecksValue = {
   annotate: nothing,
   updateAnnotation: nothing,
   removeAnnotation: nothing,
+  resetAi: nothing,
+  resetResult: null,
   locate: nothing
 };
 

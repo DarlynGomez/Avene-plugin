@@ -1,7 +1,7 @@
 import type { AltCropMessage } from "../../../shared/handoff/alt/altMessages";
 import { nodeById } from "./nodeLookup";
 
-/** The longest side of the picture sent for a suggestion, in pixels, a placeholder to tune from a measured run */
+/** Longest side sent for a suggestion in pixels, not yet checked against what a model reads */
 export const ALT_CROP_MAX_SIDE = 768;
 /** A small layer is sent larger, but never more than this, so an icon is not blown up into blur */
 const MAX_UPSCALE = 2;

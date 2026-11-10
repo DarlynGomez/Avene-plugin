@@ -45,7 +45,7 @@ interface AudiencePickerProps {
 export function AudiencePicker({ value, onChange }: AudiencePickerProps) {
   const name = useId();
   return (
-    <StepCard step={2} title="Who is it for?" aside={<em>Adapts language and code</em>}>
+    <StepCard step={2} title="Who is it for?">
       <div className={styles.grid} role="radiogroup" aria-label="Who is it for?">
         {(Object.keys(READERS) as Audience[]).map((audience) => {
           const { tag, Icon } = READERS[audience];

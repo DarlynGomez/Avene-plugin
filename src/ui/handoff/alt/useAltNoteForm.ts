@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { DEFAULT_ALT_STYLE, type AltStyle } from "../../../shared/handoff/alt/altStyles";
 import { sourceAfterEdit, type AltLayerView } from "../../../shared/handoff/alt/altRoots";
 import type { NoteSource } from "../../../shared/handoff/noteStorage";
 import { useAltChecks } from "./AltChecksContext";
@@ -17,6 +18,7 @@ export function useAltNoteForm(
   const [text, setText] = useState(layer.text);
   const [decorative, setDecorative] = useState(startDecorative || layer.status === "decorative");
   const [applyAll, setApplyAll] = useState(false);
+  const [style, setStyle] = useState<AltStyle>(DEFAULT_ALT_STYLE);
   // The suggestion the text came from, so an edit before saving is told apart from using it as it was
   const [aiOrigin, setAiOrigin] = useState<string | null>(null);
 
@@ -43,6 +45,12 @@ export function useAltNoteForm(
     setDecorative,
     applyAll,
     setApplyAll,
+    style,
+    setStyle,
+    /** Asks for a description at the chosen setting, a saved one is used if there is one */
+    generate: () => alt.suggest.suggest(layer, style),
+    /** Asks again, so the saved one for this setting is replaced */
+    regenerate: () => alt.suggest.suggest(layer, style, true),
     save,
     /** Saves the suggestion as it is, as an AI note */
     useSuggestion(suggested: string) {

@@ -1,5 +1,2 @@
-/**
- * How long the alt text field aims to stay, shown as a counter and never enforced
- * 125 characters is a common convention and not a standard, to be tuned in A4
- */
+/** Aims for this many characters, a common convention and not a standard, so it only warns */
 export const ALT_MAX_CHARS = 125;

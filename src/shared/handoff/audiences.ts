@@ -2,6 +2,7 @@ import { buildDoc } from "./buildDoc";
 import { buildItems } from "./buildItems";
 import { findDesignerTextHits } from "./designerText";
 import { structureHash } from "./hash";
+import { AI_ALT_HEADER } from "./header";
 import { CLIENT_LINE, HIGHER_UP_LINE, NOT_COVERED_LINE } from "./fixedLines";
 import { actionLines, leftLines } from "./itemLines";
 import { pmSummaryLines } from "./pmSummary";
@@ -100,7 +101,11 @@ export function buildAudienceDoc(input: HandoffInput, audience: Audience): Audie
   ];
   return {
     audience,
-    header: base.header,
+    // Only the version that prints alt notes says it holds AI-drafted ones
+    header:
+      audience === "developer"
+        ? base.header
+        : base.header.filter((line) => !line.startsWith(AI_ALT_HEADER)),
     hash: base.hash,
     structureHash: structureHash(sections[audience], slots.table()),
     sections: sections[audience],

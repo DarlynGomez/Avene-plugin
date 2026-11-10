@@ -4,13 +4,16 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ALT_BATCH_CAP } from "./suggestTypes";
-import { capturePosts, layer, mountPanel } from "./altHarness";
+import { capturePosts, layer, mountPanel, openAlt } from "./altHarness";
 import { described, emit, pluginResponder, stubServer } from "./altServers";
 
 vi.mock("../../../shared/handoffFlags", async (original) => ({
   ...(await original<typeof import("../../../shared/handoffFlags")>()),
   FEATURE_ALT_SUGGEST_LIVE: true
 }));
+
+// Several of these mount the panel twice and a loaded machine needs longer than the default
+vi.setConfig({ testTimeout: 15000 });
 
 const SUGGESTED = "Order summary icon that opens the cart";
 let posted: ReturnType<typeof capturePosts>;
@@ -31,8 +34,8 @@ const altSets = () => posted.filter((m) => m.type === "HANDOFF_ALT_SET");
 async function openHero(layers?: ReturnType<typeof layer>[]) {
   const user = userEvent.setup();
   await mountPanel(layers ? { layers } : {});
-  await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-  await user.click(screen.getAllByRole("button", { name: "Add note" })[0]);
+  await openAlt(user);
+  await user.click(screen.getAllByRole("button", { name: "Add Note" })[0]);
   return user;
 }
 
@@ -42,7 +45,7 @@ describe("Suggest for one layer", () => {
   it("shows an AI suggestion under the field and does not put it in the field or in a note", async () => {
     stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     const box = await suggestion();
     expect(within(box).getByText(SUGGESTED)).toBeInTheDocument();
     expect(within(box).getByText("AI suggestion")).toBeInTheDocument();
@@ -53,12 +56,12 @@ describe("Suggest for one layer", () => {
   it("sends the layer's picture and its size to the local server and nothing else", async () => {
     const { fetchStub } = stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     const [url, init] = fetchStub.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("http://localhost:8750/v1/alt");
     const body = JSON.parse(init.body as string);
-    expect(Object.keys(body).sort()).toEqual(["height", "image", "requestId", "width"]);
+    expect(Object.keys(body).sort()).toEqual(["height", "image", "requestId", "style", "width"]);
     expect(body.image).toBe("iVBORw==");
     expect(JSON.stringify(body)).not.toContain("Hero");
   });
@@ -66,7 +69,7 @@ describe("Suggest for one layer", () => {
   it("saves with the source ai only when Use this is pressed", async () => {
     stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     expect(altSets()).toEqual([]);
     await user.click(screen.getByRole("button", { name: "Use this" }));
@@ -79,7 +82,7 @@ describe("Suggest for one layer", () => {
   it("puts the text in the field on Edit, and saves ai if it is kept and ai_edited if it is changed", async () => {
     stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     await user.click(screen.getByRole("button", { name: "Edit" }));
     expect(screen.getByLabelText("Description")).toHaveValue(SUGGESTED);
@@ -89,10 +92,11 @@ describe("Suggest for one layer", () => {
     cleanup();
     posted.length = 0;
     const again = await openHero();
-    await again.click(screen.getByRole("button", { name: "Suggest" }));
+    await again.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     await again.click(screen.getByRole("button", { name: "Edit" }));
-    await again.type(screen.getByLabelText("Description"), " today");
+    await again.click(screen.getByLabelText("Description"));
+    await again.paste(" today");
     await again.click(screen.getByRole("button", { name: "Save alt text" }));
     expect(altSets()[0]).toMatchObject({ text: `${SUGGESTED} today`, source: "ai_edited" });
   });
@@ -100,7 +104,7 @@ describe("Suggest for one layer", () => {
   it("gives a note the designer writes the source designer, whatever was suggested", async () => {
     stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     await user.click(screen.getByLabelText("Description"));
     await user.paste("My own words");
@@ -111,7 +115,7 @@ describe("Suggest for one layer", () => {
   it("removes the suggestion on Dismiss and writes nothing", async () => {
     stubServer(() => described(SUGGESTED));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByRole("region", { name: "AI suggestion" })).toBeNull();
@@ -121,13 +125,13 @@ describe("Suggest for one layer", () => {
   it("offers a decorative suggestion without ticking anything, and saves it only after the designer confirms", async () => {
     stubServer(() => ({ kind: "decorative", text: "", reason: "ok", model: "vision:v1", ms: 5 }));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     const box = await suggestion();
     expect(within(box).getByText("This image looks decorative.")).toBeInTheDocument();
-    expect(screen.getByLabelText(/This image is decorative/)).not.toBeChecked();
+    expect(screen.getByLabelText(/Decorative element/)).not.toBeChecked();
     expect(altSets()).toEqual([]);
     await user.click(within(box).getByRole("button", { name: "Mark as decorative" }));
-    expect(screen.getByLabelText(/This image is decorative/)).toBeChecked();
+    expect(screen.getByLabelText(/Decorative element/)).toBeChecked();
     expect(altSets()).toEqual([]);
     await user.click(screen.getByRole("button", { name: "Save alt text" }));
     expect(altSets()[0]).toMatchObject({ decorative: true, text: "", source: "designer" });
@@ -138,7 +142,7 @@ describe("when there is no suggestion", () => {
   it("drops a rejected one and shows no model text", async () => {
     stubServer(() => described("Image of a very secret cafe"));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     expect(await screen.findByText("No suggestion available.")).toBeInTheDocument();
     expect(document.body.textContent).not.toContain("secret");
     expect(screen.queryByRole("region", { name: "AI suggestion" })).toBeNull();
@@ -147,7 +151,7 @@ describe("when there is no suggestion", () => {
   it("says one plain line when the model cannot tell, and an unsure reply has no text", async () => {
     stubServer(() => ({ kind: "unsure", text: "", reason: "ok", model: "m", ms: 1 }));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     expect(
       await screen.findByText(/The model could not tell what this image shows/)
     ).toBeInTheDocument();
@@ -156,7 +160,7 @@ describe("when there is no suggestion", () => {
   it("treats the server being down as normal: one plain line, no alert, and a note can still be written", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     expect(await screen.findByText(/not reachable right now/)).toBeInTheDocument();
     expect(screen.queryByRole("alert")).toBeNull();
     await user.click(screen.getByLabelText("Description"));
@@ -182,7 +186,7 @@ describe("when there is no suggestion", () => {
       }
     });
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     expect(
       await screen.findByText(/A picture of this layer could not be read/)
     ).toBeInTheDocument();
@@ -193,19 +197,25 @@ describe("a saved suggestion", () => {
   it("is kept in the file with the picture and the model after a live one", async () => {
     stubServer(() => described(SUGGESTED, "vision:v7"));
     const user = await openHero();
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     await suggestion();
     const saved = posted.filter((m) => m.type === "HANDOFF_ALT_CACHE_SET");
     expect(saved).toHaveLength(1);
     expect(saved[0].entries).toMatchObject([
-      { imageHash: "h-hero", modelId: "vision:v7", kind: "describe", text: SUGGESTED }
+      {
+        imageHash: "h-hero",
+        modelId: "vision:v7",
+        style: "concise",
+        kind: "describe",
+        text: SUGGESTED
+      }
     ]);
   });
 
   it("looks exactly like a live one and makes no call to the server", async () => {
     stubServer(() => described(SUGGESTED, "vision:v7"));
     const live = await openHero();
-    await live.click(screen.getByRole("button", { name: "Suggest" }));
+    await live.click(screen.getByRole("button", { name: "Generate with AI" }));
     const liveHtml = (await suggestion()).outerHTML;
     cleanup();
 
@@ -215,7 +225,7 @@ describe("a saved suggestion", () => {
     plugin = pluginResponder(plugin.entries);
     posted = capturePosts(plugin.handle);
     const saved = await openHero();
-    await saved.click(screen.getByRole("button", { name: "Suggest" }));
+    await saved.click(screen.getByRole("button", { name: "Generate with AI" }));
     const savedHtml = (await suggestion()).outerHTML;
     expect(savedHtml).toBe(liveHtml);
     expect(fetchStub).not.toHaveBeenCalled();
@@ -227,6 +237,7 @@ describe("a saved suggestion", () => {
       {
         imageHash: "h-avatar",
         modelId: "vision:v1",
+        style: "concise",
         kind: "describe",
         text: "A profile photo",
         at: "2026-11-05T10:00:00.000Z"
@@ -236,9 +247,9 @@ describe("a saved suggestion", () => {
     const { fetchStub } = stubServer(() => described("never asked"));
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Add note" })[1]);
-    await user.click(screen.getByRole("button", { name: "Suggest" }));
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Add Note" })[1]);
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
     expect(within(await suggestion()).getByText("A profile photo")).toBeInTheDocument();
     expect(fetchStub).not.toHaveBeenCalled();
   });
@@ -251,7 +262,7 @@ describe("Suggest for all unanswered", () => {
   async function startBatch(n: number) {
     const user = userEvent.setup();
     await mountPanel({ layers: many(n) });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
+    await openAlt(user);
     return user;
   }
 
@@ -314,6 +325,30 @@ describe("Suggest for all unanswered", () => {
   });
 });
 
+describe("the development reset", () => {
+  it("clears the suggestions held in the panel and reads the notes and the saved suggestions again", async () => {
+    stubServer(() => described(SUGGESTED));
+    const user = await openHero();
+    await user.click(screen.getByRole("button", { name: "Generate with AI" }));
+    await suggestion();
+    posted.length = 0;
+    await act(async () => {
+      emit({
+        type: "HANDOFF_AI_RESET_RESULT",
+        drafts: 0,
+        suggestions: 1,
+        notes: 0,
+        annotationsRemoved: 0,
+        annotationsLeft: 0
+      });
+    });
+    expect(screen.queryByRole("region", { name: "AI suggestion" })).toBeNull();
+    expect(posted.map((m) => m.type)).toEqual(
+      expect.arrayContaining(["HANDOFF_DATA_REQUEST", "HANDOFF_ALT_CACHE_REQUEST"])
+    );
+  });
+});
+
 describe("the label after saving", () => {
   const at = "2026-11-05T10:00:00.000Z";
   it.each([
@@ -325,9 +360,9 @@ describe("the label after saving", () => {
       layers: [layer("9:1", "a", "Hero")],
       notes: { "9:1": [{ category: "alt", text: "A hero", source, updatedAt: at }] }
     });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
+    await openAlt(user);
     expect(screen.getByText(label)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Edit note" }));
+    await user.click(screen.getByRole("button", { name: "Edit Note" }));
     expect(screen.getAllByText(label).length).toBeGreaterThan(1);
   });
 
@@ -337,7 +372,7 @@ describe("the label after saving", () => {
       layers: [layer("9:1", "a", "Hero")],
       notes: { "9:1": [{ category: "alt", text: "A hero", updatedAt: at }] }
     });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
+    await openAlt(user);
     expect(screen.queryByText(/AI-drafted/)).toBeNull();
     emit({ type: "HANDOFF_ALT_CACHE", entries: [] });
   });

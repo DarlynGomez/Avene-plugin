@@ -1,3 +1,4 @@
+import type { AltStyle } from "./altStyles";
 import { verifyAltSuggestion } from "./altVerifier";
 import type { AltRuleId } from "./altRuleTables";
 
@@ -17,6 +18,7 @@ export interface AltServerRequest {
   image: string;
   width: number;
   height: number;
+  style: AltStyle;
 }
 
 const KINDS: readonly SuggestionKind[] = ["describe", "decorative", "unsure"];

@@ -18,10 +18,11 @@ import { activeStudySession } from "../study/adapter/studySessionStore";
 
 type Reply = (message: AnnotationPluginMessage) => void;
 
-/** The annotation flag is read first so a build with it off touches no storage, not even the session */
+/** Both flags are read before the session, so a build with either off touches no storage, not even the session */
 function open(): boolean {
   return (
     FEATURE_ALT_ANNOTATIONS &&
+    FEATURE_HANDOFF &&
     annotationsAllowed(
       FEATURE_ALT_ANNOTATIONS,
       FEATURE_HANDOFF,

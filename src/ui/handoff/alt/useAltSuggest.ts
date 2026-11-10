@@ -3,18 +3,14 @@ import { useCallback, useRef, useState } from "react";
 import { SUGGEST_CAPPED, suggestionNoneLine } from "../../../shared/handoff/alt/altCopy";
 import { groupByImageHash } from "../../../shared/handoff/alt/altGroups";
 import type { AltLayerView } from "../../../shared/handoff/alt/altRoots";
-import { pickSuggestion } from "../../../shared/handoff/alt/altSuggestCache";
-import { outcomeOf, outcomeOfReply } from "../../../shared/handoff/alt/altSuggestion";
-import { askAltServer } from "./altServerClient";
-import { stateOf } from "./suggestState";
+import { DEFAULT_ALT_STYLE, type AltStyle } from "../../../shared/handoff/alt/altStyles";
 import {
   ALT_BATCH_CAP,
   INERT_SUGGEST,
   type SuggestApi,
   type SuggestionState
 } from "./suggestTypes";
-import { useAltCrop } from "./useAltCrop";
-import { useSuggestCache } from "./useSuggestCache";
+import { useResolveSuggestion } from "./useResolveSuggestion";
 
 /**
  * Suggestions for the alt text, from the ones saved in the file first and from the local server only when the live path is on
@@ -25,45 +21,9 @@ export function useAltSuggest(available: boolean, live: boolean): SuggestApi {
   const [states, setStates] = useState<Record<string, SuggestionState>>({});
   const [run, setRun] = useState<SuggestApi["run"]>(null);
   const [note, setNote] = useState<string | null>(null);
-  const model = useRef<string | null>(null);
   const abort = useRef<AbortController | null>(null);
-  const requestCrop = useAltCrop(available && live);
 
-  const { cache, keep } = useSuggestCache(available);
-
-  /** One picture: a saved suggestion if there is one, else the server; "stop" when the server cannot be reached */
-  const resolve = useCallback(
-    async (layer: AltLayerView, signal: AbortSignal): Promise<SuggestionState | "stop"> => {
-      const saved = pickSuggestion(cache.current, layer.imageHash, model.current);
-      if (saved) return stateOf(outcomeOf(saved.kind, saved.text, layer.name), true);
-      if (!live) return { status: "none", line: suggestionNoneLine("live-off") };
-      const crop = await requestCrop(layer.nodeId);
-      if (!crop.ok) return { status: "none", line: suggestionNoneLine("no-picture") };
-      const asked = await askAltServer(
-        {
-          requestId: `${layer.nodeId}-${Date.now().toString(36)}`,
-          image: crop.image,
-          width: crop.width,
-          height: crop.height
-        },
-        signal
-      );
-      if (asked.kind === "transport") return "stop";
-      const outcome = outcomeOfReply(asked.reply, layer.name);
-      model.current = asked.reply.model ?? model.current;
-      if (outcome.status === "describe" || outcome.status === "decorative") {
-        keep({
-          imageHash: layer.imageHash,
-          modelId: asked.reply.model ?? "unknown",
-          kind: outcome.status,
-          text: outcome.status === "describe" ? outcome.text : "",
-          at: new Date().toISOString()
-        });
-      }
-      return stateOf(outcome, false);
-    },
-    [live, requestCrop, keep]
-  );
+  const { resolve } = useResolveSuggestion(available, live);
 
   const finish = useCallback(() => {
     abort.current = null;
@@ -82,7 +42,11 @@ export function useAltSuggest(available: boolean, live: boolean): SuggestApi {
       setRun({ done, total: chosen.length });
       for (const group of chosen) {
         if (controller.signal.aborted) break;
-        const result = await resolve(group.layers[0] as AltLayerView, controller.signal);
+        const result = await resolve(
+          group.layers[0] as AltLayerView,
+          DEFAULT_ALT_STYLE,
+          controller.signal
+        );
         if (controller.signal.aborted) break;
         if (result === "stop") {
           setNote(suggestionNoneLine("unavailable"));
@@ -103,15 +67,17 @@ export function useAltSuggest(available: boolean, live: boolean): SuggestApi {
   );
 
   const suggest = useCallback(
-    (layer: AltLayerView) => {
+    (layer: AltLayerView, style: AltStyle = DEFAULT_ALT_STYLE, fresh = false) => {
       if (!available) return;
-      setStates((previous) => ({ ...previous, [layer.nodeId]: { status: "working" } }));
+      setStates((previous) => ({ ...previous, [layer.nodeId]: { status: "working", style } }));
       const controller = new AbortController();
-      void resolve(layer, controller.signal).then((result) =>
+      void resolve(layer, style, controller.signal, fresh).then((result) =>
         setStates((previous) => ({
           ...previous,
           [layer.nodeId]:
-            result === "stop" ? { status: "none", line: suggestionNoneLine("unavailable") } : result
+            result === "stop"
+              ? { status: "none", style, line: suggestionNoneLine("unavailable") }
+              : result
         }))
       );
     },
@@ -126,6 +92,11 @@ export function useAltSuggest(available: boolean, live: boolean): SuggestApi {
     []
   );
   const cancel = useCallback(() => abort.current?.abort(), []);
+  const clear = useCallback(() => {
+    abort.current?.abort();
+    setStates({});
+    setNote(null);
+  }, []);
 
   if (!available) return INERT_SUGGEST;
   return {
@@ -137,6 +108,7 @@ export function useAltSuggest(available: boolean, live: boolean): SuggestApi {
     suggestAll: (layers) => void runOver(layers.filter((layer) => layer.status === "unanswered")),
     prepare: (layers) => void runOver(layers),
     cancel,
-    dismiss
+    dismiss,
+    clear
   };
 }

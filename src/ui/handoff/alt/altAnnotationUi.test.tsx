@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AnnotationStatus } from "../../../shared/handoff/alt/annotationStatus";
 import type { NodeNote } from "../../../shared/handoff/noteStorage";
-import { capturePosts, emit, mountPanel } from "./altHarness";
+import { capturePosts, emit, mountPanel, openAlt } from "./altHarness";
 
 vi.mock("../../../shared/handoffFlags", async (original) => ({
   ...(await original<typeof import("../../../shared/handoffFlags")>()),
@@ -37,8 +37,8 @@ async function openSheet(status: AnnotationStatus = "none", noteOver: Partial<No
   await act(async () => {
     emit({ type: "HANDOFF_ANNOTATION_STATUSES", statuses: { "9:1": status } });
   });
-  await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-  await user.click(screen.getAllByRole("button", { name: "Edit note" })[0]);
+  await openAlt(user);
+  await user.click(screen.getAllByRole("button", { name: "Edit Note" })[0]);
   return { user, dialog: screen.getByRole("dialog") };
 }
 
@@ -152,8 +152,8 @@ describe("the annotation control", () => {
   it("does not annotate when the note is saved for all the layers", async () => {
     const user = userEvent.setup();
     await mountPanel({ notes: { "9:2": [note({ text: "A photo" })] } });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Add note" })[1]);
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Add Note" })[1]);
     posted.length = 0;
     await user.click(screen.getByLabelText(/Apply this note to all 2 layers/));
     await user.click(screen.getByLabelText("Description"));
@@ -165,8 +165,8 @@ describe("the annotation control", () => {
   it("is not there for a layer with no saved note yet", async () => {
     const user = userEvent.setup();
     await mountPanel();
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
-    await user.click(screen.getAllByRole("button", { name: "Add note" })[0]);
+    await openAlt(user);
+    await user.click(screen.getAllByRole("button", { name: "Add Note" })[0]);
     expect(screen.queryByText(/^Annotation:/)).toBeNull();
   });
 });
@@ -178,7 +178,7 @@ describe("the Annotated chip", () => {
     await act(async () => {
       emit({ type: "HANDOFF_ANNOTATION_STATUSES", statuses: { "9:1": "in-sync" } });
     });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Check" }), "alt");
+    await openAlt(user);
     expect(screen.getByText("Annotated")).toBeInTheDocument();
     await act(async () => {
       emit({ type: "HANDOFF_ANNOTATION_STATUSES", statuses: { "9:1": "out-of-date" } });
@@ -190,7 +190,7 @@ describe("the Annotated chip", () => {
 describe("in a study session", () => {
   it("has no annotation control, no sheet and sends no annotation message", async () => {
     await mountPanel({ study: true, notes: { "9:1": [note()] } });
-    expect(screen.queryByRole("combobox", { name: "Check" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Alt Text & Media Descriptions/ })).toBeNull();
     expect(screen.queryByText(/^Annotation:/)).toBeNull();
     expect(annotationPosts()).toEqual([]);
   });

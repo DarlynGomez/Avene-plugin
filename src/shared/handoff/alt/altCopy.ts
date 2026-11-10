@@ -58,7 +58,8 @@ export function suggestionNoneLine(reason: string): string {
     rejected: "",
     "rate-limited": "The service is busy. Try again in a minute.",
     timeout: "That took too long.",
-    unavailable: "The suggestion service is not reachable right now. You can still write notes yourself.",
+    unavailable:
+      "The suggestion service is not reachable right now. You can still write notes yourself.",
     "no-picture": "A picture of this layer could not be read."
   };
   const extra = why[reason] ?? "";
@@ -68,3 +69,9 @@ export function suggestionNoneLine(reason: string): string {
 export const SUGGEST_CAPPED = (done: number) =>
   `Stopped after ${done} images. Run it again for the rest.`;
 
+export const ALT_WHY_REQUIREMENT = "WCAG 1.1.1 (Level A)";
+
+/** Why a picture with no description is raised, with the layer's own name as the example */
+export function altWhyText(name: string): string {
+  return `Under WCAG 2.1 Criterion 1.1.1 (Non-text Content), images presented to users must have a meaningful text description or be explicitly marked decorative so assistive devices do not announce raw filenames like "${name}".`;
+}

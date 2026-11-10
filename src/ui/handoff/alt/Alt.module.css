@@ -92,33 +92,11 @@
   list-style: none;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3);
-  border: var(--size-hairline) solid var(--color-line);
-  border-radius: var(--radius-tile);
-  background: var(--color-card);
-}
-
 .head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--space-2);
-}
-
-.thumb {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: calc(var(--space-5) + var(--space-2));
-  height: calc(var(--space-5) + var(--space-2));
-  border: var(--size-hairline) solid var(--color-line);
-  border-radius: var(--radius-button);
-  background: var(--color-background);
-  color: var(--color-muted);
 }
 
 .titleBlock {
@@ -159,11 +137,6 @@
   font-size: var(--font-size-severity-label);
 }
 
-.statusNeeds {
-  border-color: var(--color-ink);
-  color: var(--color-ink);
-}
-
 .chip {
   border-color: var(--color-success-border);
   background: var(--color-success-bg);
@@ -179,13 +152,6 @@
   overflow-wrap: anywhere;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.primary,
 .secondary,
 .small {
   display: inline-flex;
@@ -218,42 +184,9 @@
   padding: 0 var(--space-2);
 }
 
-.primary:hover,
 .secondary:hover,
 .small:hover {
   border-color: var(--color-ink);
-}
-
-.disclosure {
-  border-top: var(--size-hairline) solid var(--color-line);
-  padding-top: var(--space-2);
-}
-
-.summary {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--color-ink);
-  font-family: var(--font-body);
-  font-size: var(--font-size-helper);
-  cursor: pointer;
-  list-style: none;
-}
-
-.summary::-webkit-details-marker {
-  display: none;
-}
-
-.disclosure[open] .closed,
-.disclosure:not([open]) .open {
-  display: none;
-}
-
-.count {
-  padding: 0 var(--space-1);
-  border-radius: var(--radius-pill);
-  background: var(--color-severity-low-bg);
-  font-size: var(--font-size-severity-label);
 }
 
 .layers {
@@ -293,10 +226,8 @@
   gap: var(--space-1);
 }
 
-.primary:focus-visible,
 .secondary:focus-visible,
-.small:focus-visible,
-.summary:focus-visible {
+.small:focus-visible {
   outline: var(--size-focus-ring) solid var(--color-focus-ring);
   outline-offset: var(--size-focus-offset);
 }

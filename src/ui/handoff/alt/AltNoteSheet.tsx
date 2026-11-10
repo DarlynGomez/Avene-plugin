@@ -32,6 +32,9 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
   const dirty =
     form.text.trim() !== layer.text.trim() || form.decorative !== (layer.status === "decorative");
   const status = alt.statuses[layer.nodeId] ?? "none";
+  // A suggestion belongs to the setting it was asked with, so only that setting shows it
+  const found = alt.suggest.states[layer.nodeId];
+  const shown = found?.style === form.style ? found : undefined;
 
   // Escape closes only this sheet, so it does not also put a canvas selection back
   function onKeyDown(event: KeyboardEvent) {
@@ -49,7 +52,12 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
       aria-labelledby={`${id}-t`}
       onKeyDown={onKeyDown}
     >
-      <SheetHeader id={`${id}-t`} title="Alt text" subtitle={layer.name} onClose={alt.closeSheet} />
+      <SheetHeader
+        id={`${id}-t`}
+        title="Draft Alt Text"
+        subtitle={layer.name}
+        onClose={alt.closeSheet}
+      />
       {layer.source !== "designer" && (
         <p className={styles.aiLabel}>
           {layer.source === "ai" ? "AI-drafted" : "AI-drafted, edited"}
@@ -58,12 +66,17 @@ export function AltNoteSheet({ layer, group, startDecorative }: AltNoteSheetProp
       <AltNoteFields
         text={form.text}
         decorative={form.decorative}
+        style={form.style}
+        working={shown?.status === "working"}
+        live={alt.suggest.live}
         onText={form.setText}
         onDecorative={form.setDecorative}
+        onStyle={form.setStyle}
+        onGenerate={form.generate}
+        onRegenerate={form.regenerate}
       />
       <AltSuggestBox
-        state={alt.suggest.states[layer.nodeId]}
-        onSuggest={() => alt.suggest.suggest(layer)}
+        state={shown}
         onUse={form.useSuggestion}
         onEdit={form.editSuggestion}
         onDecorative={form.markDecorative}

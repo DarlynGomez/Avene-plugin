@@ -13,6 +13,7 @@ const entry = (
 ): CachedSuggestion => ({
   imageHash: hash,
   modelId: "vision:v1",
+  style: "concise",
   kind: "describe",
   text,
   at

@@ -1,4 +1,5 @@
-import { act, render } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 import { vi } from "vitest";
 
 import type { ImageLayer } from "../../../shared/handoff/alt/altTypes";
@@ -126,4 +127,9 @@ export async function mountPanel({
     emit(dataMessage(notes));
   });
   return view;
+}
+
+/** Opens the Alt Text & Media Descriptions section, which starts closed */
+export async function openAlt(user: UserEvent): Promise<void> {
+  await user.click(screen.getByRole("button", { name: /Alt Text & Media Descriptions/ }));
 }

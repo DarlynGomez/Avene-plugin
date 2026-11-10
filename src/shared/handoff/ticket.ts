@@ -5,7 +5,7 @@ import { suggestColor } from "./suggestFix";
 import { formatRatio, plural } from "./text";
 import type { HandoffInput, HandoffItem } from "./types";
 
-/** Placeholder, tune in H4 after looking at a real file with a large root */
+/** Layer links shown in one ticket before the rest are counted */
 export const TICKET_LINK_CAP = 10;
 
 /** A template convention for acceptance criteria, not a measured figure */

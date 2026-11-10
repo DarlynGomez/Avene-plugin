@@ -15,6 +15,8 @@ export type AltUiMessage =
   /** A picture of one layer for the suggestion, a read of the file and nothing written */
   | { type: "HANDOFF_ALT_CROP_REQUEST"; nodeId: string }
   | { type: "HANDOFF_ALT_CACHE_REQUEST" }
+  /** Development only: clears everything a model wrote so a demo can start again */
+  | { type: "HANDOFF_AI_RESET" }
   | { type: "HANDOFF_ALT_CACHE_SET"; entries: CachedSuggestion[] };
 
 export interface AltInventoryMessage {
@@ -43,14 +45,29 @@ export interface AltCacheMessage {
   error?: string;
 }
 
-export type AltPluginMessage = AltInventoryMessage | AltCropMessage | AltCacheMessage;
+/** What the reset cleared, so the panel can say it */
+export interface AiResetResult {
+  type: "HANDOFF_AI_RESET_RESULT";
+  drafts: number;
+  suggestions: number;
+  notes: number;
+  annotationsRemoved: number;
+  annotationsLeft: number;
+}
+
+export type AltPluginMessage =
+  AltInventoryMessage | AltCropMessage | AltCacheMessage | AiResetResult;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
 export function isAltUiMessage(value: unknown): value is AltUiMessage {
   if (!isRecord(value)) return false;
-  if (value.type === "HANDOFF_ALT_INVENTORY_REQUEST" || value.type === "HANDOFF_ALT_CACHE_REQUEST")
+  if (
+    value.type === "HANDOFF_ALT_INVENTORY_REQUEST" ||
+    value.type === "HANDOFF_ALT_CACHE_REQUEST" ||
+    value.type === "HANDOFF_AI_RESET"
+  )
     return true;
   if (value.type === "HANDOFF_ALT_CROP_REQUEST") return typeof value.nodeId === "string";
   if (value.type === "HANDOFF_ALT_CACHE_SET") return Array.isArray(value.entries);
@@ -73,5 +90,6 @@ export function isAltPluginMessage(value: unknown): value is AltPluginMessage {
     return typeof value.nodeId === "string" && typeof value.ok === "boolean";
   }
   if (value.type === "HANDOFF_ALT_CACHE") return Array.isArray(value.entries);
+  if (value.type === "HANDOFF_AI_RESET_RESULT") return typeof value.drafts === "number";
   return isAltInventoryMessage(value);
 }

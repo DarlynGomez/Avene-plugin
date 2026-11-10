@@ -1,13 +1,13 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { FEATURE_ALT_SUGGEST_LIVE } from "../../../shared/handoffFlags";
-import { altCounts, altLayerViews, type AltGroupBy } from "../../../shared/handoff/alt/altRoots";
+import { altCounts, altLayerViews } from "../../../shared/handoff/alt/altRoots";
 import { useHandoffAvailable } from "../useHandoffAvailable";
 import {
   AltChecksContext,
   type AltChecksValue,
   type AltSheetTarget,
-  type CheckChoice
+  type SectionName
 } from "./AltChecksContext";
 import { useAltMessages } from "./useAltMessages";
 import { useAltSuggest } from "./useAltSuggest";
@@ -24,20 +24,35 @@ export function AltChecksProvider({ children }: { children: ReactNode }) {
   const { layers, notes, refresh } = messages;
   // The live path also needs handoff to be available, which is false in a study
   const suggest = useAltSuggest(available, available && FEATURE_ALT_SUGGEST_LIVE);
-  const [check, setCheckState] = useState<CheckChoice>("all");
-  const [groupBy, setGroupBy] = useState<AltGroupBy>("root-cause");
+  const [pinned, setPinned] = useState<ReadonlySet<string>>(new Set());
+  const [sections, setSections] = useState({ contrast: true, alt: false });
   const [sheet, setSheet] = useState<AltSheetTarget | null>(null);
+
+  const { clear } = suggest;
+  // After a reset the suggestions held in the panel go too, or they would be shown again from memory
+  useEffect(() => {
+    if (messages.resetResult) clear();
+  }, [messages.resetResult, clear]);
 
   const views = useMemo(() => altLayerViews(layers ?? [], notes), [layers, notes]);
   const counts = useMemo(() => altCounts(views), [views]);
 
-  const setCheck = useCallback(
-    (next: CheckChoice) => {
-      setCheckState(next);
-      // A look at the page on request, so choosing the check is also how the list is brought up to date
-      if (next !== "contrast") refresh();
+  const toggleSection = useCallback(
+    (name: SectionName) => {
+      setSections((previous) => ({ ...previous, [name]: !previous[name] }));
+      // A look at the page on request, so opening the section is also how its list is brought up to date
+      if (name === "alt" && !sections.alt) refresh();
     },
-    [refresh]
+    [refresh, sections.alt]
+  );
+  const togglePin = useCallback(
+    (hash: string) =>
+      setPinned((previous) => {
+        const next = new Set(previous);
+        if (!next.delete(hash)) next.add(hash);
+        return next;
+      }),
+    []
   );
   const openSheet = useCallback(
     (nodeId: string, decorative = false) => setSheet({ nodeId, decorative }),
@@ -55,10 +70,10 @@ export function AltChecksProvider({ children }: { children: ReactNode }) {
     error: messages.error,
     annotationError: messages.annotationError,
     annotationBusy: messages.annotationBusy,
-    check,
-    setCheck,
-    groupBy,
-    setGroupBy,
+    pinned,
+    togglePin,
+    sections,
+    toggleSection,
     suggest,
     sheet,
     openSheet,
@@ -67,6 +82,8 @@ export function AltChecksProvider({ children }: { children: ReactNode }) {
     annotate: messages.annotate,
     updateAnnotation: messages.updateAnnotation,
     removeAnnotation: messages.removeAnnotation,
+    resetAi: messages.resetAi,
+    resetResult: messages.resetResult,
     locate: messages.locate
   };
   return <AltChecksContext.Provider value={value}>{children}</AltChecksContext.Provider>;

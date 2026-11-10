@@ -1,12 +1,17 @@
 import type { HandoffPluginMessage, HandoffUiMessage } from "../../shared/handoff/handoffMessages";
 import { setMeta } from "../../shared/handoff/metaStorage";
-import { FEATURE_HANDOFF, handoffAllowed } from "../../shared/handoffFlags";
+import {
+  FEATURE_ALT_ANNOTATIONS,
+  FEATURE_HANDOFF,
+  handoffAllowed
+} from "../../shared/handoffFlags";
 import { isStudyActive } from "../../shared/study/studyActive";
 import { saveDraftCache } from "../handoff/adapter/draftCacheStore";
 import { saveFileUrl, loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta, saveHandoffMeta } from "../handoff/adapter/metaStore";
 import { exportAltCrop } from "../handoff/adapter/altCrop";
 import { loadSuggestions, saveSuggestions } from "../handoff/adapter/altSuggestStore";
+import { resetAiContent } from "../handoff/adapter/resetAiContent";
 import { listImageLayers } from "../handoff/adapter/imageInventory";
 import { setAltNote, setNodeNotes } from "../handoff/adapter/notesStore";
 import { activeStudySession } from "../study/adapter/studySessionStore";
@@ -29,6 +34,10 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
       return;
     case "HANDOFF_ALT_CROP_REQUEST":
       reply(await exportAltCrop(message.nodeId));
+      return;
+    case "HANDOFF_AI_RESET":
+      // An annotation is taken off only where annotations are allowed, which handoff being open already settles for a study
+      reply(await resetAiContent(FEATURE_ALT_ANNOTATIONS));
       return;
     case "HANDOFF_ALT_CACHE_REQUEST":
       reply({ type: "HANDOFF_ALT_CACHE", entries: loadSuggestions() });

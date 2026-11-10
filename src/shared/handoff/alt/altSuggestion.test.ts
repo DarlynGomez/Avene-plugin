@@ -17,6 +17,7 @@ const at = (n: number) => `2026-11-05T10:${String(n % 60).padStart(2, "0")}:00.0
 const entry = (hash: string, over: Partial<CachedSuggestion> = {}): CachedSuggestion => ({
   imageHash: hash,
   modelId: "vision:v1",
+  style: "concise",
   kind: "describe",
   text: "Order summary icon that opens the cart",
   at: at(1),
@@ -111,7 +112,8 @@ describe("the saved suggestions", () => {
     expect(next[0].text).toBe("A newer sentence");
     expect(putSuggestion(next, entry("a", { modelId: "vision:v2" }))).toHaveLength(2);
     expect(cleanSuggestions([entry("a"), entry("a")])).toHaveLength(1);
-    expect(cacheKey("a", "m")).toBe("a|m");
+    expect(cacheKey("a", "m")).toBe("a|m|concise");
+    expect(cacheKey("a", "m", "functional")).toBe("a|m|functional");
   });
 
   it("are found by picture, and by model when the model is known, the newest first otherwise", () => {

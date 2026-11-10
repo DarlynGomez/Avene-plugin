@@ -67,6 +67,7 @@ const SUGGEST: HandoffUiMessage[] = [
       {
         imageHash: "h",
         modelId: "m",
+        style: "concise",
         kind: "describe",
         text: "Order summary icon",
         at: "2026-11-05T10:00:00.000Z"

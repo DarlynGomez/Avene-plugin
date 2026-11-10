@@ -1,16 +1,22 @@
 import { fits } from "../limits";
+import { DEFAULT_ALT_STYLE, isAltStyle, type AltStyle } from "./altStyles";
 import { verifyAltSuggestion } from "./altVerifier";
 
-/** One saved suggestion for a picture, found by the picture and the model that wrote it */
+/** One saved suggestion for a picture, found by the picture, the model that wrote it and the setting it was asked with */
 export interface CachedSuggestion {
   imageHash: string;
   modelId: string;
+  style: AltStyle;
   kind: "describe" | "decorative";
   text: string;
   at: string;
 }
 
-export const cacheKey = (imageHash: string, modelId: string): string => `${imageHash}|${modelId}`;
+export const cacheKey = (
+  imageHash: string,
+  modelId: string,
+  style: AltStyle = DEFAULT_ALT_STYLE
+): string => `${imageHash}|${modelId}|${style}`;
 
 function readEntry(value: unknown): CachedSuggestion | null {
   if (typeof value !== "object" || value === null) return null;
@@ -18,10 +24,13 @@ function readEntry(value: unknown): CachedSuggestion | null {
   if (typeof raw.imageHash !== "string" || raw.imageHash === "") return null;
   if (typeof raw.modelId !== "string" || raw.modelId === "") return null;
   if (typeof raw.at !== "string" || typeof raw.text !== "string") return null;
+  // A suggestion saved before there were settings was a concise one
+  const style = isAltStyle(raw.style) ? raw.style : DEFAULT_ALT_STYLE;
   if (raw.kind === "decorative") {
     return {
       imageHash: raw.imageHash,
       modelId: raw.modelId,
+      style,
       kind: "decorative",
       text: "",
       at: raw.at
@@ -32,6 +41,7 @@ function readEntry(value: unknown): CachedSuggestion | null {
   return {
     imageHash: raw.imageHash,
     modelId: raw.modelId,
+    style,
     kind: "describe",
     text: raw.text.trim(),
     at: raw.at
@@ -42,7 +52,7 @@ export function cleanSuggestions(values: readonly unknown[]): CachedSuggestion[]
   const byKey = new Map<string, CachedSuggestion>();
   for (const value of values) {
     const entry = readEntry(value);
-    if (entry) byKey.set(cacheKey(entry.imageHash, entry.modelId), entry);
+    if (entry) byKey.set(cacheKey(entry.imageHash, entry.modelId, entry.style), entry);
   }
   return [...byKey.values()];
 }
@@ -85,7 +95,9 @@ export function putSuggestion(
 ): CachedSuggestion[] {
   return [
     ...entries.filter(
-      (e) => cacheKey(e.imageHash, e.modelId) !== cacheKey(entry.imageHash, entry.modelId)
+      (e) =>
+        cacheKey(e.imageHash, e.modelId, e.style) !==
+        cacheKey(entry.imageHash, entry.modelId, entry.style)
     ),
     entry
   ];
@@ -95,10 +107,14 @@ export function putSuggestion(
 export function pickSuggestion(
   entries: readonly CachedSuggestion[],
   imageHash: string,
-  modelId: string | null
+  modelId: string | null,
+  style: AltStyle = DEFAULT_ALT_STYLE
 ): CachedSuggestion | null {
   const matches = entries.filter(
-    (entry) => entry.imageHash === imageHash && (modelId === null || entry.modelId === modelId)
+    (entry) =>
+      entry.imageHash === imageHash &&
+      entry.style === style &&
+      (modelId === null || entry.modelId === modelId)
   );
   return matches.sort((a, b) => (a.at < b.at ? 1 : -1))[0] ?? null;
 }

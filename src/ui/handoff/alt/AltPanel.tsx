@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useMemo } from "react";
 
 import {
   ALT_EMPTY_ALL_SET,
@@ -6,22 +6,32 @@ import {
   ALT_LOADING,
   altLine
 } from "../../../shared/handoff/alt/altCopy";
-import { sectionAltRoots } from "../../../shared/handoff/alt/altRoots";
+import { sectionAltRoots, type AltGroupBy } from "../../../shared/handoff/alt/altRoots";
+import type { GroupBy } from "../../../shared/grouping/sectionRoots";
+import { SectionAccordion } from "../../issues/components/SectionAccordion";
 import { useAltChecks } from "./AltChecksContext";
 import { AltCard } from "./AltCard";
 import { AltSuggestBar } from "./AltSuggestBar";
 import styles from "./Alt.module.css";
 
-interface AltPanelProps {
-  /** Under the contrast list in All checks it gets a heading of its own, so the two read as separate */
-  heading?: boolean;
-}
+/** The panel's one Group control has three choices, an image has no severity so it is listed by picture */
+const altGroupOf = (groupBy: GroupBy): AltGroupBy =>
+  groupBy === "screen" ? "screen" : "root-cause";
 
-/** The alt text view, its own line and its own count, never added into the contrast numbers */
-export function AltPanel({ heading = false }: AltPanelProps) {
-  const id = useId();
-  const { views, counts, groupBy, ready, error } = useAltChecks();
-  const sections = useMemo(() => sectionAltRoots(views, groupBy), [views, groupBy]);
+/** The alt text list, its own line and its own count, never added into the contrast numbers */
+export function AltPanel({ groupBy }: { groupBy: GroupBy }) {
+  const { views, counts, ready, error, pinned } = useAltChecks();
+  const sections = useMemo(
+    () =>
+      sectionAltRoots(views, altGroupOf(groupBy)).map((section) => ({
+        ...section,
+        // Flagged pictures come first, the rest keep their order
+        roots: [...section.roots].sort(
+          (a, b) => Number(pinned.has(b.imageHash)) - Number(pinned.has(a.imageHash))
+        )
+      })),
+    [views, groupBy, pinned]
+  );
 
   let line = altLine(counts.layers, counts.screens);
   if (!ready) line = ALT_LOADING;
@@ -29,10 +39,7 @@ export function AltPanel({ heading = false }: AltPanelProps) {
   else if (counts.layers === 0) line = ALT_EMPTY_ALL_SET;
 
   return (
-    <section className={`${styles.panel} ${heading ? styles.separate : ""}`} aria-labelledby={id}>
-      <h2 id={id} className={heading ? styles.heading : styles.srOnly}>
-        Alt text &amp; Media Descriptions
-      </h2>
+    <div className={styles.panel}>
       <p className={styles.line} role="status">
         {line}
       </p>
@@ -42,16 +49,27 @@ export function AltPanel({ heading = false }: AltPanelProps) {
           {error}
         </p>
       )}
-      {sections.map((section) => (
-        <div key={section.key} className={styles.section}>
-          {section.label && <h3 className={styles.sectionLabel}>{section.label}</h3>}
+      {sections.map((section) => {
+        const cards = (
           <ul className={styles.list}>
             {section.roots.map((root) => (
               <AltCard key={`${section.key}:${root.imageHash}`} root={root} />
             ))}
           </ul>
-        </div>
-      ))}
-    </section>
+        );
+        if (!section.label) return <div key={section.key}>{cards}</div>;
+        const open = section.roots.filter((root) => root.unanswered > 0);
+        return (
+          <SectionAccordion
+            key={section.key}
+            title={section.label}
+            roots={open.length}
+            issues={open.reduce((sum, root) => sum + root.unanswered, 0)}
+          >
+            {cards}
+          </SectionAccordion>
+        );
+      })}
+    </div>
   );
 }
