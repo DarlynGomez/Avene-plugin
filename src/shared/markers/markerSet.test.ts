@@ -120,14 +120,37 @@ describe("buildMarkerSet", () => {
     expect(markers).toEqual([]);
   });
 
-  it("gives a deferred or decided root no marker at all", () => {
+  it("gives a decided root no marker at all", () => {
     const roots = [
-      root("r1", [instance("1:1", "A", "deferred", 0)], "deferred"),
       root("r2", [instance("1:2", "A", "ignored", 1)], "decided"),
       root("r3", [instance("1:3", "A", "resolved", 2)], "decided")
     ];
 
     expect(buildMarkerSet(roots, "A", [])).toEqual([]);
+  });
+
+  it("keeps a marker on a deferred root, flagged so it is drawn faded", () => {
+    const roots = [root("r1", [instance("1:1", "A", "deferred", 0)], "deferred")];
+
+    const [marker] = buildMarkerSet(roots, "A", []);
+    expect(marker).toMatchObject({ signature: "r1", nodeId: "1:1", deferred: true });
+  });
+
+  it("does not flag a marker of a root that is open", () => {
+    const [marker] = buildMarkerSet([root("r1", [instance("1:1", "A", "open", 0)])], "A", []);
+    expect(marker.deferred).toBeUndefined();
+  });
+
+  it("puts a deferred root's marker only on a deferred layer of the screen", () => {
+    const roots = [
+      root(
+        "r1",
+        [instance("1:1", "B", "deferred", 0), instance("1:2", "A", "deferred", 1)],
+        "deferred"
+      )
+    ];
+    expect(buildMarkerSet(roots, "A", []).map((m) => m.nodeId)).toEqual(["1:2"]);
+    expect(buildMarkerSet(roots, "C", [])).toEqual([]);
   });
 
   it("prefers the layer the designer selected most recently among the eligible ones", () => {

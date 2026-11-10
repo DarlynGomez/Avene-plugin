@@ -114,7 +114,7 @@ describe("showing markers", () => {
     expect(t.shows.at(-1)).toEqual({ screen: "A", nodes: [] });
   });
 
-  it("takes a deferred root's marker away as soon as the list says it is deferred", async () => {
+  it("keeps a deferred root's marker, as a faded one, as soon as the list says it is deferred", async () => {
     const t = setup();
     t.controller.onRoots(ROOTS);
     await t.controller.idle();
@@ -124,7 +124,7 @@ describe("showing markers", () => {
     ]);
     await t.controller.idle();
 
-    expect(t.shows.at(-1)?.nodes).toEqual([]);
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1"]);
   });
 
   it("writes nothing when no screen is known yet, then draws once one settles", async () => {
