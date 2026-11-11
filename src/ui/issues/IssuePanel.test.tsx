@@ -172,22 +172,22 @@ describe("IssuePanel", () => {
       return postedMessages(posted).find((m) => m.type === "ROOT_IGNORE");
     };
 
-    it("ignores only the ticked issues", async () => {
+    it("ignores the whole root even when only some issues are ticked", async () => {
       await open();
       fireEvent.click(screen.getByRole("checkbox", { name: /Footer copy/ }));
-      expect(record()?.issueIds).toEqual(["contrast:1:2"]);
+      expect(record()?.issueIds).toEqual(["contrast:1:1", "contrast:1:2"]);
     });
 
-    it("ignores every related issue when none are ticked, as before", async () => {
+    it("ignores every related issue when none are ticked", async () => {
       await open();
       expect(record()?.issueIds).toEqual(["contrast:1:1", "contrast:1:2"]);
     });
 
-    it("says how many it will ignore in the sheet", async () => {
+    it("counts every layer of the root in the sheet, whatever is ticked", async () => {
       await open();
       fireEvent.click(screen.getByRole("checkbox", { name: /Footer copy/ }));
       fireEvent.click(screen.getByRole("button", { name: "Ignore" }));
-      expect(screen.getByRole("dialog")).toHaveTextContent("1 layer");
+      expect(screen.getByRole("dialog")).toHaveTextContent("2 layers");
     });
   });
 
