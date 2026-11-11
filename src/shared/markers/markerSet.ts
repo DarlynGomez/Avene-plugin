@@ -3,11 +3,8 @@ import { pickRepresentativeInstance } from "../grouping/representativeInstance";
 import type { IssueState } from "../issues/issueTypes";
 import { markerLabel } from "./markerLabel";
 
-/** The states that earn a full marker */
+/** The states that earn a marker, deferred, ignored and resolved never do */
 export const MARKER_STATES: ReadonlySet<IssueState> = new Set(["open", "important"]);
-
-/** A root that is wholly deferred keeps a marker, drawn faded, ignored and resolved layers never get one */
-const DEFERRED_STATES: ReadonlySet<IssueState> = new Set(["deferred"]);
 
 /** One marker, on one layer of one root on one screen */
 export interface Marker {
@@ -16,15 +13,12 @@ export interface Marker {
   issueId: string;
   nodeId: string;
   label: string;
-  /** The root is deferred, so the marker is drawn faded and stays where it is */
-  deferred?: boolean;
 }
 
 /**
  * One marker per root on the current screen
  * The pool is this screen's instances narrowed to open and important before the picker runs, so a
- * marker can never land on an ignored layer, wherever that layer is in document order
- * A root that is only deferred has its deferred layers in the pool instead, and its marker is faded
+ * marker can never land on a deferred or ignored layer, wherever that layer is in document order
  */
 export function buildMarkerSet(
   roots: readonly Root[],
@@ -36,24 +30,21 @@ export function buildMarkerSet(
   }
   const markers: Marker[] = [];
   for (const root of roots) {
-    if (root.displayState === "decided") {
+    if (root.displayState === "deferred" || root.displayState === "decided") {
       continue;
     }
-    const deferred = root.displayState === "deferred";
-    const states = deferred ? DEFERRED_STATES : MARKER_STATES;
     const pool = root.instances.filter(
-      (instance) => instance.screenId === currentScreenId && states.has(instance.state)
+      (instance) => instance.screenId === currentScreenId && MARKER_STATES.has(instance.state)
     );
     if (pool.length === 0) {
       continue;
     }
-    const representative = pickRepresentativeInstance(pool, states, designerSelectionOrder);
+    const representative = pickRepresentativeInstance(pool, MARKER_STATES, designerSelectionOrder);
     markers.push({
       signature: root.signature,
       screenId: currentScreenId,
       issueId: representative.issueId,
       nodeId: representative.nodeId,
-      ...(deferred ? { deferred: true } : {}),
       label: markerLabel({
         measuredRatio: representative.measuredRatio,
         requiredRatio: root.requiredRatio,

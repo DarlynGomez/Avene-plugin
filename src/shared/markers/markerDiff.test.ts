@@ -81,20 +81,4 @@ describe("diffMarkers", () => {
     expect(old).toEqual([marker("r1", "A", "1:1")]);
     expect(next).toEqual([marker("r2", "A", "1:2")]);
   });
-
-  it("removes and adds a marker whose root went faded, and the other way round", () => {
-    const plain = marker("r1", "A", "1:1");
-    const faded = { ...plain, deferred: true };
-    expect(diffMarkers([plain], [faded])).toEqual({
-      added: [faded],
-      removed: [plain],
-      unchanged: []
-    });
-    expect(diffMarkers([faded], [plain])).toEqual({
-      added: [plain],
-      removed: [faded],
-      unchanged: []
-    });
-    expect(diffMarkers([faded], [{ ...faded }]).unchanged).toHaveLength(1);
-  });
 });

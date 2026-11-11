@@ -1,23 +1,10 @@
-import { nearlyEqual, shapeColor, shapeGeometry } from "../../../shared/markers/markerShape";
+import { nearlyEqual, shapeGeometry } from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import type { BackendResult } from "./annotationBackend";
 import { findTaggedNodes } from "./markerCategory";
 import { rememberMarkerNode } from "./markerNodeRegistry";
 import { makeContainer, paintShape, tagOf, type ShapeStyle } from "./shapeLayers";
 import { MARKER_TAG_KEY, parseTag } from "./markerTags";
-
-/** Whether the dot or ring already has the colour its marker wants, so a layer that went faded is painted again */
-function hasColor(shape: EllipseNode, style: ShapeStyle, deferred: boolean | undefined): boolean {
-  const paints = (style === "dot" ? shape.fills : shape.strokes) as readonly Paint[];
-  const paint = paints[0];
-  if (!paint || paint.type !== "SOLID") return false;
-  const want = shapeColor(deferred);
-  return (
-    nearlyEqual(paint.color.r, want.r) &&
-    nearlyEqual(paint.color.g, want.g) &&
-    nearlyEqual(paint.color.b, want.b)
-  );
-}
 
 function removeNode(node: BaseNode): void {
   if (!node.removed) node.remove();
@@ -79,13 +66,12 @@ export function createShapeBackend(sessionId: string) {
         !nearlyEqual(shape.y, y) ||
         !nearlyEqual(shape.width, geometry.size) ||
         !nearlyEqual(shape.strokeWeight as number, geometry.strokeWeight) ||
-        (shape.fills as readonly Paint[]).length !== (geometry.filled ? 1 : 0) ||
-        !hasColor(shape, style, marker.deferred);
+        (shape.fills as readonly Paint[]).length !== (geometry.filled ? 1 : 0);
       if (differs) {
         shape.resize(geometry.size, geometry.size);
         shape.x = x;
         shape.y = y;
-        paintShape(shape, style, geometry.strokeWeight, marker.deferred);
+        paintShape(shape, style, geometry.strokeWeight);
         wrote = true;
       }
     }

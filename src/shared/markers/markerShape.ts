@@ -9,14 +9,9 @@ export const SHAPE_GAP = 2;
 
 /** The muted red the plugin already uses for warnings, Figma does not expose its category colours */
 export const SHAPE_COLOR = { r: 0.659, g: 0.278, b: 0.122 };
-/** A deferred marker stays on the canvas but fades to a light grey */
-export const SHAPE_COLOR_DEFERRED = { r: 0.76, g: 0.76, b: 0.78 };
 export const SHAPE_STROKE_WHITE = { r: 1, g: 1, b: 1 };
 
 export const CONTAINER_NAME = "Avene markers (temporary)";
-
-export const shapeColor = (deferred: boolean | undefined) =>
-  deferred ? SHAPE_COLOR_DEFERRED : SHAPE_COLOR;
 
 export interface TargetBox {
   x: number;

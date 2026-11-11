@@ -1,6 +1,6 @@
 import {
   CONTAINER_NAME,
-  shapeColor,
+  SHAPE_COLOR,
   SHAPE_STROKE_WHITE
 } from "../../../shared/markers/markerShape";
 import type { MarkerStyle } from "../../../shared/markers/markerStyle";
@@ -36,23 +36,17 @@ export function makeContainer(userId: string, sessionId: string): FrameNode {
   return frame;
 }
 
-export function paintShape(
-  shape: EllipseNode,
-  style: ShapeStyle,
-  weight: number,
-  deferred?: boolean
-): void {
-  const color = shapeColor(deferred);
+export function paintShape(shape: EllipseNode, style: ShapeStyle, weight: number): void {
   const solid = (color: { r: number; g: number; b: number }): SolidPaint => ({
     type: "SOLID",
     color
   });
   if (style === "dot") {
-    shape.fills = [solid(color)];
+    shape.fills = [solid(SHAPE_COLOR)];
     shape.strokes = [solid(SHAPE_STROKE_WHITE)];
   } else {
     shape.fills = [];
-    shape.strokes = [solid(color)];
+    shape.strokes = [solid(SHAPE_COLOR)];
   }
   shape.strokeWeight = weight;
   shape.strokeAlign = "INSIDE";

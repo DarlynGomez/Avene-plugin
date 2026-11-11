@@ -1,11 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  CONTAINER_NAME,
-  SHAPE_COLOR,
-  SHAPE_COLOR_DEFERRED,
-  shapeGeometry
-} from "../../../shared/markers/markerShape";
+import { CONTAINER_NAME, SHAPE_COLOR, shapeGeometry } from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import { isMarkerNodeId, forgetMarkerNodes } from "./markerNodeRegistry";
 import { MARKER_TAG_KEY, parseTag } from "./markerTags";
@@ -60,47 +55,6 @@ describe("the dot and the ring", () => {
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
     expect(shape).toMatchObject({ width: 12, height: 12, strokeWeight: 2, strokeAlign: "INSIDE" });
-  });
-
-  it("draws the marker of a deferred root in a faded light grey, in the same place and size", async () => {
-    fake.addNode("1:1", [], "", BOX);
-    await createMarkerRenderer("s1").show(
-      "A",
-      [{ ...marker("r1", "A", "1:1"), deferred: true }],
-      "dot"
-    );
-
-    const [shape] = shapesOnCanvas();
-    const expected = shapeGeometry("dot", BOX, 1);
-    expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
-    expect(shape).toMatchObject({ x: expected.x, y: expected.y, width: 12, height: 12 });
-    expect(SHAPE_COLOR_DEFERRED.r).toBeGreaterThan(0.7);
-    expect(SHAPE_COLOR_DEFERRED.r).toBeCloseTo(SHAPE_COLOR_DEFERRED.b, 1);
-  });
-
-  it("fades the same dot when its root is deferred and colours it again when it is brought back, without a new shape", async () => {
-    fake.addNode("1:1", [], "", BOX);
-    const renderer = createMarkerRenderer("s1");
-    await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
-    const [first] = shapesOnCanvas();
-    expect(first?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
-
-    await renderer.show("A", [{ ...marker("r1", "A", "1:1"), deferred: true }], "dot");
-    expect(shapesOnCanvas()).toHaveLength(1);
-    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
-
-    await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
-    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
-  });
-
-  it("draws a faded ring with the faded colour on its stroke", async () => {
-    fake.addNode("1:1", [], "", BOX);
-    await createMarkerRenderer("s1").show(
-      "A",
-      [{ ...marker("r1", "A", "1:1"), deferred: true }],
-      "ring"
-    );
-    expect(shapesOnCanvas()[0]?.strokes).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
   });
 
   it("sits just outside the top left corner of the layer, never over it", async () => {

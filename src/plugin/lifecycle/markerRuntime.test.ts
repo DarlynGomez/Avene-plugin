@@ -197,34 +197,18 @@ describe("markers with no session", () => {
     expect(t2.annotations).toEqual([]);
   });
 
-  it("follow the issue list, so an ignored root loses its marker", async () => {
+  it("follow the issue list, so a deferred root loses its marker", async () => {
     const m = await load(true);
     await m.runtime.startMarkers();
     m.runtime.markersOnIssues(ISSUES);
     await settle();
-    m.runtime.markersOnIssues([
-      issue("contrast:T1", "T1", "F1", "ignored"),
-      ISSUES[1] as IssueSummary
-    ]);
-    await settle();
-
-    expect(t1.annotations).toEqual([]);
-  });
-
-  it("keep the marker of a deferred root on its layer, so deferring does not take it off the canvas", async () => {
-    const m = await load(true);
-    await m.runtime.startMarkers();
-    m.runtime.markersOnIssues(ISSUES);
-    await settle();
-    const before = t1.annotations.length;
     m.runtime.markersOnIssues([
       issue("contrast:T1", "T1", "F1", "deferred"),
       ISSUES[1] as IssueSummary
     ]);
     await settle();
 
-    expect(before).toBeGreaterThan(0);
-    expect(t1.annotations.length).toBeGreaterThan(0);
+    expect(t1.annotations).toEqual([]);
   });
 
   it("tell the panel to scroll to the root of a selected marked layer and never set the selection", async () => {
@@ -390,7 +374,7 @@ describe("reconciling against the canvas", () => {
     m.runtime.markersOnIssues(ISSUES);
     await settle();
     m.runtime.markersOnIssues([
-      issue("contrast:T1", "T1", "F1", "ignored"),
+      issue("contrast:T1", "T1", "F1", "deferred"),
       ISSUES[1] as IssueSummary
     ]);
     await settle();

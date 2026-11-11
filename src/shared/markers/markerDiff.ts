@@ -7,12 +7,11 @@ export interface MarkerDiff {
 }
 
 const keyOf = (marker: Marker): string => `${marker.signature}|${marker.screenId}`;
-const sameMarker = (a: Marker, b: Marker): boolean =>
-  a.nodeId === b.nodeId && a.label === b.label && Boolean(a.deferred) === Boolean(b.deferred);
+const sameMarker = (a: Marker, b: Marker): boolean => a.nodeId === b.nodeId && a.label === b.label;
 
 /**
  * Only the difference needs writing
- * A marker that moved to another layer, changed its label or went faded is removed from the old one and added
+ * A marker that moved to another layer or changed its label is removed from the old one and added
  * to the new one, one that is the same is left alone
  */
 export function diffMarkers(oldSet: readonly Marker[], newSet: readonly Marker[]): MarkerDiff {
