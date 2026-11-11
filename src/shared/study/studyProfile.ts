@@ -21,6 +21,14 @@ export const STUDY_ANSWERS: Readonly<Record<string, CalibrationAnswer>> = {
 };
 
 /**
+ * What an exited file falls back on when it holds no stored profile, so the participant never meets calibration
+ * Logging is off, nothing written after the researcher leaves study mode is recorded
+ */
+export function buildExitedProfile(session: StudySession): CalibrationProfile {
+  return { ...buildStudyProfile(session), loggingConsent: false };
+}
+
+/**
  * The profile used while a session is active, in place of any stored calibration
  * Consent is on paper and the researcher confirmed it at block start, so logging is on
  */

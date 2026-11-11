@@ -357,7 +357,11 @@ describe("block controls", () => {
 
     const confirm = screen.getByRole("group", { name: "Confirm" });
     expect(within(confirm).getByText(/This block has not ended/)).toBeInTheDocument();
-    expect(within(confirm).getByText(/no export taken after it ended/)).toBeInTheDocument();
+    expect(
+      within(confirm).getByText(
+        /No export yet\. Exiting keeps records but the file has not been saved\./
+      )
+    ).toBeInTheDocument();
     expect(sentTypes()).not.toContain("STUDY_EXIT");
     await user.click(within(confirm).getByRole("button", { name: "Exit without exporting" }));
     expect(sentTypes()).toContain("STUDY_EXIT");
@@ -373,7 +377,9 @@ describe("block controls", () => {
     });
     await user.click(screen.getByRole("button", { name: "Exit study mode" }));
 
-    expect(screen.getByText(/no export taken after it ended/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No export yet\. Exiting keeps records but the file has not been saved\./)
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Exit without exporting" })).toBeInTheDocument();
   });
 
@@ -388,7 +394,7 @@ describe("block controls", () => {
     await user.click(screen.getByRole("button", { name: "Exit study mode" }));
 
     const confirm = screen.getByRole("group", { name: "Confirm" });
-    expect(within(confirm).queryByText(/no export taken/)).not.toBeInTheDocument();
+    expect(within(confirm).queryByText(/No export yet/)).not.toBeInTheDocument();
     expect(within(confirm).queryByRole("button", { name: "Exit without exporting" })).toBeNull();
     await user.click(within(confirm).getByRole("button", { name: "Exit study mode" }));
     expect(sentTypes()).toContain("STUDY_EXIT");

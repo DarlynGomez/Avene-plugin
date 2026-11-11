@@ -1,7 +1,7 @@
 import { isCalibrationProfile, type CalibrationProfile } from "../../shared/calibrationSchema";
 import type { CalibrationScope } from "../../shared/calibrationScope";
-import { buildStudyProfile } from "../../shared/study/studyProfile";
-import { activeStudySession } from "../study/adapter/studySessionStore";
+import { buildExitedProfile, buildStudyProfile } from "../../shared/study/studyProfile";
+import { activeStudySession, loadStudySession } from "../study/adapter/studySessionStore";
 import { STORAGE_KEY_PROFILE } from "./storageKeys";
 
 export interface CalibrationResolution {
@@ -34,7 +34,7 @@ async function readUserProfile(): Promise<CalibrationResolution | null> {
 
 /**
  * An active study session wins over both stored scopes
- * Otherwise file first while the ownership rule is provisional
+ * Otherwise file first while the ownership rule is provisional, then user, then an exited session
  */
 export async function resolveCalibration(): Promise<CalibrationResolution | null> {
   const session = activeStudySession();
@@ -42,7 +42,13 @@ export async function resolveCalibration(): Promise<CalibrationResolution | null
     return { scope: "study", profile: buildStudyProfile(session) };
   }
   const [fileProfile, userProfile] = await Promise.all([readFileProfile(), readUserProfile()]);
-  return fileProfile ?? userProfile ?? null;
+  const stored = fileProfile ?? userProfile;
+  if (stored) {
+    return stored;
+  }
+  // A file the researcher has left keeps its session record, so it never asks a participant to calibrate
+  const exited = loadStudySession();
+  return exited ? { scope: "study", profile: buildExitedProfile(exited) } : null;
 }
 
 /** Outcome of persisting a profile to the two storage surfaces */

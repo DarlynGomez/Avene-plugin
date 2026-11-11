@@ -125,6 +125,70 @@ describe("resolveCalibration with a study session", () => {
     expect(await resolveCalibration()).toEqual({ scope: "user", profile: USER_PROFILE });
   });
 
+  describe("a file the researcher has exited, with no stored profile", () => {
+    function putExited() {
+      const exited = exitStudy(startedSession(), clock("2026-10-06T09:30:00.000Z"));
+      if (!exited.ok) throw new Error("fixture did not exit");
+      putSession(exited.session);
+    }
+
+    it("resolves to a profile with logging off, so no calibration or consent is reached", async () => {
+      putExited();
+      setPluginData.mockClear();
+
+      const resolution = await resolveCalibration();
+
+      expect(resolution?.scope).toBe("study");
+      expect(resolution?.profile.answers).toEqual(STUDY_ANSWERS);
+      expect(resolution?.profile.loggingConsent).toBe(false);
+      expect(setPluginData).not.toHaveBeenCalled();
+      expect(setAsync).not.toHaveBeenCalled();
+    });
+
+    it("answers the panel's load with that profile and not with null", async () => {
+      putExited();
+      const replies: unknown[] = [];
+
+      await handleCalibrationMessage({ type: "CALIBRATION_LOAD" }, (m) => replies.push(m));
+
+      expect(replies).toEqual([
+        expect.objectContaining({ type: "CALIBRATION_LOADED", resolvedScope: "study" })
+      ]);
+      expect(replies[0]).toHaveProperty("profile.loggingConsent", false);
+    });
+
+    it("keeps a seeded profile ahead of the fallback", async () => {
+      putExited();
+      fileData.set(STORAGE_KEY_PROFILE, JSON.stringify(FILE_PROFILE));
+
+      expect(await resolveCalibration()).toEqual({ scope: "file", profile: FILE_PROFILE });
+    });
+
+    it("records no Adjust entry, so nothing after exit can reach a later export", async () => {
+      putExited();
+
+      await logAdjustEvent({
+        issueId: "contrast:1:1",
+        loggedAt: "2026-10-06T10:00:00.000Z"
+      } as never);
+
+      expect(fileData.get(STORAGE_KEY_ADJUST_LOG)).toBeUndefined();
+    });
+
+    it("leaves the session record as it was", async () => {
+      putExited();
+      const before = fileData.get(STORAGE_KEY_STUDY_SESSION);
+
+      await resolveCalibration();
+
+      expect(fileData.get(STORAGE_KEY_STUDY_SESSION)).toBe(before);
+    });
+  });
+
+  it("still asks for calibration when there is no session and no stored profile", async () => {
+    expect(await resolveCalibration()).toBeNull();
+  });
+
   it("is unchanged when there is no session", async () => {
     fileData.set(STORAGE_KEY_PROFILE, JSON.stringify(FILE_PROFILE));
 

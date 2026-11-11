@@ -20,8 +20,8 @@ export function BlockControls({ session, onSend }: BlockControlsProps) {
   const canReveal = !live && session.phase === "designing";
   const canEnd = live ? session.phase === "designing" : session.phase === "reviewing";
   const exportNote = hasCurrentExport(session)
-    ? ""
-    : "This block has no export taken after it ended. Export first, or exit without exporting. ";
+    ? "Exiting study mode keeps every recorded answer and returns the plugin to normal."
+    : "No export yet. Exiting keeps records but the file has not been saved.";
   const exitNote = session.phase === "ended" ? "" : "This block has not ended. ";
 
   function confirm(action: () => void) {
@@ -52,7 +52,7 @@ export function BlockControls({ session, onSend }: BlockControlsProps) {
   if (pending === "exit") {
     return (
       <ConfirmStep
-        message={`${exitNote}${exportNote}Exiting study mode keeps every recorded answer and returns the plugin to normal.`}
+        message={`${exitNote}${exportNote}`}
         confirmLabel={hasCurrentExport(session) ? "Exit study mode" : "Exit without exporting"}
         onConfirm={() => confirm(() => onSend({ type: "STUDY_EXIT" }))}
         onCancel={() => setPending(null)}

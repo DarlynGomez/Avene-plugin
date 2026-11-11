@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { isCalibrationProfile } from "../calibrationSchema";
 import { questions } from "../../ui/calibration/data/questions";
-import { STUDY_ANSWERS, STUDY_AI_ASSISTANCE_LEVEL, buildStudyProfile } from "./studyProfile";
+import {
+  STUDY_ANSWERS,
+  STUDY_AI_ASSISTANCE_LEVEL,
+  buildExitedProfile,
+  buildStudyProfile
+} from "./studyProfile";
 import type { StudySession } from "./studyTypes";
 
 function session(patch: Partial<StudySession> = {}): StudySession {
@@ -85,5 +90,15 @@ describe("study profile", () => {
     );
 
     expect(second.answers).toEqual(first.answers);
+  });
+});
+
+describe("exited profile", () => {
+  it("is the study answers with logging off, and a valid profile", () => {
+    const profile = buildExitedProfile(session({ exitedAt: "2026-10-06T10:00:00.000Z" }));
+
+    expect(isCalibrationProfile(profile)).toBe(true);
+    expect(profile.answers).toEqual(STUDY_ANSWERS);
+    expect(profile.loggingConsent).toBe(false);
   });
 });
