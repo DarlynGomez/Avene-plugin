@@ -45,7 +45,7 @@ const SECONDARY: [string, string, string, string][] = [
     ".ratioLabel",
     "--color-card"
   ],
-  ["empty state", "TeachMeWhyTab.module.css", ".emptyText", "--color-background"]
+  ["topic library empty state", "ModuleLibrary.module.css", ".empty", "--color-background"]
 ];
 
 describe("secondary text in the explanation card", () => {

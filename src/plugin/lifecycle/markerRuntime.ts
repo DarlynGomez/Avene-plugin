@@ -104,10 +104,16 @@ export async function startMarkers(): Promise<void> {
 function watchZoom(): void {
   let lastZoom = figma.viewport.zoom;
   const timer = setInterval(() => {
-    const zoom = figma.viewport.zoom;
-    if (zoomChanged(lastZoom, zoom)) {
-      lastZoom = zoom;
-      controller().onZoomChange();
+    try {
+      const zoom = figma.viewport.zoom;
+      if (zoomChanged(lastZoom, zoom)) {
+        lastZoom = zoom;
+        controller().onZoomChange();
+      }
+    } catch (error) {
+      // A viewport that cannot be read will not come back, so the timer stops and does not throw forever
+      clearInterval(timer);
+      console.error("markers: the zoom could not be read, so it is no longer watched", error);
     }
   }, ZOOM_POLL_MS);
   figma.on("close", () => clearInterval(timer));

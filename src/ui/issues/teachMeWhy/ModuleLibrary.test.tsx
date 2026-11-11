@@ -45,9 +45,7 @@ describe("Teach Me Why module library", () => {
 
     rerender(<ModuleLibrary selectedModuleId="M01" onSelectModule={onSelectModule} />);
 
-    expect(
-      screen.getByRole("heading", { name: "Why Text Contrast Matters" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Why Text Contrast Matters" })).toBeInTheDocument();
     expect(
       screen.getByRole("region", { name: "Why Text Contrast Matters module" })
     ).toBeInTheDocument();
@@ -64,7 +62,9 @@ describe("Teach Me Why module library", () => {
     render(<ModuleLibrary selectedModuleId={null} onSelectModule={() => {}} />);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "buttons" } });
 
-    expect(screen.getByRole("button", { name: /Contrast for Interface Parts/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Contrast for Interface Parts/ })
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Text Size and Weight/ })).toBeInTheDocument();
   });
 
@@ -106,19 +106,26 @@ describe("Teach Me Why module library", () => {
     );
 
     expect(screen.queryByTitle("Alternatives to Low-Contrast Text")).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("during a study session");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Videos are unavailable during study sessions."
+    );
     expect(screen.queryByRole("button", { name: "Load video" })).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
     ).not.toBeInTheDocument();
-    expect(screen.getByText(/during study sessions/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/is unavailable offline and during study sessions/)
+    ).toBeInTheDocument();
   });
 
   it("filters topics by the category tabs", () => {
     render(<ModuleLibrary selectedModuleId={null} onSelectModule={() => {}} />);
-    fireEvent.click(screen.getByRole("tab", { name: "Cognitive" }));
+    // The label is the category word, shown capitalized by the stylesheet, so the accessible name is the word itself
+    fireEvent.click(screen.getByRole("tab", { name: /^cognitive$/i }));
 
     expect(screen.getAllByRole("button", { name: /Explore topic/ })).toHaveLength(1);
-    expect(screen.getByRole("button", { name: /Placeholder and Decorative Text/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Placeholder and Decorative Text/ })
+    ).toBeInTheDocument();
   });
 });

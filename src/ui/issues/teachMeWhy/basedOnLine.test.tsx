@@ -34,6 +34,7 @@ describe("the Based on line", () => {
           hidden={false}
           onHide={() => undefined}
           onShowAgain={() => undefined}
+          onDeepDive={() => undefined}
         />
       );
       expect(screen.getByText(`Based on: ${fact.source}`)).toBeInTheDocument();
@@ -47,6 +48,7 @@ describe("the Based on line", () => {
         hidden={false}
         onHide={() => undefined}
         onShowAgain={() => undefined}
+        onDeepDive={() => undefined}
       />
     );
     const line = screen.getByText(/^Based on:/).textContent ?? "";

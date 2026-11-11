@@ -657,6 +657,27 @@ describe("dots and rings holding their size on screen", () => {
     expect(writes()).toBe(settled);
   });
 
+  it("stops watching the zoom when the viewport can no longer be read", async () => {
+    await withDot();
+    const failures: unknown[] = [];
+    const record = (error: unknown) => void failures.push(error);
+    process.on("uncaughtException", record);
+    Object.defineProperty(figma.viewport, "zoom", {
+      get() {
+        throw new ReferenceError("figma is not defined");
+      }
+    });
+    try {
+      await settle(1000);
+    } catch (error) {
+      record(error);
+    }
+    process.off("uncaughtException", record);
+
+    expect(failures).toEqual([]);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it("does not add an undo step for a resize", async () => {
     await withDot();
     fake.commitUndo.mockClear();
