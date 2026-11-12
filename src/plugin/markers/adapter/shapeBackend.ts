@@ -2,27 +2,15 @@ import {
   MARKER_LOOKS,
   markerKind,
   nearlyEqual,
-  shapeGeometry,
-  type MarkerLook
+  shapeGeometry
 } from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import type { BackendResult } from "./annotationBackend";
 import { findTaggedNodes } from "./markerCategory";
 import { rememberMarkerNode } from "./markerNodeRegistry";
-import { makeContainer, paintShape, tagOf, type ShapeStyle } from "./shapeLayers";
+import { hasColor, makeContainer, paintShape, tagOf, type ShapeStyle } from "./shapeLayers";
 import { MARKER_TAG_KEY, parseTag } from "./markerTags";
-
-/** Whether the shape already has the color its marker wants, so a layer that changed kind is painted again */
-function hasColor(shape: PolygonNode, style: ShapeStyle, want: MarkerLook["color"]): boolean {
-  const paints = (style === "dot" ? shape.fills : shape.strokes) as readonly Paint[];
-  const paint = paints[0];
-  if (!paint || paint.type !== "SOLID") return false;
-  return (
-    nearlyEqual(paint.color.r, want.r) &&
-    nearlyEqual(paint.color.g, want.g) &&
-    nearlyEqual(paint.color.b, want.b)
-  );
-}
+import { createDigitLayer } from "./shapeDigits";
 
 function removeNode(node: BaseNode): void {
   if (!node.removed) node.remove();
@@ -35,6 +23,7 @@ function removeNode(node: BaseNode): void {
  */
 export function createShapeBackend(sessionId: string) {
   const shapes = new Map<string, PolygonNode>();
+  const digits = createDigitLayer(sessionId);
   let container: FrameNode | null = null;
 
   function ensureContainer(id: string): FrameNode {
@@ -57,6 +46,7 @@ export function createShapeBackend(sessionId: string) {
       if (!wantedByNode.has(nodeId) || shape.removed) {
         removeNode(shape);
         shapes.delete(nodeId);
+        digits.remove(nodeId);
         wrote = true;
       }
     }
@@ -96,6 +86,9 @@ export function createShapeBackend(sessionId: string) {
         paintShape(shape, style, geometry.strokeWeight, look.color);
         wrote = true;
       }
+      // The number of a group goes in the middle, drawn after the shape so it sits above it
+      const place = { x: geometry.x, y: geometry.y, size: geometry.size };
+      if (digits.sync(frame, id, marker.nodeId, marker.count, place)) wrote = true;
     }
     if (shapes.size === 0 && container && !container.removed) {
       removeNode(container);
@@ -109,6 +102,7 @@ export function createShapeBackend(sessionId: string) {
           try {
             removeNode(shape);
             shapes.delete(nodeId);
+            digits.remove(nodeId);
           } catch {
             // Nothing more can be done for a layer that cannot be written
           }
@@ -121,6 +115,7 @@ export function createShapeBackend(sessionId: string) {
   function releaseAll(userId: string | null): void {
     for (const shape of shapes.values()) removeNode(shape);
     shapes.clear();
+    digits.releaseAll();
     if (container) removeNode(container);
     container = null;
     if (userId !== null) {
@@ -136,6 +131,7 @@ export function createShapeBackend(sessionId: string) {
     releaseAll,
     liveNodeIds: (): string[] => [
       ...[...shapes.values()].map((shape) => shape.id),
+      ...digits.liveNodeIds(),
       ...(container && !container.removed ? [container.id] : [])
     ]
   };

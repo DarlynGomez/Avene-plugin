@@ -1,5 +1,9 @@
-import { CONTAINER_NAME, SHAPE_STROKE_WHITE } from "../../../shared/markers/markerShape";
-import type { MarkerLook } from "../../../shared/markers/markerShape";
+import {
+  CONTAINER_NAME,
+  SHAPE_STROKE_WHITE,
+  nearlyEqual,
+  type MarkerLook
+} from "../../../shared/markers/markerShape";
 import type { MarkerStyle } from "../../../shared/markers/markerStyle";
 import { rememberMarkerNode } from "./markerNodeRegistry";
 import { MARKER_TAG_KEY, serializeTag, type MarkerTag } from "./markerTags";
@@ -50,4 +54,20 @@ export function paintShape(
   }
   shape.strokeWeight = weight;
   shape.strokeAlign = "INSIDE";
+}
+
+/** Whether the shape already has the color its marker wants, so a layer that changed kind is painted again */
+export function hasColor(
+  shape: PolygonNode,
+  style: ShapeStyle,
+  want: MarkerLook["color"]
+): boolean {
+  const paints = (style === "dot" ? shape.fills : shape.strokes) as readonly Paint[];
+  const paint = paints[0];
+  if (!paint || paint.type !== "SOLID") return false;
+  return (
+    nearlyEqual(paint.color.r, want.r) &&
+    nearlyEqual(paint.color.g, want.g) &&
+    nearlyEqual(paint.color.b, want.b)
+  );
 }

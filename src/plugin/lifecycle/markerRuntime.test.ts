@@ -562,11 +562,15 @@ describe("clicking a dot or a ring", () => {
     ]);
     await settle();
     expect(shapes()).toHaveLength(1);
+    const numbers = () => [...fake.nodes.values()].filter((node) => node.type === "VECTOR");
+    // The group's marker carries its count, and the single marker of another group would carry none
+    expect(numbers()).toHaveLength(1);
 
     selection = [shapes()[0]];
     await m.listener.handleSelectionChange(false);
     await settle();
     expect(shapes()).toHaveLength(2);
+    expect(numbers()).toHaveLength(2);
 
     selection = [shapes()[1]];
     await m.listener.handleSelectionChange(false);
@@ -577,6 +581,7 @@ describe("clicking a dot or a ring", () => {
     await m.listener.handleSelectionChange(false);
     await settle();
     expect(shapes()).toHaveLength(1);
+    expect(numbers()).toHaveLength(1);
   });
 
   it("works for a ring as well", async () => {

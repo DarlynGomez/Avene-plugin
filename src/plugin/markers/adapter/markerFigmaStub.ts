@@ -18,6 +18,9 @@ export interface FakeNode {
   strokes: unknown[];
   strokeWeight: number;
   strokeAlign: string;
+  /** The stroke paths of a vector, as written by the plugin */
+  vectorPaths?: { windingRule: string; data: string }[];
+  pointCount?: number;
   x: number;
   y: number;
   width: number;
@@ -169,7 +172,7 @@ export function createFakeFigma(options: Options = {}) {
   }
 
   /** What a layer drawn by the plugin looks like to the stand in, added to the page like figma does */
-  function create(type: "FRAME" | "POLYGON"): FakeNode {
+  function create(type: "FRAME" | "POLYGON" | "VECTOR"): FakeNode {
     if (state.readOnly) throw new Error(READ_ONLY);
     const node = build(`${type === "FRAME" ? "frame" : "shape"}:${nextShape++}`, type, [], "");
     const target = (globalThis as unknown as { figma: { currentPage: typeof page } }).figma
@@ -212,6 +215,7 @@ export function createFakeFigma(options: Options = {}) {
       getNodeByIdAsync: async (id: string) => nodes.get(id) ?? null,
       createFrame: () => create("FRAME"),
       createPolygon: () => create("POLYGON"),
+      createVector: () => create("VECTOR"),
       currentPage: page,
       viewport: {
         get zoom() {

@@ -108,4 +108,10 @@ describe("diffMarkers", () => {
     });
     expect(diffMarkers([important], [{ ...important }]).unchanged).toHaveLength(1);
   });
+
+  it("removes and adds a marker whose count changed", () => {
+    const one = marker("r1", "A", "1:1");
+    const two = { ...one, count: 2 };
+    expect(diffMarkers([one], [two])).toEqual({ added: [two], removed: [one], unchanged: [] });
+  });
 });

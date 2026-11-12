@@ -11,7 +11,8 @@ const sameMarker = (a: Marker, b: Marker): boolean =>
   a.nodeId === b.nodeId &&
   a.label === b.label &&
   Boolean(a.deferred) === Boolean(b.deferred) &&
-  Boolean(a.important) === Boolean(b.important);
+  Boolean(a.important) === Boolean(b.important) &&
+  a.count === b.count;
 
 /**
  * Only the difference needs writing

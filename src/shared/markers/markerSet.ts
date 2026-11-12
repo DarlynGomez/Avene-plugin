@@ -20,6 +20,8 @@ export interface Marker {
   deferred?: boolean;
   /** The root is important, so its marker is a diamond and not a triangle */
   important?: boolean;
+  /** How many layers of the root are marked on this screen, present only for a group of more than one */
+  count?: number;
 }
 
 /**
@@ -61,6 +63,7 @@ export function buildMarkerSet(
         nodeId: layer.nodeId,
         ...(deferred ? { deferred: true } : {}),
         ...(root.displayState === "important" ? { important: true } : {}),
+        ...(pool.length > 1 ? { count: pool.length } : {}),
         label: markerLabel({
           measuredRatio: layer.measuredRatio,
           requiredRatio: root.requiredRatio,

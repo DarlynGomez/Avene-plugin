@@ -17,7 +17,8 @@ describe("buildMarkerSet", () => {
         screenId: "A",
         issueId: "contrast:1:1",
         nodeId: "1:1",
-        label: "2.2 x2"
+        label: "2.2 x2",
+        count: 2
       }
     ]);
   });
@@ -237,6 +238,28 @@ describe("buildMarkerSet", () => {
       const markers = buildMarkerSet([deferred], "A", [], "r1");
       expect(markers).toHaveLength(2);
       expect(markers.every((m) => m.deferred === true)).toBe(true);
+    });
+  });
+
+  describe("the count of a group", () => {
+    it("is on every marker of a group, as the number of open layers on the screen", () => {
+      const roots = [
+        root("r1", [
+          instance("1:1", "A", "open", 0),
+          instance("1:2", "A", "open", 1),
+          instance("1:3", "A", "ignored", 2),
+          instance("2:1", "B", "open", 3)
+        ])
+      ];
+      expect(buildMarkerSet(roots, "A", [])[0]).toMatchObject({ count: 2 });
+      expect(buildMarkerSet(roots, "A", [], "r1").map((m) => m.count)).toEqual([2, 2]);
+    });
+
+    it("is absent for a root with one layer on the screen, even when it has others on another screen", () => {
+      const roots = [
+        root("r1", [instance("1:1", "A", "open", 0), instance("2:1", "B", "open", 1)])
+      ];
+      expect(buildMarkerSet(roots, "A", [])[0]?.count).toBeUndefined();
     });
   });
 });

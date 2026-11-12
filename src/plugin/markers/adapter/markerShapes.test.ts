@@ -42,6 +42,13 @@ const drawn = (): FakeNode[] =>
   [...fake.nodes.values()].filter((node) => parseTag(node.getPluginData(MARKER_TAG_KEY))?.kind);
 const shapesOnCanvas = () => drawn().filter((node) => node.type === "POLYGON");
 const containers = () => drawn().filter((node) => node.type === "FRAME");
+const countsOnCanvas = () => drawn().filter((node) => node.type === "VECTOR");
+/** The width of the path as written, read back from its data, since the stand in has no bounding box */
+const countWidth = (node?: FakeNode): number => {
+  const data = String((node?.vectorPaths as { data: string }[])[0]?.data);
+  const xs = [...data.matchAll(/[ML](-?[\d.]+) /g)].map((match) => Number(match[1]));
+  return Math.max(...xs) - Math.min(...xs);
+};
 const markerAnnotations = (node: FakeNode) => node.annotations.filter((a) => a.categoryId);
 
 describe("the dot and the ring", () => {
@@ -205,6 +212,98 @@ describe("the dot and the ring", () => {
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
 
     expect(drawn()).toEqual([]);
+  });
+});
+
+describe("the number on the marker of a group", () => {
+  const group = (nodeId: string, count?: number): Marker => ({
+    ...marker("r1", "A", nodeId),
+    ...(count === undefined ? {} : { count })
+  });
+
+  it("is a white stroke path in the middle of the shape, not a text layer, tagged as the marker's own", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show("A", [group("1:1", 3)], "dot");
+
+    const [shape] = shapesOnCanvas();
+    const [count] = countsOnCanvas();
+    expect(countsOnCanvas()).toHaveLength(1);
+    expect(fake.nodes.size).toBeGreaterThan(0);
+    expect(
+      [...fake.nodes.values()].some(
+        (node) => node.type === "TEXT" && node.name === "Avene marker count"
+      )
+    ).toBe(false);
+    expect(count?.parent).toBe(containers()[0]);
+    expect(count?.fills).toEqual([]);
+    expect(count?.strokes).toEqual([{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
+    expect(String((count?.vectorPaths as { data: string }[])[0]?.data)).toMatch(/^M/);
+    expect(parseTag(count?.getPluginData(MARKER_TAG_KEY) ?? "")).toMatchObject({
+      kind: "shape",
+      target: "1:1"
+    });
+    const shapeCenter = (shape?.x as number) + (shape?.width as number) / 2;
+    const countCenter = (count?.x as number) + countWidth(count) / 2;
+    expect(countCenter).toBeCloseTo(shapeCenter, 1);
+  });
+
+  it("is not drawn for a marker with no related issues", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show("A", [group("1:1")], "dot");
+    expect(shapesOnCanvas()).toHaveLength(1);
+    expect(countsOnCanvas()).toEqual([]);
+  });
+
+  it("changes in place when the count changes, goes when the group becomes one, and comes back", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    const first = countsOnCanvas()[0];
+    const pathOf = (node?: FakeNode) => (node?.vectorPaths as { data: string }[])[0]?.data;
+    const three = pathOf(first);
+
+    await renderer.show("A", [group("1:1", 4)], "dot");
+    expect(countsOnCanvas()).toEqual([first]);
+    expect(pathOf(first)).not.toBe(three);
+
+    await renderer.show("A", [group("1:1")], "dot");
+    expect(countsOnCanvas()).toEqual([]);
+    expect(shapesOnCanvas()).toHaveLength(1);
+
+    await renderer.show("A", [group("1:1", 2)], "dot");
+    expect(countsOnCanvas()).toHaveLength(1);
+  });
+
+  it("writes nothing when nothing changed", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    fake.calls.length = 0;
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    expect(fake.calls).toEqual([]);
+  });
+
+  it("goes with its shape when the marker is removed, and when markers are cleared", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    await renderer.show("A", [], "dot");
+    expect(countsOnCanvas()).toEqual([]);
+    expect(containers()).toEqual([]);
+
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    renderer.clearSync();
+    expect(countsOnCanvas()).toEqual([]);
+  });
+
+  it("follows the zoom with its shape", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    const near = countWidth(countsOnCanvas()[0]);
+    fake.state.zoom = 2;
+    await renderer.show("A", [group("1:1", 3)], "dot");
+    expect(countWidth(countsOnCanvas()[0])).toBeCloseTo(near / 2, 3);
   });
 });
 
