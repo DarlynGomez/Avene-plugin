@@ -10,7 +10,14 @@ const PAGE_SOURCE: BackgroundSource = { kind: "page" };
 
 function solidLayer(color = BLACK, overrides: Partial<ChainLayer> = {}): ChainLayer {
   const fill: PaintLayer = { kind: "solid", color, opacity: 1 };
-  return { fill, nodeOpacity: 1, blendMode: "NORMAL", visible: true, source: NODE_SOURCE, ...overrides };
+  return {
+    fill,
+    nodeOpacity: 1,
+    blendMode: "NORMAL",
+    visible: true,
+    source: NODE_SOURCE,
+    ...overrides
+  };
 }
 
 function emptyLayer(overrides: Partial<ChainLayer> = {}): ChainLayer {
@@ -38,7 +45,12 @@ describe("resolveColors", () => {
   });
 
   it("walks past unpainted ancestors to find the first solid fill", () => {
-    const result = resolveColors([solidLayer(BLACK), emptyLayer(), emptyLayer(), solidLayer(WHITE)]);
+    const result = resolveColors([
+      solidLayer(BLACK),
+      emptyLayer(),
+      emptyLayer(),
+      solidLayer(WHITE)
+    ]);
     expect(result.background).toEqual(WHITE);
     expect(result.indeterminateReasons).toEqual([]);
   });
@@ -60,12 +72,28 @@ describe("resolveColors", () => {
 
   it("carries each resolved fill's own alpha separately from the other", () => {
     const foreground: PaintLayer = { kind: "solid", color: BLACK, opacity: 1 };
-    const result = resolveColors([
-      { ...emptyLayer(), fill: foreground },
-      solidLayer(WHITE)
-    ]);
+    const result = resolveColors([{ ...emptyLayer(), fill: foreground }, solidLayer(WHITE)]);
     expect(result.foregroundAlpha).toBe(1);
     expect(result.backgroundAlpha).toBe(1);
+  });
+
+  it("is indeterminate, with the reason named, when the background says it is not a plain color", () => {
+    const result = resolveColors([
+      solidLayer(BLACK),
+      solidLayer(WHITE, { notPlain: ["multiple-visible-fills", "blur-effect"] })
+    ]);
+    expect(result.background).toBeNull();
+    expect(result.foreground).toBeNull();
+    expect(result.indeterminateReasons).toEqual(["multiple-visible-fills", "blur-effect"]);
+  });
+
+  it("holds an unpainted ancestor that is not plain to the same rule, since the walk consulted it", () => {
+    const result = resolveColors([
+      solidLayer(BLACK),
+      emptyLayer({ notPlain: ["blur-effect"] }),
+      solidLayer(WHITE, { source: PAGE_SOURCE })
+    ]);
+    expect(result.indeterminateReasons).toEqual(["blur-effect"]);
   });
 
   it("is indeterminate when the text fill is mixed", () => {
@@ -87,7 +115,10 @@ describe("resolveColors", () => {
   });
 
   it("is indeterminate when an ancestor's fill blocks resolution with a gradient", () => {
-    const result = resolveColors([solidLayer(BLACK), { ...emptyLayer(), fill: { kind: "unresolvable" } }]);
+    const result = resolveColors([
+      solidLayer(BLACK),
+      { ...emptyLayer(), fill: { kind: "unresolvable" } }
+    ]);
     expect(result.indeterminateReasons).toContain("fill-unresolvable");
   });
 
@@ -108,7 +139,10 @@ describe("resolveColors", () => {
   });
 
   it("does not treat PASS_THROUGH as a blend mode, since it is Figma's own default for an ordinary frame or group", () => {
-    const result = resolveColors([solidLayer(BLACK), solidLayer(WHITE, { blendMode: "PASS_THROUGH" })]);
+    const result = resolveColors([
+      solidLayer(BLACK),
+      solidLayer(WHITE, { blendMode: "PASS_THROUGH" })
+    ]);
     expect(result.indeterminateReasons).toEqual([]);
     expect(result.foreground).toEqual(BLACK);
     expect(result.background).toEqual(WHITE);

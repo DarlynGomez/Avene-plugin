@@ -1,6 +1,6 @@
 import type { ChainLayer } from "../colorResolution";
 import { isMarkerNodeId } from "../../markers/adapter/markerNodeRegistry";
-import { extractNodeLayer, extractPageBackgroundLayer } from "./paintExtraction";
+import { extractBackgroundLayer, extractPageBackgroundLayer } from "./paintExtraction";
 
 /** How many siblings below a layer are looked at, a crowded page is not walked end to end */
 const MAX_SIBLINGS_LOOKED_AT = 60;
@@ -51,7 +51,7 @@ function shapeBehind(parent: ChildrenMixin, current: SceneNode, point: Point): C
       continue;
     }
     if (!("fills" in sibling) || !covers(sibling, point)) continue;
-    const layer = extractNodeLayer(sibling);
+    const layer = extractBackgroundLayer(sibling);
     if (hasPaint(layer)) return layer;
   }
   return null;
@@ -78,7 +78,7 @@ export function buildBackdropChain(node: SceneNode): ChainLayer[] {
       layers.push(extractPageBackgroundLayer(parent as PageNode));
       return layers;
     }
-    const layer = extractNodeLayer(parent);
+    const layer = extractBackgroundLayer(parent);
     layers.push(layer);
     if (hasPaint(layer)) return layers;
     current = parent as SceneNode;

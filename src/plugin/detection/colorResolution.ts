@@ -4,7 +4,7 @@ import type { BackgroundSource, RGBColor } from "../../shared/issues/issueTypes"
 export type PaintLayer =
   | { kind: "solid"; color: RGBColor; opacity: number }
   | { kind: "unresolvable" } // a gradient, image, or video: opaque, but not a single color
-  | { kind: "empty" };  // no paint at all, the walk continues past it
+  | { kind: "empty" }; // no paint at all, the walk continues past it
 
 /** One node in the chain from the text node itself up through its ancestors to the page */
 export interface ChainLayer {
@@ -14,6 +14,8 @@ export interface ChainLayer {
   visible: boolean;
   /** Which layer this is, so a resolved background can name its source */
   source: BackgroundSource;
+  /** Why this layer is not a plain opaque color even if its first fill is one, present only when something is */
+  notPlain?: readonly string[];
 }
 
 export interface ColorResolutionResult {
@@ -45,6 +47,9 @@ function checkLayerValidity(layer: ChainLayer, reasons: Set<string>): void {
   }
   if (!NON_BLOCKING_BLEND_MODES.has(layer.blendMode)) {
     reasons.add("blend-mode");
+  }
+  for (const reason of layer.notPlain ?? []) {
+    reasons.add(reason);
   }
 }
 
@@ -88,7 +93,11 @@ export function resolveColors(chain: readonly ChainLayer[]): ColorResolutionResu
   const reasons = new Set<string>();
   checkLayerValidity(textLayer, reasons);
   const resolvedForeground = resolveFill(textLayer.fill, reasons);
-  if (resolvedForeground === null && textLayer.fill !== "mixed" && textLayer.fill.kind === "empty") {
+  if (
+    resolvedForeground === null &&
+    textLayer.fill !== "mixed" &&
+    textLayer.fill.kind === "empty"
+  ) {
     reasons.add("no-foreground-fill");
   }
 

@@ -1,5 +1,5 @@
 import type { ChainLayer } from "../colorResolution";
-import { extractNodeLayer, extractPageBackgroundLayer } from "./paintExtraction";
+import { extractBackgroundLayer, extractPageBackgroundLayer } from "./paintExtraction";
 
 /**
  * Walks from the parent up to the page, ending with the page background as the last layer
@@ -10,7 +10,7 @@ export function buildAncestorChain(node: SceneNode): ChainLayer[] {
   let current: BaseNode | null = node.parent;
 
   while (current && current.type !== "PAGE") {
-    layers.push(extractNodeLayer(current));
+    layers.push(extractBackgroundLayer(current));
     current = current.parent;
   }
 
