@@ -2,7 +2,7 @@
   "id": "M10",
   "title": "How Human Vision Sees Contrast",
   "category": "visual",
-  "context": "Added Context - Perceptual contrast algorithms (APCA)",
+  "context": "Perceptual contrast algorithms (APCA)",
   "estimatedMinutes": 3,
   "timeBudgetMinutes": {
     "reading": 2,
@@ -11,7 +11,7 @@
   },
   "whyItMatters": "Some researchers argue the current formula does not match how people see contrast. Understanding that gap explains why some results can feel visually incorrect.",
   "learningObjectives": [
-    "Recognize the flaws in current contrast mathematics.",
+    "Recognize the limitations critics describe in current contrast mathematics.",
     "Understand how color polarity affects human perception.",
     "Learn about perceptual contrast approaches being explored."
   ],

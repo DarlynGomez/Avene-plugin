@@ -26,7 +26,7 @@
       "correctOptionId": "B",
       "explanation": "Current math is not polarity-aware, meaning it does not model how human eyes perceive reverse polarity.",
       "hint": "Think about how it handles inverting colors.",
-      "testedLearningPoint": "Recognize the flaws in current contrast mathematics."
+      "testedLearningPoint": "Recognize the limitations critics describe in current contrast mathematics."
     },
     {
       "moduleId": "M10",

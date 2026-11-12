@@ -18,7 +18,7 @@
   "lessonParagraphs": [
     "Dark mode enjoys popularity for reducing eye strain in dim environments and saving battery life on some displays. However, simply flipping a light interface to dark usually alters perceptual contrast.",
     "Brand colors are typically formulated for white backgrounds. For example, a blue at 6 to 1 on white could drop to about 3 to 1 on a very dark gray, which may fall below the minimum. In dark mode, shadows disappear, and dark text on a dark background lacks a defining boundary. To resolve this, generating a separate, desaturated version of the brand colors often helps.",
-    "Another unique challenge of reverse polarity is halation. When pure white text is placed directly against a pure black background, the bright light from the text bleeds outward into the dark space. This creates an effect that can blur for some people with astigmatism6.",
+    "Another unique challenge of reverse polarity is halation. When pure white text is placed directly against a pure black background, the bright light from the text bleeds outward into the dark space. This creates an effect that can blur for some people with astigmatism.",
     "Because of halation, maximizing the contrast ratio is not always the optimal choice for dark mode. Softening the contrast by using off-white text on a dark gray background reduces the glare while safely remaining above the required 4.5 threshold. Designing for dark mode requires balancing mathematical contrast rules with optical comfort, which means dark mode often needs its own palette."
   ],
   "video": null,
