@@ -6,21 +6,21 @@ import {
   type ExplanationView
 } from "../../../shared/teachMeWhy/explanationView";
 import { EXPLANATION_TABLE } from "../../../shared/teachMeWhy/explanationTableData";
-import type { Depth } from "../../../shared/teachMeWhy/explanationTypes";
 import { resolveFocusRoot } from "../../../shared/teachMeWhy/resolveFocusRoot";
 import { toInstanceRoles } from "../../../shared/roles/lookupRole";
 import { useRoleState, type RoleQuestionState } from "../../roles/useRoleState";
 import { focusRootCard } from "../hooks/useMarkerSignals";
 import { sendExplanationEvent } from "./sendExplanationEvent";
 
+/** The one explanation a finding has, the Quick text */
+const QUICK = 1;
+
 const NO_SELECTION: ReadonlySet<string> = new Set();
 
 export interface TeachMeWhyState {
   root: Root | null;
   view: ExplanationView | null;
-  depth: Depth;
   hidden: boolean;
-  changeDepth: (depth: Depth) => void;
   hide: () => void;
   showAgain: () => void;
   backToIssue: () => void;
@@ -31,8 +31,8 @@ export interface TeachMeWhyState {
 }
 
 /**
- * Which root is shown, the depth, and what has been hidden, all held here and none of it saved
- * Opening, a depth change and hiding are reported to the sandbox for the study log
+ * Which root is shown and what has been hidden, all held here and none of it saved
+ * Opening and hiding are reported to the sandbox for the study log
  */
 export function useTeachMeWhy(
   roots: readonly Root[],
@@ -40,7 +40,6 @@ export function useTeachMeWhy(
   fontSizeOf: (issueId: string) => number | null,
   roleQuestionsShown = false
 ) {
-  const [depth, setDepth] = useState<Depth>(1);
   const [lastOpened, setLastOpened] = useState<string | null>(null);
   const [hiddenRoots, setHiddenRoots] = useState<ReadonlySet<string>>(new Set());
 
@@ -64,13 +63,13 @@ export function useTeachMeWhy(
       root
         ? buildExplanationView(
             root,
-            depth,
+            QUICK,
             EXPLANATION_TABLE,
             rolesFor,
             fontSizeOf(root.representativeIssueId)
           )
         : null,
-    [root, depth, fontSizeOf, rolesFor]
+    [root, fontSizeOf, rolesFor]
   );
 
   const open = useCallback(
@@ -78,14 +77,14 @@ export function useTeachMeWhy(
       setLastOpened(target.signature);
       const opened = buildExplanationView(
         target,
-        depth,
+        QUICK,
         EXPLANATION_TABLE,
         rolesFor,
         fontSizeOf(target.representativeIssueId)
       );
       sendExplanationEvent({ kind: "opened", key: opened.key, source });
     },
-    [depth, fontSizeOf, rolesFor]
+    [fontSizeOf, rolesFor]
   );
 
   /** The link on a root card */
@@ -109,14 +108,7 @@ export function useTeachMeWhy(
   const state: TeachMeWhyState = {
     root,
     view,
-    depth,
     hidden: root !== null && hiddenRoots.has(root.signature),
-    changeDepth: (next) => {
-      if (view && next !== depth) {
-        sendExplanationEvent({ kind: "depth_changed", key: view.key, toDepth: next });
-      }
-      setDepth(next);
-    },
     hide: () => {
       if (!root || !view) return;
       sendExplanationEvent({ kind: "dismissed", key: view.key });

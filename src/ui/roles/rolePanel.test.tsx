@@ -18,15 +18,11 @@ vi.mock("../../shared/teachMeWhy/explanationTableData", () => {
   const fallback = (text: string) => ({ text, status: "fallback", reviewer: null, factIds: [] });
   return {
     EXPLANATION_TABLE: {
-      fallbacks: {
-        "1": fallback("Fallback one."),
-        "2": fallback("Fallback two."),
-        "3": fallback("Fallback three.")
-      },
+      fallbacks: { "1": fallback("Fallback one.") },
       entries: {
-        "unknown:high:normal:2": entry("Words for text of unknown kind."),
-        "caption:high:normal:2": entry("Words for a caption."),
-        "button text:high:normal:2": entry("Words for button text.")
+        "unknown:high:normal:1": entry("Words for text of unknown kind."),
+        "caption:high:normal:1": entry("Words for a caption."),
+        "button text:high:normal:1": entry("Words for button text.")
       }
     }
   };
@@ -148,7 +144,7 @@ describe("the server is unreachable", () => {
   it("is unsure with no error shown to the participant, and the panel carries on", async () => {
     fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
     sandbox = { ...sandbox, request };
-    const user = await openTab();
+    await openTab();
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(roleServerSession.unavailable).toBe(true));
     expect(screen.getByText("What kind of text is this?")).toBeInTheDocument();
@@ -160,7 +156,6 @@ describe("the server is unreachable", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(types()).not.toContain("ROLE_SERVER_RESULT");
     // The tab still works
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     expect(screen.getByText("Words for text of unknown kind.")).toBeInTheDocument();
   });
 
@@ -227,7 +222,6 @@ describe("confirming a role changes the explanation key", () => {
   it("a confirmed suggestion changes the key and so the words", async () => {
     sandbox = { ...sandbox, suggestion: { label: "caption", model: "m", live: false } };
     const user = await openTab();
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     // A suggestion is only a question, it is not read until answered
     expect(screen.getByText("Words for text of unknown kind.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Yes" }));
@@ -237,16 +231,15 @@ describe("confirming a role changes the explanation key", () => {
       response: "confirmed"
     });
     expect(await screen.findByText("Words for a caption.")).toBeInTheDocument();
-    const logged = posted
-      .filter((m) => m.type === "EXPLANATION_EVENT")
-      .map((m) => m.event as { kind: string; key: { role: string } });
-    expect(logged.find((e) => e.kind === "depth_changed")?.key.role).toBe("unknown");
-    await user.click(screen.getByRole("radio", { name: "Quick" }));
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    const changes = posted
-      .filter((m) => m.type === "EXPLANATION_EVENT")
-      .map((m) => m.event as { kind: string; key: { role: string }; toDepth?: number });
-    expect(changes[changes.length - 1].key.role).toBe("caption");
+    const logged = () =>
+      posted
+        .filter((m) => m.type === "EXPLANATION_EVENT")
+        .map((m) => m.event as { kind: string; key: { role: string; depth: number } });
+    expect(logged().find((e) => e.kind === "opened")?.key.role).toBe("unknown");
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
+    const dismissed = logged().find((e) => e.kind === "dismissed");
+    expect(dismissed?.key.role).toBe("caption");
+    expect(dismissed?.key.depth).toBe(1);
   });
 
   it("changing the role to another one changes the key again", async () => {
@@ -255,7 +248,6 @@ describe("confirming a role changes the explanation key", () => {
       rule: { role: "caption", ruleId: "N3", reason: "Its layer name says it is a note." }
     };
     const user = await openTab();
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     expect(screen.getByText("Words for a caption.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Change" }));
     await user.click(screen.getByRole("radio", { name: /button text/ }));
@@ -269,7 +261,6 @@ describe("confirming a role changes the explanation key", () => {
       rule: { role: "caption", ruleId: "N3", reason: "Its layer name says it is a note." }
     };
     const user = await openTab();
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     await user.click(screen.getByRole("button", { name: "Change" }));
     await user.click(screen.getByRole("radio", { name: /Not sure/ }));
     await user.click(screen.getByRole("button", { name: "Save" }));

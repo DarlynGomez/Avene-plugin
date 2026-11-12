@@ -54,9 +54,7 @@ describe("Teach Me Why module library", () => {
     expect(screen.getByRole("region", { name: "Lesson" })).toHaveTextContent(
       "Contrast measures the difference in lightness"
     );
-    expect(
-      screen.getByTitle("Web Accessibility Perspectives: Colors with Good Contrast")
-    ).toHaveAttribute("src", expect.stringContaining("youtube-nocookie.com/embed/a9kNUv6N8Rk"));
+    expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
     expect(screen.queryByRole("tablist", { name: "Topic categories" })).not.toBeInTheDocument();
   });
 
@@ -72,67 +70,37 @@ describe("Teach Me Why module library", () => {
     ).toBeInTheDocument();
   });
 
-  it("enables optional article links online outside a study session", () => {
-    render(<ModuleLibrary selectedModuleId="M02" onSelectModule={() => {}} />);
-
-    expect(
-      screen.getByRole("link", {
-        name: "Challenges of Situational Impairments during Interaction with Mobile Devices"
-      })
-    ).toHaveAttribute("href", "https://www.jorgegoncalves.com/docs/ozchi17.pdf");
-  });
-
-  it("shows a local video placeholder offline with an option to retry", () => {
-    setOnline(false);
-    render(<ModuleLibrary selectedModuleId="M01" onSelectModule={() => {}} />);
-
-    expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Can't confirm an internet connection");
-    fireEvent.click(screen.getByRole("button", { name: "Load video" }));
-    expect(screen.getByTitle(M01_VIDEO)).toBeInTheDocument();
-  });
-
-  it("disables article links offline", () => {
-    setOnline(false);
-    render(<ModuleLibrary selectedModuleId="M02" onSelectModule={() => {}} />);
-
-    expect(
-      screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
-    ).not.toBeInTheDocument();
-    expect(screen.getByText(/unavailable offline/)).toBeInTheDocument();
-  });
-
-  describe("during an active study session", () => {
-    const state = {
+  describe("the lesson is text only", () => {
+    const study = {
       type: "STUDY_STATE" as const,
       session: SESSION,
       visibility: participantVisibility(SESSION),
       refusal: null
     };
-    const open = (id: string) =>
+    const open = (id: string, inSession: boolean) =>
       render(
-        <StudyStateContext.Provider value={state}>
+        <StudyStateContext.Provider value={inSession ? study : null}>
           <ModuleLibrary selectedModuleId={id} onSelectModule={() => {}} />
         </StudyStateContext.Provider>
       );
 
-    it("does not load an embed", () => {
-      open("M01");
-      expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
-      expect(screen.getByRole("status")).toHaveTextContent(
-        "Videos are unavailable during study sessions."
-      );
-      expect(screen.queryByRole("button", { name: "Load video" })).not.toBeInTheDocument();
-    });
-
-    it("does not link the external article", () => {
-      open("M02");
-      expect(
-        screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
-      ).not.toBeInTheDocument();
-      expect(
-        screen.getByText(/is unavailable offline and during study sessions/)
-      ).toBeInTheDocument();
+    it.each([
+      ["online, outside a study session", true, false],
+      ["offline", false, false],
+      ["during a study session", true, true]
+    ])("shows no video and no article link %s", (_name, online, inSession) => {
+      setOnline(online);
+      for (const id of ["M01", "M02"]) {
+        open(id, inSession);
+        expect(screen.getByRole("region", { name: "Lesson" })).toBeInTheDocument();
+        expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
+        expect(document.querySelector("iframe")).toBeNull();
+        expect(screen.queryByRole("region", { name: "Video" })).not.toBeInTheDocument();
+        expect(screen.queryByRole("link")).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: "Load video" })).not.toBeInTheDocument();
+        expect(screen.queryByText(/unavailable/i)).not.toBeInTheDocument();
+        cleanup();
+      }
     });
   });
 

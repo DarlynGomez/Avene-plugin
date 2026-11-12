@@ -63,12 +63,8 @@ describe("the shipped Quick texts", () => {
       expect(plainWords(textOf(key)), key).toBeLessThanOrEqual(max);
     }
   });
-  it("set the depth 1 limits at 35 to 60 and leave depths 2 and 3", () => {
-    expect(DEPTH_WORD_LIMITS).toEqual({
-      1: { min: 35, max: 60 },
-      2: { min: 60, max: 90 },
-      3: { min: 100, max: 150 }
-    });
+  it("set the depth 1 limits at 35 to 60 and keep no limit for any other depth", () => {
+    expect(DEPTH_WORD_LIMITS).toEqual({ 1: { min: 35, max: 60 } });
   });
   it("resolve through the lookup to the imported text once approved, never to a fallback", () => {
     const approved: ExplanationTable = {
@@ -100,6 +96,14 @@ describe("the shipped Quick texts", () => {
   });
 });
 
+describe("no other depth", () => {
+  it("has no entry and no fallback for depth 2 or 3, and every key ends in :1", () => {
+    expect(Object.keys(table.fallbacks)).toEqual(["1"]);
+    expect(Object.keys(table.entries).every((key) => key.endsWith(":1"))).toBe(true);
+    expect(Object.keys(table.entries)).toHaveLength(42);
+  });
+});
+
 describe("the depth 1 fallback", () => {
   it("is the unknown medium normal text, with no forbidden phrase", () => {
     expect(table.fallbacks["1"].text).toBe(textOf("unknown:medium:normal:1"));
@@ -123,21 +127,18 @@ describe("buildQuickTable", () => {
       QUICK_KEYS.map((key) => [key, { headline: `Move ${key}.`, bullets: ["One."] }])
     )
   };
-  it("replaces depth 1, carries depths 2 and 3 and the other fallbacks over untouched", () => {
-    const built = buildQuickTable(table, parts, null);
-    const deeper = (entries: ExplanationTable["entries"]) =>
-      Object.entries(entries).filter(([key]) => !key.endsWith(":1"));
-    expect(deeper(built.entries)).toEqual(deeper(table.entries));
-    expect(built.fallbacks["2"]).toEqual(table.fallbacks["2"]);
-    expect(built.fallbacks["3"]).toEqual(table.fallbacks["3"]);
+  it("writes the 42 Quick entries and the one fallback and nothing from any other depth", () => {
+    const built = buildQuickTable(parts, null);
+    expect(Object.keys(built.entries)).toEqual(QUICK_KEYS);
+    expect(Object.keys(built.fallbacks)).toEqual(["1"]);
     expect(built.entries[QUICK_KEYS[0]].text).toBe(composeQuickText(parts.keys[QUICK_KEYS[0]]));
   });
   it("writes pending entries with no reviewer, and approved ones only when a reviewer is given", () => {
-    expect(buildQuickTable(table, parts, null).entries[QUICK_KEYS[0]]).toMatchObject({
+    expect(buildQuickTable(parts, null).entries[QUICK_KEYS[0]]).toMatchObject({
       status: "fallback",
       reviewer: null
     });
-    expect(buildQuickTable(table, parts, "DG").entries[QUICK_KEYS[0]]).toMatchObject({
+    expect(buildQuickTable(parts, "DG").entries[QUICK_KEYS[0]]).toMatchObject({
       status: "approved",
       reviewer: "DG"
     });

@@ -1,7 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-import tableData from "../src/shared/teachMeWhy/explanationTable.json";
-import type { ExplanationTable } from "../src/shared/teachMeWhy/explanationTypes";
 import { buildQuickTable } from "../src/shared/teachMeWhy/quickTable";
 import { checkQuickParts, plainWords, type QuickParts } from "../src/shared/teachMeWhy/quickText";
 
@@ -24,12 +22,12 @@ if (problems.length > 0) {
   process.exit(1);
 }
 
-const table = buildQuickTable(tableData as unknown as ExplanationTable, parts, reviewer);
+const table = buildQuickTable(parts, reviewer);
 const counts = Object.keys(parts.keys).map((key) => plainWords(table.entries[key].text));
 writeFileSync(TABLE, `${JSON.stringify(table, null, 2)}\n`);
 console.log("checks passed: version 3, 42 keys equal the repo depth 1 keys, no text problems");
 console.log(`depth 1 words: ${Math.min(...counts)} to ${Math.max(...counts)}`);
-console.log(`depth 2 and 3 entries kept: ${Object.keys(table.entries).length - counts.length}`);
+console.log(`entries written: ${Object.keys(table.entries).length}`);
 console.log(
   reviewer ? `entries approved by ${reviewer}` : "entries written as pending, no reviewer"
 );

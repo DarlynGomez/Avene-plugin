@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { calendarAllowed, FEATURE_CALENDAR } from "../calendarFlags";
 import { FEATURE_VARIABLE_SCOPE } from "../featureFlags";
+import { FEATURE_MODULES, modulesAllowed } from "../moduleFlags";
 import {
   altLiveAllowed,
   annotationsAllowed,
@@ -52,6 +53,7 @@ describe("features with the shipped flags", () => {
     expect(annotationsAllowed(FEATURE_ALT_ANNOTATIONS, FEATURE_HANDOFF, studyActive)).toBe(false);
     expect(altLiveAllowed(FEATURE_ALT_SUGGEST_LIVE, FEATURE_HANDOFF, studyActive)).toBe(false);
     expect(variableScopeAllowed(FEATURE_VARIABLE_SCOPE, studyActive)).toBe(false);
+    expect(modulesAllowed(FEATURE_MODULES, studyActive)).toBe(!active);
   });
 });
 
@@ -64,5 +66,6 @@ describe("features with every flag on", () => {
     expect(annotationsAllowed(true, true, studyActive)).toBe(!active);
     expect(altLiveAllowed(true, true, studyActive)).toBe(!active);
     expect(variableScopeAllowed(true, studyActive)).toBe(!active);
+    expect(modulesAllowed(true, studyActive)).toBe(!active);
   });
 });

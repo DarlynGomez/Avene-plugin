@@ -1,10 +1,7 @@
 import { createHash } from "node:crypto";
-import {
-  DEPTH_WORD_LIMITS,
-  type ExplanationKey,
-  type Fact
-} from "../../src/shared/teachMeWhy/explanationTypes";
+import type { ExplanationKey, Fact } from "../../src/shared/teachMeWhy/explanationTypes";
 import { STORY_FACTS } from "../../src/shared/teachMeWhy/factEligibility";
+import { GENERATOR_WORD_LIMITS } from "./legacyLimits";
 
 /** Bump this with any change to the prompt text, it is recorded in the output file */
 export const PROMPT_VERSION = "8";
@@ -59,7 +56,7 @@ function notesFor(facts: readonly Fact[]): string[] {
 
 /** Everything the model is told about one explanation and nothing more */
 export function buildUserMessage(key: ExplanationKey, facts: readonly Fact[]): string {
-  const limit = DEPTH_WORD_LIMITS[key.depth];
+  const limit = GENERATOR_WORD_LIMITS[key.depth];
   const lines = [
     `Role: ${key.role}`,
     `Severity: ${key.severity}`,

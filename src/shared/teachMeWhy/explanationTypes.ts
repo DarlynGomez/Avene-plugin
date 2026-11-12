@@ -22,11 +22,9 @@ export interface ExplanationKey {
   depth: Depth;
 }
 
-/** Inclusive word counts for each depth */
-export const DEPTH_WORD_LIMITS: Record<Depth, { min: number; max: number }> = {
-  1: { min: 35, max: 60 },
-  2: { min: 60, max: 90 },
-  3: { min: 100, max: 150 }
+/** Inclusive word counts for a Quick text, counted without the list markers, the only depth that has text */
+export const DEPTH_WORD_LIMITS: { 1: { min: number; max: number } } = {
+  1: { min: 35, max: 60 }
 };
 
 export type ReadStatus = "full" | "excerpt" | "summary";
@@ -67,8 +65,8 @@ export interface ExplanationTable {
   generation?: GenerationRecord;
   /** Where the text came from, in words a reader of the table can follow */
   provenance?: string;
-  /** One fixed template for every depth */
-  fallbacks: Record<`${Depth}`, ExplanationEntry>;
+  /** The fixed text shown when a key has no approved entry */
+  fallbacks: { "1": ExplanationEntry };
   /** Approved entries by key string */
   entries: Record<string, ExplanationEntry>;
 }

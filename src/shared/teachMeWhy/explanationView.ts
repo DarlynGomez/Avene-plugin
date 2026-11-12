@@ -39,7 +39,7 @@ export function buildExplanationView(
   const approved = lookupExplanation(table, key);
   // A text that needs a value this issue cannot give, such as a fix colour, shows the template
   const needsMissing = unfilledSlots(approved.text, measuredRatio, root.requiredRatio, details);
-  const entry = needsMissing.length > 0 ? table.fallbacks[`${depth}`] : approved;
+  const entry = needsMissing.length > 0 ? table.fallbacks["1"] : approved;
   const isAi = entry.status === "approved";
   const values = slotValues(measuredRatio, root.requiredRatio);
   return {

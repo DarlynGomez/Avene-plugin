@@ -1,37 +1,13 @@
-.line {
+.bar {
   position: sticky;
   top: 0;
   z-index: 1;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-1);
-  padding: var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-tile) var(--radius-tile) 0 0;
   background: var(--color-card);
   border-bottom: var(--size-hairline) solid var(--color-line);
-}
-
-.text {
-  min-width: 0;
-}
-
-.name,
-.detail {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--font-size-helper);
-  line-height: var(--font-line-height-helper);
-}
-
-.name {
-  color: var(--color-ink);
-  font-weight: var(--font-weight-medium);
-}
-
-.detail {
-  color: var(--color-muted);
 }
 
 .back {

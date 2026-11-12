@@ -1,12 +1,10 @@
-import {
-  DEPTH_WORD_LIMITS,
-  type ExplanationKey
-} from "../../src/shared/teachMeWhy/explanationTypes";
+import type { ExplanationKey } from "../../src/shared/teachMeWhy/explanationTypes";
+import { GENERATOR_WORD_LIMITS } from "./legacyLimits";
 import type { Rejection } from "../../src/shared/teachMeWhy/validateExplanation";
 
 /** The exact failure, in words the model can act on, appended to the prompt on a retry */
 export function retryMessage(key: ExplanationKey, rejection: Rejection): string {
-  const limit = DEPTH_WORD_LIMITS[key.depth];
+  const limit = GENERATOR_WORD_LIMITS[key.depth];
   const quoted = `"${rejection.detail}"`;
   switch (rejection.code) {
     case "too-short":

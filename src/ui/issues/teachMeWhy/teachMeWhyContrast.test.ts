@@ -33,12 +33,9 @@ function ratio(foreground: string, background: string): number {
 
 // Secondary text, each on the surface it sits on
 const SECONDARY: [string, string, string, string][] = [
-  ["unselected depth label", "DepthGroup.module.css", ".label", "--color-background"],
-  ["depth group legend", "DepthGroup.module.css", ".legend", "--color-card"],
   ["AI label and Based on", "ExplanationCard.module.css", ".note", "--color-card"],
   ["hidden line", "ExplanationCard.module.css", ".quiet", "--color-card"],
   ["Hide this explanation", "ExplanationCard.module.css", ".action", "--color-card"],
-  ["context line detail", "ExplanationContextLine.module.css", ".detail", "--color-card"],
   [
     "popover ratio label",
     "../components/WhySurfacedPopover.module.css",
@@ -61,8 +58,13 @@ describe("secondary text in the explanation card", () => {
     ).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("keeps the context line in view while the explanation scrolls", () => {
-    expect(read("ExplanationContextLine.module.css")).toMatch(/position:\s*sticky/);
+  it("keeps Back to issue in view while the explanation scrolls", () => {
+    expect(read("BackToIssue.module.css")).toMatch(/position:\s*sticky/);
+  });
+
+  it("gives Back to issue and the deep dive a visible focus ring", () => {
+    expect(read("BackToIssue.module.css")).toMatch(/\.back:focus-visible[^}]*outline/);
+    expect(read("ExplanationCard.module.css")).toMatch(/\.deepDive:focus-visible[^}]*outline/);
   });
 });
 

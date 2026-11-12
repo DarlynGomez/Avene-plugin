@@ -119,9 +119,10 @@ export function validateExplanation(input: ValidationInput): Validation {
   reasons.push(...issueTextProblems(input.text));
 
   const words = plainWords(input.text);
-  const limits = DEPTH_WORD_LIMITS[input.key.depth];
-  if (words < limits.min) reasons.push({ code: "too-short", detail: `${words} words` });
-  if (words > limits.max) reasons.push({ code: "too-long", detail: `${words} words` });
+  // Only a Quick text has a length rule, no other depth has text any more
+  const limits = input.key.depth === 1 ? DEPTH_WORD_LIMITS[1] : null;
+  if (limits && words < limits.min) reasons.push({ code: "too-short", detail: `${words} words` });
+  if (limits && words > limits.max) reasons.push({ code: "too-long", detail: `${words} words` });
 
   return reasons.length === 0 ? { ok: true } : { ok: false, reasons };
 }

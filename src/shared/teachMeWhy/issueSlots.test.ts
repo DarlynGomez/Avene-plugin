@@ -82,9 +82,7 @@ const root: Root = {
 };
 const table: ExplanationTable = {
   fallbacks: {
-    "1": { text: "Fallback quick.", status: "fallback", reviewer: null, factIds: [] },
-    "2": { text: "Fallback mid.", status: "fallback", reviewer: null, factIds: [] },
-    "3": { text: "Fallback deep.", status: "fallback", reviewer: null, factIds: [] }
+    "1": { text: "Fallback quick.", status: "fallback", reviewer: null, factIds: [] }
   },
   entries: {
     "unknown:high:normal:1": {

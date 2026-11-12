@@ -10,28 +10,15 @@ import { StudyHost } from "../../study/StudyHost";
 import { IssuePanel } from "../IssuePanel";
 import { AI_LABEL } from "./ExplanationCard";
 
-// Quick has no entry so it falls back, Why it matters used a fact, the idea behind it used none
+// One approved Quick text for the finding in these tests, in the stored shape: a headline, a blank line, dashed bullets
 vi.mock("../../../shared/teachMeWhy/explanationTableData", () => ({
   EXPLANATION_TABLE: {
     fallbacks: {
-      "1": {
-        text: "Fallback quick {measured} needs {required}.",
-        status: "fallback",
-        reviewer: null,
-        factIds: []
-      },
-      "2": { text: "Fallback mid.", status: "fallback", reviewer: null, factIds: [] },
-      "3": { text: "Fallback deep.", status: "fallback", reviewer: null, factIds: [] }
+      "1": { text: "Fallback quick.", status: "fallback", reviewer: null, factIds: [] }
     },
     entries: {
-      "unknown:high:normal:2": {
-        text: "Mid words at {measured} against {required}.",
-        status: "approved",
-        reviewer: "DG",
-        factIds: ["F15", "F01", "F02"]
-      },
-      "unknown:high:normal:3": {
-        text: "Deep words with no facts.",
+      "unknown:high:normal:1": {
+        text: "Move the colors of this text much further apart.\n\n- First idea.\n- Second idea.\n- Third idea.",
         status: "approved",
         reviewer: "DG",
         factIds: []
@@ -124,64 +111,127 @@ async function goToExplanation(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: "Why this matters" }));
 }
 
+const EXITED: StudySession = { ...LIVE, phase: "ended", endedAt: "t", exitedAt: "t" };
+const DEEP_DIVE = { name: "Deep dive into this rule" };
+
 describe("Teach Me Why tab", () => {
-  it("opens from the black button in the Why this surfaced box with Quick chosen", async () => {
+  it("opens from the black button in the Why this surfaced box on the Quick text, with no depth choices", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
-    expect(screen.getByRole("radio", { name: "Quick" })).toBeChecked();
     expect(screen.getByRole("tab", { name: /Teach Me Why/ })).toHaveAttribute(
       "aria-selected",
       "true"
     );
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
+    expect(screen.queryByRole("radio", { name: /Quick|Why it matters|idea behind/ })).toBeNull();
   });
 
-  it("shows a fixed template with the measured values and no AI label for a missing key", async () => {
+  it("shows the Quick text as a paragraph and a list of three, with the AI label and no numbers line", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
-    expect(screen.getByText("Fallback quick 2.17:1 needs 4.5:1.")).toBeInTheDocument();
-    expect(screen.queryByText(AI_LABEL)).not.toBeInTheDocument();
+    const card = screen.getByRole("region", { name: "Explanation" });
+    expect(card.querySelectorAll("p")).toHaveLength(2);
+    expect(card.querySelectorAll("ul")).toHaveLength(1);
+    expect(card.querySelectorAll("li")).toHaveLength(3);
+    expect(
+      screen.getByText("Move the colors of this text much further apart.")
+    ).toBeInTheDocument();
+    expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
     expect(screen.queryByText(/Based on:/)).not.toBeInTheDocument();
+    expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
   });
 
-  it("carries the AI label with every AI explanation, and Based on only when facts were used", async () => {
+  it("has Back to issue as its own control above the card, and it returns to the Live Watch card", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
-
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    expect(screen.getByText("Mid words at 2.17:1 against 4.5:1.")).toBeInTheDocument();
-    expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Based on: WebAIM, The WebAIM Million 2026; World Wide Web Consortium (W3C), Contrast (Minimum)"
-      )
-    ).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Explanation" }).querySelector("a")).toBeNull();
-
-    await user.click(screen.getByRole("radio", { name: "The idea behind it" }));
-    expect(screen.getByText("Deep words with no facts.")).toBeInTheDocument();
-    expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
-    expect(screen.queryByText(/Based on:/)).not.toBeInTheDocument();
+    const card = screen.getByRole("region", { name: "Explanation" });
+    const back = screen.getByRole("button", { name: "Back to issue" });
+    expect(card.contains(back)).toBe(false);
+    expect(back.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(back);
+    expect(screen.getByRole("tab", { name: /Live Watch/ })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    );
+    expect(screen.getByRole("button", { name: "Ignore" })).toBeInTheDocument();
   });
 
-  it("opens the contrast module from the deep dive action", async () => {
-    const user = userEvent.setup();
-    open();
-    await goToExplanation(user);
-    // The context line is kept at the deeper levels, so the check is made at one of them
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    await user.click(screen.getByRole("button", { name: "Deep dive into this rule" }));
+  describe("the deep dive", () => {
+    it("is one control at the bottom right of the card when no session is active, with a decorative arrow", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      const card = screen.getByRole("region", { name: "Explanation" });
+      const controls = within(card).getAllByRole("button", DEEP_DIVE);
+      expect(controls).toHaveLength(1);
+      expect(controls[0].querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+      const actions = controls[0].parentElement as HTMLElement;
+      expect(actions.firstElementChild).toBe(within(card).getByRole("button", { name: "Dismiss" }));
+      expect(actions.lastElementChild).toBe(controls[0]);
+    });
 
-    expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
-    expect(screen.getByRole("heading", { name: "Why Text Contrast Matters" })).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Lesson" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Back to issue" })).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "All topics" }));
-    expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Back to issue" })).toBeInTheDocument();
+    it("is not rendered at all while a session is active, and Dismiss stays", async () => {
+      const user = userEvent.setup();
+      open(LIVE);
+      await goToExplanation(user);
+      expect(screen.queryByRole("button", DEEP_DIVE)).not.toBeInTheDocument();
+      const actions = screen.getByRole("button", { name: "Dismiss" }).parentElement as HTMLElement;
+      expect(actions.children).toHaveLength(1);
+    });
+
+    it("stays off for an ended block that has not been exited, and comes back once exited", async () => {
+      const user = userEvent.setup();
+      open({ ...LIVE, phase: "ended", endedAt: "t" });
+      expect(screen.queryByRole("tab", { name: /Teach Me Why/ })).not.toBeInTheDocument();
+      cleanup();
+      open(POST_REVIEWING);
+      await goToExplanation(user);
+      expect(screen.queryByRole("button", DEEP_DIVE)).not.toBeInTheDocument();
+      cleanup();
+      open(EXITED);
+      await goToExplanation(user);
+      expect(screen.getByRole("button", DEEP_DIVE)).toBeInTheDocument();
+    });
+
+    it("opens the lesson with focus on its heading, and Escape puts focus back on the control", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      await user.click(screen.getByRole("button", DEEP_DIVE));
+
+      const heading = screen.getByRole("heading", { name: "Why Text Contrast Matters" });
+      expect(heading).toHaveFocus();
+      expect(screen.getByRole("region", { name: "Lesson" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", DEEP_DIVE)).not.toBeInTheDocument();
+
+      await user.keyboard("{Escape}");
+      expect(screen.getByRole("button", DEEP_DIVE)).toHaveFocus();
+    });
+
+    it("puts focus back on the control after the All topics button too", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      await user.click(screen.getByRole("button", DEEP_DIVE));
+      await user.click(screen.getByRole("button", { name: "All topics" }));
+      expect(screen.getByRole("button", DEEP_DIVE)).toHaveFocus();
+      expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
+    });
+
+    it("shows the lesson as text only, with no video and no article link", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      await user.click(screen.getByRole("button", DEEP_DIVE));
+      expect(screen.queryByRole("region", { name: "Video" })).not.toBeInTheDocument();
+      expect(document.querySelector("iframe")).toBeNull();
+      expect(screen.queryByRole("link")).not.toBeInTheDocument();
+      expect(screen.queryByText(/quiz/i)).not.toBeInTheDocument();
+    });
   });
 
   it("shows the contrast label and the ratio at opposite ends of the box", async () => {
@@ -194,65 +244,18 @@ describe("Teach Me Why tab", () => {
     expect(screen.queryByRole("link", { name: "Why this matters" })).not.toBeInTheDocument();
   });
 
-  it("hides the context line at Quick and shows it at the two deeper levels", async () => {
-    const user = userEvent.setup();
-    open();
-    await goToExplanation(user);
-    expect(screen.getByRole("radio", { name: "Quick" })).toBeChecked();
-    expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Back to issue" })).not.toBeInTheDocument();
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
-    await user.click(screen.getByRole("radio", { name: "The idea behind it" }));
-    expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
-    await user.click(screen.getByRole("radio", { name: "Quick" }));
-    expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
-  });
-
-  it("names the issue and its values in a line with a Back to issue button", async () => {
-    const user = userEvent.setup();
-    open();
-    await goToExplanation(user);
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
-    expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Back to issue" }));
-    expect(screen.getByRole("tab", { name: /Live Watch/ })).toHaveAttribute(
-      "aria-selected",
-      "true"
-    );
-  });
-
-  it("moves between the three depths with the arrow keys", async () => {
-    const user = userEvent.setup();
-    open();
-    await goToExplanation(user);
-    const group = screen.getByRole("radiogroup");
-    expect(
-      within(group)
-        .getAllByRole("radio")
-        .map((r) => r.getAttribute("value"))
-    ).toEqual(["1", "2", "3"]);
-    screen.getByRole("radio", { name: "Quick" }).focus();
-    await user.keyboard("{ArrowRight}");
-    expect(screen.getByRole("radio", { name: "Why it matters" })).toBeChecked();
-    await user.keyboard("{ArrowRight}");
-    expect(screen.getByRole("radio", { name: "The idea behind it" })).toBeChecked();
-    await user.keyboard("{ArrowLeft}");
-    expect(screen.getByRole("radio", { name: "Why it matters" })).toBeChecked();
-  });
-
   it("dismisses an AI explanation and its label, and brings them back", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
-    await user.click(screen.getByRole("radio", { name: "The idea behind it" }));
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(screen.queryByText("Deep words with no facts.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Move the colors of this text much further apart.")).toBeNull();
     expect(screen.queryByText(AI_LABEL)).not.toBeInTheDocument();
     expect(screen.getByText("This explanation is hidden.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Show again" }));
-    expect(screen.getByText("Deep words with no facts.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Move the colors of this text much further apart.")
+    ).toBeInTheDocument();
     expect(events("dismissed")).toHaveLength(1);
   });
 
@@ -262,11 +265,10 @@ describe("Teach Me Why tab", () => {
     await user.click(screen.getByRole("tab", { name: /Teach Me Why/ }));
     expect(screen.getByRole("region", { name: "Accessibility topics" })).toBeInTheDocument();
     expect(screen.queryByText("Pick an issue to see why it matters.")).not.toBeInTheDocument();
-    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
     expect(events("opened")).toHaveLength(0);
   });
 
-  it("logs the key and source on open, the depth after a change, and each dismissal", async () => {
+  it("logs the key and source on open and each dismissal, always on depth 1, and never a depth change", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
@@ -275,21 +277,20 @@ describe("Teach Me Why tab", () => {
       { type: "EXPLANATION_EVENT", event: { kind: "opened", key, source: "card" } }
     ]);
 
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    expect(events("depth_changed")).toEqual([
-      { type: "EXPLANATION_EVENT", event: { kind: "depth_changed", key, toDepth: 2 } }
-    ]);
-    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
-    expect(events("depth_changed")).toHaveLength(1);
-
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(events("dismissed")).toEqual([
-      { type: "EXPLANATION_EVENT", event: { kind: "dismissed", key: { ...key, depth: 2 } } }
+      { type: "EXPLANATION_EVENT", event: { kind: "dismissed", key } }
     ]);
 
     await user.click(screen.getByRole("button", { name: "Back to issue" }));
     await user.click(screen.getByRole("tab", { name: /Teach Me Why/ }));
     expect(events("opened")[1]).toMatchObject({ event: { kind: "opened", source: "tab" } });
+    for (const message of posted.filter((m) => m.type === "EXPLANATION_EVENT")) {
+      const event = message.event as { kind: string; key?: { depth: number } };
+      expect(event.kind).not.toBe("depth_changed");
+      expect(event.key?.depth).toBe(1);
+    }
+    expect(events("depth_changed")).toHaveLength(0);
   });
 });
 

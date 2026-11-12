@@ -118,11 +118,7 @@ describe("validateExplanation, dashes", () => {
 });
 
 describe("validateExplanation, length", () => {
-  const limits: Array<[Depth, number, number]> = [
-    [1, 35, 60],
-    [2, 60, 90],
-    [3, 100, 150]
-  ];
+  const limits: Array<[Depth, number, number]> = [[1, 35, 60]];
   it.each(limits)("depth %i accepts %i to %i words and rejects outside", (depth, min, max) => {
     const run = (count: number) =>
       validateExplanation({
@@ -140,6 +136,16 @@ describe("validateExplanation, length", () => {
     const long = run(max + 1);
     expect(!short.ok && short.reasons[0].code).toBe("too-short");
     expect(!long.ok && long.reasons[0].code).toBe("too-long");
+  });
+  it.each([2, 3] as const)("has no length rule for depth %i, which has no text", (depth) => {
+    const result = validateExplanation({
+      text: filler(5),
+      key: key(depth),
+      usedFactIds: [],
+      allowedFacts: [],
+      slots
+    });
+    expect(!result.ok && result.reasons.map((r) => r.code)).not.toContain("too-short");
   });
 });
 
@@ -162,12 +168,12 @@ describe("validateExplanation, every reason", () => {
   });
 });
 
-describe("the fixed templates", () => {
+describe("the fixed template", () => {
   const table = tableData as unknown as ExplanationTable;
-  it.each([1, 2, 3] as const)("depth %i passes every check with no facts", (depth) => {
+  it("passes every check with no facts", () => {
     const result = validateExplanation({
-      text: table.fallbacks[`${depth}`].text,
-      key: key(depth),
+      text: table.fallbacks["1"].text,
+      key: key(1),
       usedFactIds: [],
       allowedFacts: [],
       slots

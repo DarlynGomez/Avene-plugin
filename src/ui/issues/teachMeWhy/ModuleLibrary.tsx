@@ -17,8 +17,7 @@ interface ModuleLibraryProps {
 export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibraryProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
-  const selectedModule =
-    LEARNING_MODULES.find((module) => module.id === selectedModuleId) ?? null;
+  const selectedModule = LEARNING_MODULES.find((module) => module.id === selectedModuleId) ?? null;
   const filteredModules = useMemo(() => {
     const search = query.trim().toLowerCase();
     return LEARNING_MODULES.filter((module) => {
@@ -49,12 +48,7 @@ export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibrar
   }
 
   if (selectedModule) {
-    return (
-      <ModuleDetailScreen
-        module={selectedModule}
-        onBack={() => onSelectModule(null)}
-      />
-    );
+    return <ModuleDetailScreen module={selectedModule} onBack={() => onSelectModule(null)} />;
   }
 
   return (
@@ -96,13 +90,19 @@ export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibrar
           </button>
         ))}
       </div>
-      <div id="topics-panel" className={styles.list} role="tabpanel" aria-labelledby={`topic-filter-${category}`}>
+      <div
+        id="topics-panel"
+        className={styles.list}
+        role="tabpanel"
+        aria-labelledby={`topic-filter-${category}`}
+      >
         {filteredModules.length > 0 ? (
           filteredModules.map((module) => (
             <button
               key={module.id}
               type="button"
               className={styles.topic}
+              data-return-focus={`topic-${module.id}`}
               onClick={() => onSelectModule(module.id)}
             >
               <span className={styles.metadata}>

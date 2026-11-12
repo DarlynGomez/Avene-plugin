@@ -8,15 +8,10 @@ export const QUICK_PROVENANCE =
 const FALLBACK_SOURCE = "unknown:medium:normal:1";
 
 /**
- * The table with its 42 depth 1 entries replaced, depths 2 and 3 and their fallbacks are carried over as they are
+ * The table as the 42 depth 1 entries and the one fallback, nothing else is carried over
  * Without a reviewer the entries are written as pending, and the lookup does not show a pending entry
  */
-export function buildQuickTable(
-  existing: ExplanationTable,
-  parts: QuickParts,
-  reviewer: string | null
-): ExplanationTable {
-  const kept = Object.entries(existing.entries).filter(([key]) => !key.endsWith(":1"));
+export function buildQuickTable(parts: QuickParts, reviewer: string | null): ExplanationTable {
   const quick: [string, ExplanationEntry][] = QUICK_KEYS.map((key) => [
     key,
     {
@@ -26,11 +21,10 @@ export function buildQuickTable(
       factIds: []
     }
   ]);
-  const entries = Object.fromEntries([...quick, ...kept]);
+  const entries = Object.fromEntries(quick);
   return {
     provenance: QUICK_PROVENANCE,
     fallbacks: {
-      ...existing.fallbacks,
       "1": { text: entries[FALLBACK_SOURCE].text, status: "fallback", reviewer: null, factIds: [] }
     },
     entries

@@ -31,7 +31,8 @@ interface ExplanationCardProps {
   hidden: boolean;
   onHide: () => void;
   onShowAgain: () => void;
-  onDeepDive: () => void;
+  /** Absent when lessons are not allowed, the control is then not rendered and nothing is left in its place */
+  onDeepDive?: () => void;
 }
 
 /** The words, then the label and sources, with a quiet way to put it away */
@@ -50,10 +51,17 @@ export function ExplanationCard({
           <button type="button" className={styles.action} onClick={onShowAgain}>
             Show again
           </button>
-          <button type="button" className={styles.deepDive} onClick={onDeepDive}>
-            <span>Deep dive into this rule</span>
-            <ArrowRight size={16} aria-hidden="true" />
-          </button>
+          {onDeepDive && (
+            <button
+              type="button"
+              className={styles.deepDive}
+              data-return-focus="deep-dive"
+              onClick={onDeepDive}
+            >
+              <span>Deep dive into this rule</span>
+              <ArrowRight size={16} aria-hidden="true" />
+            </button>
+          )}
         </div>
       </section>
     );
@@ -75,10 +83,17 @@ export function ExplanationCard({
         <button type="button" className={styles.action} onClick={onHide}>
           Dismiss
         </button>
-        <button type="button" className={styles.deepDive} onClick={onDeepDive}>
-          <span>Deep dive into this rule</span>
-          <ArrowRight size={16} aria-hidden="true" />
-        </button>
+        {onDeepDive && (
+          <button
+            type="button"
+            className={styles.deepDive}
+            data-return-focus="deep-dive"
+            onClick={onDeepDive}
+          >
+            <span>Deep dive into this rule</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </section>
   );
