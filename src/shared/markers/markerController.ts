@@ -13,6 +13,8 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   const tracker = createScreenTracker(deps.clock, deps.launchScreenId());
   let roots: readonly Root[] = [];
   let designerOrder: readonly string[] = [];
+  // The root whose layers are all marked, set by a click on one of its markers and cleared by any other click
+  let expandedSignature: string | null = null;
   let markers: Marker[] = [];
   let active = false;
   let shownScreen: string | null = null;
@@ -34,7 +36,7 @@ export function createMarkerController(deps: MarkerControllerDeps) {
       return;
     }
     const screen = tracker.currentScreenId();
-    const next = buildMarkerSet(roots, screen, designerOrder);
+    const next = buildMarkerSet(roots, screen, designerOrder, expandedSignature);
     const style = deps.style();
     const result = await deps.renderer.show(screen ?? "", next, style, undoStep);
     if (!result.written) {
@@ -79,11 +81,19 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   }
 
   return {
-    /** A designer selection moves the screen after the dwell, a plugin one changes nothing */
-    onSelection(event: SelectionEvent, selectedNodeIds: readonly string[]): void {
+    /**
+     * A designer selection moves the screen after the dwell, a plugin one changes nothing
+     * Clicking a marker passes its root as expand, and every layer of that root is then marked
+     */
+    onSelection(
+      event: SelectionEvent,
+      selectedNodeIds: readonly string[],
+      expand: string | null = null
+    ): void {
       if (event.origin === "plugin") {
         return;
       }
+      expandedSignature = expand;
       designerOrder = selectedNodeIds;
       tracker.onSelection(event);
       waitOutDwell();

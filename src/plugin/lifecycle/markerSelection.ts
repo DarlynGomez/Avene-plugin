@@ -22,9 +22,15 @@ export function markersOnSelection(isPluginOriginated: boolean): void {
     const marker = markerController().markerForNode(target);
     return marker ? [marker.screenId] : [];
   });
+  // A click on a marker of a group of issues marks every layer of that group, any other click puts it back
+  const clicked = selected.find(({ target }) => target !== null);
+  const expand = clicked?.target
+    ? (markerController().markerForNode(clicked.target)?.signature ?? null)
+    : null;
   markerController().onSelection(
     { origin: isPluginOriginated ? "plugin" : "designer", screenIds },
-    selected.map(({ node, target }) => target ?? node.id)
+    selected.map(({ node, target }) => target ?? node.id),
+    expand
   );
   if (isPluginOriginated) {
     return;

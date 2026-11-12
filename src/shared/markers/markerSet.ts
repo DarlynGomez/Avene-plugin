@@ -23,7 +23,7 @@ export interface Marker {
 }
 
 /**
- * One marker per root on the current screen
+ * One marker per root on the current screen, and one for every layer of the root that was clicked
  * The pool is this screen's instances narrowed to open and important before the picker runs, so a
  * marker can never land on an ignored layer, wherever that layer is in document order
  * A root that is only deferred has its deferred layers in the pool instead, and its marker is faded
@@ -31,7 +31,8 @@ export interface Marker {
 export function buildMarkerSet(
   roots: readonly Root[],
   currentScreenId: string | null,
-  designerSelectionOrder: readonly string[]
+  designerSelectionOrder: readonly string[],
+  expandedSignature: string | null = null
 ): Marker[] {
   if (currentScreenId === null) {
     return [];
@@ -50,20 +51,24 @@ export function buildMarkerSet(
       continue;
     }
     const representative = pickRepresentativeInstance(pool, states, designerSelectionOrder);
-    markers.push({
-      signature: root.signature,
-      screenId: currentScreenId,
-      issueId: representative.issueId,
-      nodeId: representative.nodeId,
-      ...(deferred ? { deferred: true } : {}),
-      ...(root.displayState === "important" ? { important: true } : {}),
-      label: markerLabel({
-        measuredRatio: representative.measuredRatio,
-        requiredRatio: root.requiredRatio,
-        important: root.displayState === "important",
-        layersHere: pool.length
-      })
-    });
+    // The root the designer clicked shows every layer it covers here, the others stay at one marker
+    const shown = root.signature === expandedSignature ? pool : [representative];
+    for (const layer of shown) {
+      markers.push({
+        signature: root.signature,
+        screenId: currentScreenId,
+        issueId: layer.issueId,
+        nodeId: layer.nodeId,
+        ...(deferred ? { deferred: true } : {}),
+        ...(root.displayState === "important" ? { important: true } : {}),
+        label: markerLabel({
+          measuredRatio: layer.measuredRatio,
+          requiredRatio: root.requiredRatio,
+          important: root.displayState === "important",
+          layersHere: pool.length
+        })
+      });
+    }
   }
   return markers;
 }

@@ -550,6 +550,35 @@ describe("clicking a dot or a ring", () => {
     expect(typeof selectedMessages()[0]?.signature).toBe("string");
   });
 
+  it("marks every layer of the group when one of its markers is clicked, and puts it back on any other click", async () => {
+    const t3 = fake.addNode("T3");
+    Object.assign(t3, { parent: t1.parent, name: "T3" });
+    t3.absoluteBoundingBox = { x: 20, y: 70, width: 60, height: 20 };
+    const m = await load(true, "dot");
+    await m.runtime.startMarkers();
+    m.runtime.markersOnIssues([
+      issue("contrast:T1", "T1", "F1", "open"),
+      issue("contrast:T3", "T3", "F1", "open")
+    ]);
+    await settle();
+    expect(shapes()).toHaveLength(1);
+
+    selection = [shapes()[0]];
+    await m.listener.handleSelectionChange(false);
+    await settle();
+    expect(shapes()).toHaveLength(2);
+
+    selection = [shapes()[1]];
+    await m.listener.handleSelectionChange(false);
+    await settle();
+    expect(shapes()).toHaveLength(2);
+
+    selection = [t1];
+    await m.listener.handleSelectionChange(false);
+    await settle();
+    expect(shapes()).toHaveLength(1);
+  });
+
   it("works for a ring as well", async () => {
     const m = await withDot("ring");
     posted.length = 0;
@@ -622,14 +651,14 @@ describe("dots and rings holding their size on screen", () => {
 
   it("resizes by itself when the zoom changes, with no click", async () => {
     await withDot();
-    expect(shapes()[0]?.width).toBe(12);
+    expect(shapes()[0]?.width).toBe(18);
     fake.state.zoom = 4;
     await settle(300);
 
-    expect(shapes()[0]?.width).toBe(3);
+    expect(shapes()[0]?.width).toBe(4.5);
     fake.state.zoom = 0.25;
     await settle(300);
-    expect(shapes()[0]?.width).toBe(48);
+    expect(shapes()[0]?.width).toBe(72);
   });
 
   it("follows a zoom that keeps moving and settles on the last one", async () => {
@@ -640,7 +669,7 @@ describe("dots and rings holding their size on screen", () => {
     }
     await settle(300);
 
-    expect(shapes()[0]?.width).toBeCloseTo(12 / 5, 4);
+    expect(shapes()[0]?.width).toBeCloseTo(18 / 5, 4);
   });
 
   it("does nothing for a zoom change too small to see, and nothing while the zoom holds still", async () => {
@@ -685,7 +714,7 @@ describe("dots and rings holding their size on screen", () => {
     await settle(300);
 
     expect(fake.commitUndo).not.toHaveBeenCalled();
-    expect(shapes()[0]?.width).toBe(4);
+    expect(shapes()[0]?.width).toBe(6);
   });
 
   it("writes nothing for an annotation, which Figma scales itself", async () => {

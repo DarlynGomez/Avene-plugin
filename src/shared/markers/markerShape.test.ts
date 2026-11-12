@@ -20,14 +20,14 @@ import {
 const BOX: TargetBox = { x: 100, y: 200, width: 80, height: 20 };
 
 describe("shapeGeometry", () => {
-  it("is 12 canvas units at 100 percent, with a 2 unit stroke for a dot and 3 for a ring", () => {
-    expect(shapeGeometry("dot", BOX, 1)).toMatchObject({ size: 12, strokeWeight: 2, filled: true });
+  it("is 18 canvas units at 100 percent, with a 1 unit stroke for a dot and 2 for a ring", () => {
+    expect(shapeGeometry("dot", BOX, 1)).toMatchObject({ size: 18, strokeWeight: 1, filled: true });
     expect(shapeGeometry("ring", BOX, 1)).toMatchObject({
-      size: 12,
-      strokeWeight: 3,
+      size: 18,
+      strokeWeight: 2,
       filled: false
     });
-    expect([SHAPE_SIZE, DOT_STROKE, RING_STROKE]).toEqual([12, 2, 3]);
+    expect([SHAPE_SIZE, DOT_STROKE, RING_STROKE]).toEqual([18, 1, 2]);
   });
 
   it("sits just outside the top left corner and never covers the layer", () => {
@@ -49,22 +49,22 @@ describe("shapeGeometry", () => {
   });
 
   it("is sized by the zoom it was written at, so it reads about the same on screen", () => {
-    expect(shapeGeometry("dot", BOX, 0.5).size).toBe(24);
-    expect(shapeGeometry("dot", BOX, 2).size).toBe(6);
-    expect(shapeGeometry("ring", BOX, 0.5).strokeWeight).toBe(6);
+    expect(shapeGeometry("dot", BOX, 0.5).size).toBe(36);
+    expect(shapeGeometry("dot", BOX, 2).size).toBe(9);
+    expect(shapeGeometry("ring", BOX, 0.5).strokeWeight).toBe(4);
   });
 
   it("reads a zoom that cannot be right as 100 percent", () => {
     for (const zoom of [0, -1, Number.NaN, Number.POSITIVE_INFINITY, 1000]) {
-      expect(shapeGeometry("dot", BOX, zoom).size).toBe(12);
+      expect(shapeGeometry("dot", BOX, zoom).size).toBe(18);
     }
   });
 
   it("follows the layer's corner wherever it is, including negative coordinates", () => {
     const shape = shapeGeometry("dot", { x: -500, y: -300, width: 10, height: 10 }, 1);
 
-    expect(shape.x).toBe(-514);
-    expect(shape.y).toBe(-314);
+    expect(shape.x).toBe(-520);
+    expect(shape.y).toBe(-320);
   });
 });
 

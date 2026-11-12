@@ -206,4 +206,37 @@ describe("buildMarkerSet", () => {
 
     expect(markers[0]?.label).toBe("2.9");
   });
+
+  describe("a root that was clicked", () => {
+    const grouped = () =>
+      root("r1", [
+        instance("1:1", "A", "open", 0),
+        instance("1:2", "A", "open", 1),
+        instance("1:3", "A", "ignored", 2),
+        instance("2:1", "B", "open", 3)
+      ]);
+
+    it("has a marker on every open layer of the screen, and none on an ignored one or another screen", () => {
+      const markers = buildMarkerSet([grouped()], "A", [], "r1");
+      expect(markers.map((m) => m.nodeId)).toEqual(["1:1", "1:2"]);
+      expect(new Set(markers.map((m) => m.signature))).toEqual(new Set(["r1"]));
+      expect(markers.map((m) => m.issueId)).toEqual(["contrast:1:1", "contrast:1:2"]);
+    });
+
+    it("is one marker as before when it was not the root that was clicked", () => {
+      expect(buildMarkerSet([grouped()], "A", [], "other")).toHaveLength(1);
+      expect(buildMarkerSet([grouped()], "A", [])).toHaveLength(1);
+    });
+
+    it("keeps every marker of a deferred root as a deferred one", () => {
+      const deferred = root(
+        "r1",
+        [instance("1:1", "A", "deferred", 0), instance("1:2", "A", "deferred", 1)],
+        "deferred"
+      );
+      const markers = buildMarkerSet([deferred], "A", [], "r1");
+      expect(markers).toHaveLength(2);
+      expect(markers.every((m) => m.deferred === true)).toBe(true);
+    });
+  });
 });

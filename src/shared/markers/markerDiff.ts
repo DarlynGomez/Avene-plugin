@@ -6,7 +6,7 @@ export interface MarkerDiff {
   unchanged: Marker[];
 }
 
-const keyOf = (marker: Marker): string => `${marker.signature}|${marker.screenId}`;
+const keyOf = (marker: Marker): string => `${marker.signature}|${marker.screenId}|${marker.nodeId}`;
 const sameMarker = (a: Marker, b: Marker): boolean =>
   a.nodeId === b.nodeId &&
   a.label === b.label &&

@@ -60,7 +60,7 @@ describe("the dot and the ring", () => {
     expect(shape?.parent).toBe(frame);
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
-    expect(shape).toMatchObject({ width: 12, height: 12, strokeWeight: 2, strokeAlign: "INSIDE" });
+    expect(shape).toMatchObject({ width: 18, height: 18, strokeWeight: 1, strokeAlign: "INSIDE" });
   });
 
   it("draws a failing marker as a triangle in the warning red with a white outline", async () => {
@@ -68,7 +68,7 @@ describe("the dot and the ring", () => {
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
 
     const [shape] = shapesOnCanvas();
-    expect(shape).toMatchObject({ pointCount: 3, width: 12, height: 12 });
+    expect(shape).toMatchObject({ pointCount: 3, width: 18, height: 18 });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
   });
@@ -82,7 +82,7 @@ describe("the dot and the ring", () => {
     );
 
     const [shape] = shapesOnCanvas();
-    expect(shape).toMatchObject({ pointCount: 4, width: 12, height: 12 });
+    expect(shape).toMatchObject({ pointCount: 4, width: 18, height: 18 });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
   });
@@ -97,7 +97,7 @@ describe("the dot and the ring", () => {
 
     const [shape] = shapesOnCanvas();
     const expected = shapeGeometry("dot", BOX, 1);
-    expect(shape).toMatchObject({ x: expected.x, y: expected.y, width: 12, height: 12 });
+    expect(shape).toMatchObject({ x: expected.x, y: expected.y, width: 18, height: 18 });
     expect(shape).toMatchObject({ pointCount: 3 });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
@@ -146,12 +146,12 @@ describe("the dot and the ring", () => {
     expect((shape?.y ?? 0) + (shape?.height ?? 0)).toBeLessThanOrEqual(BOX.y);
   });
 
-  it("draws a ring the same size with no fill and a 3 unit stroke", async () => {
+  it("draws a ring the same size with no fill and a 2 unit stroke", async () => {
     fake.addNode("1:1", [], "", BOX);
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "ring");
 
     const [shape] = shapesOnCanvas();
-    expect(shape).toMatchObject({ width: 12, height: 12, fills: [], strokeWeight: 3 });
+    expect(shape).toMatchObject({ width: 18, height: 18, fills: [], strokeWeight: 2 });
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
   });
 
@@ -160,7 +160,7 @@ describe("the dot and the ring", () => {
     fake.addNode("1:1", [], "", BOX);
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
 
-    expect(shapesOnCanvas()[0]).toMatchObject({ width: 24, strokeWeight: 4 });
+    expect(shapesOnCanvas()[0]).toMatchObject({ width: 36, strokeWeight: 2 });
   });
 
   it("tags the frame and every shape with the owner, the session and what they are", async () => {
@@ -426,7 +426,7 @@ describe("following the zoom", () => {
     fake.state.zoom = 4;
     await renderer.show("A", [marker1], "dot");
 
-    expect(shapesOnCanvas()[0]).toMatchObject({ width: 3, height: 3, strokeWeight: 0.5 });
+    expect(shapesOnCanvas()[0]).toMatchObject({ width: 4.5, height: 4.5, strokeWeight: 0.25 });
     expect(shapesOnCanvas()).toHaveLength(1);
   });
 
@@ -466,7 +466,7 @@ describe("following the zoom", () => {
 
     expect(result).toEqual({ written: true });
     expect(fake.commitUndo).not.toHaveBeenCalled();
-    expect(shapesOnCanvas()[0]?.width).toBe(6);
+    expect(shapesOnCanvas()[0]?.width).toBe(9);
   });
 
   it("still commits an undo step for a write that is not a zoom", async () => {

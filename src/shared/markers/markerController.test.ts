@@ -416,3 +416,59 @@ describe("following the zoom", () => {
     }
   });
 });
+
+describe("clicking a marker of a group of issues", () => {
+  const GROUPED = [
+    root("r1", [
+      instance("1:1", "A", "open", 0),
+      instance("1:2", "A", "open", 1),
+      instance("1:3", "A", "open", 2),
+      instance("2:1", "B", "open", 3)
+    ]),
+    root("r2", [instance("3:1", "A", "open", 4)])
+  ];
+
+  it("marks every layer of that group on the screen, and leaves the other groups at one marker", async () => {
+    const t = setup();
+    t.controller.onRoots(GROUPED);
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "3:1"]);
+
+    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    await t.controller.idle();
+    expect(t.shows.at(-1)).toEqual({ screen: "A", nodes: ["1:1", "1:2", "1:3", "3:1"] });
+  });
+
+  it("keeps them while a marker of the same group is clicked, and moves on to another group's", async () => {
+    const t = setup();
+    t.controller.onRoots(GROUPED);
+    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    t.controller.onSelection(designer("A"), ["1:2"], "r1");
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "1:2", "1:3", "3:1"]);
+
+    t.controller.onSelection(designer("A"), ["3:1"], "r2");
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "3:1"]);
+  });
+
+  it("puts the group back to one marker when the designer clicks anything else", async () => {
+    const t = setup();
+    t.controller.onRoots(GROUPED);
+    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    await t.controller.idle();
+    t.controller.onSelection(designer("A"), ["9:9"]);
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "3:1"]);
+  });
+
+  it("is not changed by a selection the plugin made", async () => {
+    const t = setup();
+    t.controller.onRoots(GROUPED);
+    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    await t.controller.idle();
+    t.controller.onSelection(plugin("A"), ["9:9"]);
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "1:2", "1:3", "3:1"]);
+  });
+});

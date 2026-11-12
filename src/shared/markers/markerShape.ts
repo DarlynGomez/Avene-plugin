@@ -1,9 +1,10 @@
 import type { MarkerStyle } from "./markerStyle";
 
 /** Canvas units at 100 percent zoom */
-export const SHAPE_SIZE = 12;
-export const DOT_STROKE = 2;
-export const RING_STROKE = 3;
+export const SHAPE_SIZE = 18;
+/** A thin outline, enough to set the fill off from any background without eating into a small shape */
+export const DOT_STROKE = 1;
+export const RING_STROKE = 2;
 /** Clear space between the shape's corner and the corner of the layer it points at */
 export const SHAPE_GAP = 2;
 
