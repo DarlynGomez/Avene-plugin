@@ -2,6 +2,7 @@ import { exclusiveViolations } from "./factEligibility";
 import { DEPTH_WORD_LIMITS, type ExplanationKey, type Fact } from "./explanationTypes";
 import type { SlotValues } from "./fillSlots";
 import { issueTextProblems, type IssueTextCode } from "./issueTextChecks";
+import { plainWords } from "./quickText";
 
 export type RejectionCode =
   | "fact-not-allowed"
@@ -117,7 +118,7 @@ export function validateExplanation(input: ValidationInput): Validation {
 
   reasons.push(...issueTextProblems(input.text));
 
-  const words = input.text.split(/\s+/).filter((word) => word !== "").length;
+  const words = plainWords(input.text);
   const limits = DEPTH_WORD_LIMITS[input.key.depth];
   if (words < limits.min) reasons.push({ code: "too-short", detail: `${words} words` });
   if (words > limits.max) reasons.push({ code: "too-long", detail: `${words} words` });

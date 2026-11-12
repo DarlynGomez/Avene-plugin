@@ -37,10 +37,10 @@ describe("lookupExplanation", () => {
       table.fallbacks["2"]
     );
   });
-  it("ships a person written template for every depth, and only approved entries", () => {
+  it("ships a person written template for every depth, and an entry is approved only with a reviewer", () => {
     for (const entry of Object.values(table.entries)) {
-      expect(entry.status).toBe("approved");
-      expect(entry.reviewer).toBeTruthy();
+      if (entry.status === "approved") expect(entry.reviewer).toBeTruthy();
+      else expect(entry.reviewer).toBeNull();
     }
     for (const depth of ["1", "2", "3"] as const) {
       expect(table.fallbacks[depth].status).toBe("fallback");

@@ -143,7 +143,7 @@ describe("validator, slots and literal values", () => {
     expect(
       check(
         1,
-        `{foreground} {background} {fontsize} {measured} {required} change the text to {fix} ${filler(20)}`
+        `{foreground} {background} {fontsize} {measured} {required} change the text to {fix} ${filler(35)}`
       ).ok
     ).toBe(true);
     expect(codes(check(2, `Change the text to {fix} ${filler(70)}`, ["F20"]))).toEqual([

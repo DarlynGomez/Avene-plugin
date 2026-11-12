@@ -9,6 +9,7 @@
     "test:watch": "vitest",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"*.{js,json,ts,html}\" .prettierrc",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"*.{js,json,ts,html}\" .prettierrc",
+    "teach:quick": "vite-node scripts/importQuickText.ts",
     "teach:generate": "vite-node tools/teach-me-why/generate.ts",
     "teach:import": "vite-node tools/teach-me-why/importCli.ts",
     "teach:coverage": "vite-node tools/teach-me-why/coverage.ts",

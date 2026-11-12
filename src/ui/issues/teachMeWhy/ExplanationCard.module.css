@@ -14,6 +14,22 @@
   line-height: var(--font-line-height-option-label);
 }
 
+.list {
+  margin: 0;
+  padding-inline-start: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.item {
+  max-width: 60ch;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-option-label);
+  line-height: var(--font-line-height-option-label);
+}
+
 .note,
 .quiet {
   margin: 0;

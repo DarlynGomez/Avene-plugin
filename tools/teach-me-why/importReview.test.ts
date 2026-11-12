@@ -13,7 +13,7 @@ const generation = {
   generatedAt: "2026-10-14T00:00:00.000Z"
 };
 const words = (count: number) => Array.from({ length: count }, () => "word").join(" ");
-const quick = (extra = "") => `It is {measured} and needs {required}. ${extra} ${words(24)}`.trim();
+const quick = (extra = "") => `It is {measured} and needs {required}. ${extra} ${words(30)}`.trim();
 
 function row(fields: Partial<Record<(typeof REVIEW_COLUMNS)[number], string>>): string[] {
   return REVIEW_COLUMNS.map((name) => fields[name] ?? "");

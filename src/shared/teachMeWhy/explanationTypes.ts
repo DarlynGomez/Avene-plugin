@@ -24,7 +24,7 @@ export interface ExplanationKey {
 
 /** Inclusive word counts for each depth */
 export const DEPTH_WORD_LIMITS: Record<Depth, { min: number; max: number }> = {
-  1: { min: 25, max: 45 },
+  1: { min: 35, max: 60 },
   2: { min: 60, max: 90 },
   3: { min: 100, max: 150 }
 };
@@ -65,6 +65,8 @@ export interface GenerationRecord {
 export interface ExplanationTable {
   /** Set when the entries were imported from a reviewed generation run */
   generation?: GenerationRecord;
+  /** Where the text came from, in words a reader of the table can follow */
+  provenance?: string;
   /** One fixed template for every depth */
   fallbacks: Record<`${Depth}`, ExplanationEntry>;
   /** Approved entries by key string */

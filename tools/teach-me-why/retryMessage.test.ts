@@ -13,7 +13,7 @@ const words = (n: number) => Array.from({ length: n }, () => "w").join(" ");
 describe("retryMessage", () => {
   it("says the word count and the minimum", () => {
     expect(retryMessage(key, { code: "too-short", detail: "19 words" })).toBe(
-      "your last attempt had 19 words, the minimum is 25"
+      "your last attempt had 19 words, the minimum is 35"
     );
   });
   it("quotes what was written for the fix wording", () => {
@@ -47,7 +47,7 @@ describe("generateItem retries", () => {
     expect(result.status).toBe("completed");
     expect(seen[0]).toBe(buildUserMessage(key, []));
     expect(seen[1]).toContain(
-      "Your last attempt failed: your last attempt had 12 words, the minimum is 25"
+      "Your last attempt failed: your last attempt had 12 words, the minimum is 35"
     );
     expect(seen[2]).toContain('you wrote "');
     expect(seen[2]).toContain("{fix} is a color");

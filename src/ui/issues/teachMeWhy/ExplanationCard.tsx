@@ -3,7 +3,28 @@ import { ArrowRight } from "lucide-react";
 import type { ExplanationView } from "../../../shared/teachMeWhy/explanationView";
 import styles from "./ExplanationCard.module.css";
 
-export const AI_LABEL = "Written in advance by AI, reviewed by the research team.";
+/** The one place the wording of the AI label lives, the wording is not yet confirmed with Dr. Tigwell */
+export const AI_LABEL =
+  "Drafted in advance with AI help and reviewed by the research team. No AI runs while you use this.";
+
+const LIST_MARK = "- ";
+
+/** A block whose every line starts with the list mark is a list, anything else is a paragraph */
+function TextBlock({ block }: { block: string }) {
+  const lines = block.split("\n");
+  if (lines.every((line) => line.startsWith(LIST_MARK))) {
+    return (
+      <ul className={styles.list}>
+        {lines.map((line, index) => (
+          <li key={`${index}:${line}`} className={styles.item}>
+            {line.slice(LIST_MARK.length)}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  return <p className={styles.text}>{block}</p>;
+}
 
 interface ExplanationCardProps {
   view: ExplanationView;
@@ -39,10 +60,8 @@ export function ExplanationCard({
   }
   return (
     <section className={styles.card} aria-label="Explanation">
-      {view.text.split(/\n{2,}/).map((paragraph) => (
-        <p key={paragraph} className={styles.text}>
-          {paragraph}
-        </p>
+      {view.text.split(/\n{2,}/).map((block) => (
+        <TextBlock key={block} block={block} />
       ))}
       {view.isAi && (
         <>

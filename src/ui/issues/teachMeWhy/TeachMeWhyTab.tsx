@@ -27,13 +27,16 @@ export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
     <div ref={outer} className={styles.outer}>
       {!selectedModuleId && root && view && (
         <div className={styles.highlight}>
-          <ExplanationContextLine
-            name={rootName(root, representative?.backgroundBinding ?? null)}
-            role={view.key.role}
-            measured={view.measured}
-            required={view.required}
-            onBack={state.backToIssue}
-          />
+          {/* Quick shows no numbers and so no context line, the deeper levels keep it */}
+          {state.depth !== 1 && (
+            <ExplanationContextLine
+              name={rootName(root, representative?.backgroundBinding ?? null)}
+              role={view.key.role}
+              measured={view.measured}
+              required={view.required}
+              onBack={state.backToIssue}
+            />
+          )}
           {state.role?.view?.allowed && (
             <RoleQuestion view={state.role.view} onAnswer={state.role.answer} />
           )}

@@ -171,6 +171,8 @@ describe("Teach Me Why tab", () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
+    // The context line is kept at the deeper levels, so the check is made at one of them
+    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     await user.click(screen.getByRole("button", { name: "Deep dive into this rule" }));
 
     expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" });
@@ -192,10 +194,26 @@ describe("Teach Me Why tab", () => {
     expect(screen.queryByRole("link", { name: "Why this matters" })).not.toBeInTheDocument();
   });
 
+  it("hides the context line at Quick and shows it at the two deeper levels", async () => {
+    const user = userEvent.setup();
+    open();
+    await goToExplanation(user);
+    expect(screen.getByRole("radio", { name: "Quick" })).toBeChecked();
+    expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Back to issue" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
+    expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "The idea behind it" }));
+    expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "Quick" }));
+    expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
+  });
+
   it("names the issue and its values in a line with a Back to issue button", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
+    await user.click(screen.getByRole("radio", { name: "Why it matters" }));
     expect(screen.getByText("sage/muted on #FFFFFF")).toBeInTheDocument();
     expect(screen.getByText("2.17:1 now, 4.5:1 needed")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Back to issue" }));

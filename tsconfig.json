@@ -17,5 +17,5 @@
     "jsx": "react-jsx",
     "types": ["node", "@figma/plugin-typings"]
   },
-  "include": ["src", "tools", "vite.config.ts", "vitest.config.ts"]
+  "include": ["src", "tools", "scripts", "vite.config.ts", "vitest.config.ts"]
 }

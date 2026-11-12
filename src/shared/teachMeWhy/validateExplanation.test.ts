@@ -119,7 +119,7 @@ describe("validateExplanation, dashes", () => {
 
 describe("validateExplanation, length", () => {
   const limits: Array<[Depth, number, number]> = [
-    [1, 25, 45],
+    [1, 35, 60],
     [2, 60, 90],
     [3, 100, 150]
   ];
