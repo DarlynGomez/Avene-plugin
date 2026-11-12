@@ -23,254 +23,254 @@
   "entries": {
     "heading:low:normal:1": {
       "text": "Nudge the colors of this heading a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "heading:low:large:1": {
       "text": "Nudge the colors of this heading a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "heading:medium:normal:1": {
       "text": "Move the colors of this heading clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "heading:medium:large:1": {
       "text": "Move the colors of this heading clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "heading:high:normal:1": {
       "text": "Move the colors of this heading much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "heading:high:large:1": {
       "text": "Move the colors of this heading much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:low:normal:1": {
       "text": "Nudge the colors of this body text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:low:large:1": {
       "text": "Nudge the colors of this body text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:medium:normal:1": {
       "text": "Move the colors of this body text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:medium:large:1": {
       "text": "Move the colors of this body text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:high:normal:1": {
       "text": "Move the colors of this body text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "body:high:large:1": {
       "text": "Move the colors of this body text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:low:normal:1": {
       "text": "Nudge the colors of this caption a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:low:large:1": {
       "text": "Nudge the colors of this caption a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:medium:normal:1": {
       "text": "Move the colors of this caption clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:medium:large:1": {
       "text": "Move the colors of this caption clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:high:normal:1": {
       "text": "Move the colors of this caption much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "caption:high:large:1": {
       "text": "Move the colors of this caption much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:low:normal:1": {
       "text": "Nudge the colors of this label a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:low:large:1": {
       "text": "Nudge the colors of this label a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:medium:normal:1": {
       "text": "Move the colors of this label clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:medium:large:1": {
       "text": "Move the colors of this label clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:high:normal:1": {
       "text": "Move the colors of this label much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "label:high:large:1": {
       "text": "Move the colors of this label much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:low:normal:1": {
       "text": "Nudge the colors of this button text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:low:large:1": {
       "text": "Nudge the colors of this button text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:medium:normal:1": {
       "text": "Move the colors of this button text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:medium:large:1": {
       "text": "Move the colors of this button text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:high:normal:1": {
       "text": "Move the colors of this button text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:high:large:1": {
       "text": "Move the colors of this button text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Keep it, and change the other color.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:low:normal:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:low:large:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:medium:normal:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:medium:large:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:high:normal:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "decorative:high:large:1": {
       "text": "Avene reads this as decoration. Is that right?\n\n- If people need to read it, treat it like other text: move the colors apart.\n- If it is only decoration, you may leave it as it is.\n- Not sure? Ask whether anything is lost if the words vanish.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:low:normal:1": {
       "text": "Nudge the colors of this text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:low:large:1": {
       "text": "Nudge the colors of this text a little further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:medium:normal:1": {
       "text": "Move the colors of this text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:medium:large:1": {
       "text": "Move the colors of this text clearly further apart.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:high:normal:1": {
       "text": "Move the colors of this text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- Much larger text needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "unknown:high:large:1": {
       "text": "Move the colors of this text much further apart. You have several ways to do it.\n\n- Make the lighter color lighter, or the darker color darker.\n- Locked to a brand color? Put a solid, contrasting shape behind the text, in the same frame.\n- This text already counts as large, so it needs less contrast.",
-      "status": "fallback",
-      "reviewer": null,
+      "status": "approved",
+      "reviewer": "DG",
       "factIds": []
     },
     "button text:medium:normal:2": {

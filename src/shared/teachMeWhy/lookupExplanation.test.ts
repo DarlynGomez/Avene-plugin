@@ -23,7 +23,8 @@ describe("lookupExplanation", () => {
   it("falls back to the template for that depth when the key is missing", () => {
     expect(lookupExplanation(table, key)).toBe(table.fallbacks["2"]);
     expect(lookupExplanation(table, { ...key, depth: 3 })).toBe(table.fallbacks["3"]);
-    expect(lookupExplanation(table, { ...key, depth: 1 })).toBe(table.fallbacks["1"]);
+    const empty: ExplanationTable = { ...table, entries: {} };
+    expect(lookupExplanation(empty, { ...key, depth: 1 })).toBe(table.fallbacks["1"]);
   });
   it("never returns an entry that was not approved", () => {
     const draft = { ...approved, status: "fallback" as const };
