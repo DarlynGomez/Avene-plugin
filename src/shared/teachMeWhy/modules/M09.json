@@ -2,20 +2,24 @@
   "id": "M09",
   "title": "Contrast for Interface Parts",
   "category": "visual",
-  "context": "Non-text contrast for inputs, borders, icons, and charts",
+  "context": "Added Context - Non-text contrast for inputs, borders, and charts",
   "estimatedMinutes": 4.5,
-  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
-  "whyItMatters": "Text is not the only part of an interface that needs to be visible. Boundaries help people find controls and distinguish chart information.",
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 1.5,
+    "quiz": 1
+  },
+  "whyItMatters": "Text is not the only element requiring visibility. If the border of a text input or the slice of a data chart cannot be perceived, the product cannot be used.",
   "learningObjectives": [
-    "Identify user interface components.",
-    "Understand the 3:1 target for borders and icons.",
-    "Apply contrast ideas to data visualizations."
+    "Identify what qualifies as a user interface component.",
+    "Understand the 3 ratio requirement for borders and icons.",
+    "Apply contrast rules to data visualizations and charts."
   ],
   "lessonParagraphs": [
-    "Buttons, text input borders, icons, and chart elements are interface components without words. They need a clear boundary so people can see where to interact.",
-    "A faint field border can blend into its background. The research gives a 3:1 target for non-text graphical components against adjacent colors. Avene currently focuses on text contrast, so this topic is outside its detection scope.",
-    "Adjacent colors in a pie chart can blend together. The research suggests using distinct lightness or adding a dark border between slices.",
-    "A visible cue can also communicate a component boundary. For example, a button without a border may still be clear if its text signals its purpose."
+    "While text contrast is crucial, digital interfaces are packed with graphics that contain no words. Buttons, text input borders, icons, and data charts are all classified as user interface components. Just like text, these elements require a clear visual boundary against their surroundings so the audience knows where to interact.",
+    "If a text field relies solely on a faint gray border to indicate where to click, and that border blends into a white background, the field becomes hard to see for someone with low vision. To prevent this, non-text graphical components require a contrast ratio of at least 3 against adjacent colors2. Avene focuses exclusively on text, but understanding non-text boundaries is vital for holistic design.",
+    "This requirement also heavily impacts data visualization. In a pie chart, if two adjacent slices exhibit a contrast ratio lower than 3, they will blend together for many readers, making the chart hard to read. This is resolved by ensuring the colors are distinct in lightness, or by adding a stark, dark border directly between the slices.",
+    "There is a notable exception: if the component features another visible cue, the boundary contrast is less strict. If a button lacks a border entirely but contains high-contrast text that clearly indicates its purpose, it remains highly usable. Evaluating non-text contrast ensures that the structural boundaries of a layout remain as resilient as the words inside them."
   ],
   "video": {
     "provider": "youtube",
@@ -32,12 +36,11 @@
   },
   "optionalArticle": null,
   "keyTakeaways": [
-    "Icons, borders, and input fields need a visible boundary.",
-    "The research gives a 3:1 target for non-text components.",
-    "Other cues can help distinguish chart elements and controls."
+    "Icons, borders, and input fields require a minimum contrast ratio of 3.",
+    "Adjacent colors in charts and graphs must maintain this visual boundary.",
+    "Components without borders are acceptable if other cues signal their presence."
   ],
-  "reviewFlags": [
-    "The overview lists 4 minutes, while the detailed reading, video, and quiz budget totals 4.5 minutes."
-  ],
-  "internalNote": "This topic is outside the scope of Avene's text-only detection engine."
+  "reviewFlags": [],
+  "internalNote": "Not linked from any key. Keep in the library, not in the study path.",
+  "forDevelopers": "This module directly addresses WCAG 2.2 Success Criterion 1.4.11 Non-text Contrast, a concept outside the scope of Avene's text-only detection engine."
 }

@@ -1,0 +1,45 @@
+{
+  "id": "M12",
+  "title": "Making Multimedia Accessible",
+  "category": "visual",
+  "context": "Video captions and audio descriptions",
+  "estimatedMinutes": 4,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 1,
+    "quiz": 1
+  },
+  "whyItMatters": "Video and audio are engaging ways to share content, but they exclude people with hearing or vision impairments if no alternatives are provided. Captions and audio descriptions ensure multimedia remains accessible.",
+  "learningObjectives": [
+    "Understand the difference between captions and audio descriptions.",
+    "Identify who benefits from accessible multimedia.",
+    "Recognize why automatic captions require human review."
+  ],
+  "lessonParagraphs": [
+    "Digital platforms rely heavily on video and audio content. While multimedia is highly engaging, it creates significant barriers for users with hearing or visual impairments. To make this content accessible, two main features are required: captions and audio descriptions.",
+    "Captions provide a text version of the spoken words and essential sounds in a video. They are vital for people who are deaf or hard of hearing, but they also benefit anyone watching a video in a noisy environment or a quiet space where sound cannot be played. For captions to be truly effective, they must be accurate. Relying solely on unedited automatic captions often leads to confusing or incorrect information, so a human review is highly recommended.",
+    "Audio descriptions serve a different purpose. They provide a spoken narration of the important visual elements happening on screen. This is crucial for people with low vision or blindness. If a video demonstrates a process silently, an audio description ensures that someone listening to the content still understands what is happening.",
+    "While Avene evaluates text contrast, a designer should remember that an interface frequently houses multimedia. Planning for captions and audio descriptions from the beginning ensures that videos and podcasts communicate their message universally."
+  ],
+  "video": {
+    "provider": "youtube",
+    "videoId": "iWO5N3n1DXU",
+    "title": "Web Accessibility Perspectives: Video Captions",
+    "publisher": "W3C Web Accessibility Initiative (WAI)",
+    "startSeconds": 0,
+    "endSeconds": 60,
+    "durationSeconds": 60,
+    "captionsAvailable": true,
+    "transcriptAvailable": null,
+    "embeddingAllowed": true,
+    "license": "W3C License"
+  },
+  "optionalArticle": null,
+  "keyTakeaways": [
+    "Captions provide a text version of spoken words and essential sounds.",
+    "Audio descriptions provide a spoken narration of visual actions.",
+    "Accurate multimedia alternatives benefit everyone, including users in noisy environments."
+  ],
+  "reviewFlags": [],
+  "forDevelopers": "This module references WCAG Success Criteria 1.2.2 Captions (Prerecorded) and 1.2.5 Audio Description (Prerecorded)."
+}

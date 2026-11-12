@@ -40,4 +40,6 @@ export interface LearningModule {
   keyTakeaways: string[];
   reviewFlags: string[];
   internalNote?: string;
+  /** For people building from the lesson, stored and never shown to a participant */
+  forDevelopers?: string;
 }

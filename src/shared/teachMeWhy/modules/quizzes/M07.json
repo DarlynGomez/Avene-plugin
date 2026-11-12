@@ -2,46 +2,85 @@
   "moduleId": "M07",
   "questions": [
     {
-      "questionId": "M07Q1",
+      "moduleId": "M07",
+      "questionId": "M07_Q1",
       "prompt": "Why do brand colors designed for light backgrounds often fail in dark mode?",
       "options": [
-        { "id": "A", "text": "They become too desaturated to be recognized." },
-        { "id": "B", "text": "Dark backgrounds can remove their defining boundary, making them blend or disappear." },
-        { "id": "C", "text": "Brand guidelines strictly prohibit the use of dark backgrounds." },
-        { "id": "D", "text": "The hex codes cannot be processed by dark mode software." }
+        {
+          "id": "A",
+          "text": "They become too desaturated to be recognized."
+        },
+        {
+          "id": "B",
+          "text": "Dark backgrounds lack a defining boundary, making vibrant colors bleed or vanish."
+        },
+        {
+          "id": "C",
+          "text": "Brand guidelines strictly prohibit the use of dark backgrounds."
+        },
+        {
+          "id": "D",
+          "text": "The hex codes cannot be processed by dark mode software."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "A color that contrasts against white may lose its lightness boundary when placed on a dark surface.",
+      "explanation": "A color that contrasts beautifully against white often loses its lightness boundary when placed directly on a dark surface.",
       "hint": "Think about what happens to a dark blue logo when placed on dark gray.",
       "testedLearningPoint": "Understand why brand colors fail in reverse polarity."
     },
     {
-      "questionId": "M07Q2",
-      "prompt": "What visual effect can pure white text on a pure black background create?",
+      "moduleId": "M07",
+      "questionId": "M07_Q2",
+      "prompt": "What visual effect is caused by pure white text on a pure black background?",
       "options": [
-        { "id": "A", "text": "Halation, where light bleeds into the dark space and blurs the text." },
-        { "id": "B", "text": "Pixelation, where the edges of the font become jagged." },
-        { "id": "C", "text": "Desaturation, where the white text appears gray." },
-        { "id": "D", "text": "Inversion, where the colors flip unexpectedly." }
+        {
+          "id": "A",
+          "text": "Halation, where light bleeds into the dark space and blurs the text."
+        },
+        {
+          "id": "B",
+          "text": "Pixelation, where the edges of the font become jagged."
+        },
+        {
+          "id": "C",
+          "text": "Desaturation, where the white text appears gray."
+        },
+        {
+          "id": "D",
+          "text": "Inversion, where the colors flip unexpectedly."
+        }
       ],
       "correctOptionId": "A",
-      "explanation": "Halation describes bright light bleeding outward on a dark screen, creating a fuzzy effect for some readers.",
+      "explanation": "Halation causes bright white light to bleed outward on a pitch-black screen, which can create a fuzzy effect for some people with astigmatism.",
       "hint": "It relates to how bright light interacts with total darkness in the human eye.",
       "testedLearningPoint": "Recognize the visual phenomenon of halation."
     },
     {
-      "questionId": "M07Q3",
-      "prompt": "How can dark-mode readability improve while avoiding halation?",
+      "moduleId": "M07",
+      "questionId": "M07_Q3",
+      "prompt": "How can readability in dark mode be improved while avoiding halation?",
       "options": [
-        { "id": "A", "text": "Use the highest possible contrast ratio available." },
-        { "id": "B", "text": "Use pure white text on pure black." },
-        { "id": "C", "text": "Use off-white text on a dark gray background." },
-        { "id": "D", "text": "Make all the text heavily bolded." }
+        {
+          "id": "A",
+          "text": "Use the highest possible contrast ratio available."
+        },
+        {
+          "id": "B",
+          "text": "Use pure white text on pure black."
+        },
+        {
+          "id": "C",
+          "text": "Use an off-white text color on a dark gray background."
+        },
+        {
+          "id": "D",
+          "text": "Make all the text heavily bolded."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "Softening the extremes can reduce glare and blurring while remaining above the stated minimum.",
-      "hint": "The goal is to soften the extreme difference between light and dark.",
-      "testedLearningPoint": "Adapt saturation to maintain readability on dark backgrounds."
+      "explanation": "Softening the extremes reduces glare and blurring while safely remaining above the required minimum threshold.",
+      "hint": "The goal is to soften the extreme difference between the light and the dark.",
+      "testedLearningPoint": "Identify methods to improve readability and reduce halation in dark mode."
     }
   ]
 }

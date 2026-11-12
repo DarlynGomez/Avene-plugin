@@ -2,44 +2,83 @@
   "moduleId": "M08",
   "questions": [
     {
-      "questionId": "M08Q1",
-      "prompt": "Why might a lower-contrast combination be kept intentionally?",
+      "moduleId": "M08",
+      "questionId": "M08_Q1",
+      "prompt": "Why might a lower contrast combination be kept intentionally?",
       "options": [
-        { "id": "A", "text": "Because accessibility is strictly optional." },
-        { "id": "B", "text": "Because the goal is to trick automated auditing tools." },
-        { "id": "C", "text": "Because constraints can conflict, such as a strict brand lock or intentional visual hierarchy." },
-        { "id": "D", "text": "Because high contrast drains too much battery life." }
+        {
+          "id": "A",
+          "text": "Because accessibility is strictly optional."
+        },
+        {
+          "id": "B",
+          "text": "Because the goal is to trick automated auditing tools."
+        },
+        {
+          "id": "C",
+          "text": "Because conflicting constraints must be navigated, such as a strict brand lock or intentional visual hierarchy."
+        },
+        {
+          "id": "D",
+          "text": "Because high contrast drains too much battery life."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "Design involves tradeoffs; brand requirements or visual hierarchy may lead to a lower-contrast choice.",
-      "hint": "Consider what happens when a client will not alter their logo colors.",
+      "explanation": "Design involves tradeoffs; occasionally, brand requirements or structural hierarchy forces the acceptance of a lower contrast.",
+      "hint": "Consider what happens when a client refuses to alter their logo colors.",
       "testedLearningPoint": "Recognize situations where strict contrast constraints conflict with brand rules."
     },
     {
-      "questionId": "M08Q2",
+      "moduleId": "M08",
+      "questionId": "M08_Q2",
       "prompt": "What is the primary benefit of documenting a tradeoff decision?",
       "options": [
-        { "id": "A", "text": "It automatically fixes the contrast ratio in the final code." },
-        { "id": "B", "text": "It creates transparency for developers and future audits, preventing confusion." },
-        { "id": "C", "text": "It legally protects the company from all accessibility lawsuits." },
-        { "id": "D", "text": "It hides the issue from automated scanning software permanently." }
+        {
+          "id": "A",
+          "text": "It automatically fixes the contrast ratio in the final code."
+        },
+        {
+          "id": "B",
+          "text": "It creates transparency for developers and future audits, preventing confusion."
+        },
+        {
+          "id": "C",
+          "text": "It legally protects the company from all accessibility lawsuits."
+        },
+        {
+          "id": "D",
+          "text": "It hides the error from automated scanning software permanently."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "Documentation shows that the issue was evaluated and a deliberate choice was made.",
+      "explanation": "Documentation proves the issue was evaluated and a deliberate choice was made, fostering clear team communication.",
       "hint": "Think about what a developer needs to know when they see a failing color.",
       "testedLearningPoint": "Record intentional design decisions for development teams."
     },
     {
-      "questionId": "M08Q3",
+      "moduleId": "M08",
+      "questionId": "M08_Q3",
       "prompt": "How does a documented tradeoff differ from a silent failure?",
       "options": [
-        { "id": "A", "text": "A silent failure means the contrast passes, while a tradeoff means it fails." },
-        { "id": "B", "text": "A silent failure causes confusion, while a tradeoff provides an acknowledged written justification." },
-        { "id": "C", "text": "A documented tradeoff is only used for text, while silent failures apply to images." },
-        { "id": "D", "text": "There is no difference between the two." }
+        {
+          "id": "A",
+          "text": "A silent failure means the contrast actually passes, while a tradeoff means it fails."
+        },
+        {
+          "id": "B",
+          "text": "A silent failure causes confusion, while a tradeoff provides an acknowledged, written justification."
+        },
+        {
+          "id": "C",
+          "text": "A documented tradeoff is only used for text, while silent failures apply to images."
+        },
+        {
+          "id": "D",
+          "text": "There is no difference between the two."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "Ignoring an issue leaves the team guessing, while a record explains why the color was kept.",
+      "explanation": "Ignoring a failure silently leaves the team guessing if it was a mistake; recording it explains exactly why it was kept.",
       "hint": "It is about the difference between ignoring a problem and explaining it.",
       "testedLearningPoint": "Differentiate between an ignored error and a documented tradeoff."
     }

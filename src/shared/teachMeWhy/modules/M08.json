@@ -2,40 +2,34 @@
   "id": "M08",
   "title": "Documenting a Tradeoff",
   "category": "system",
-  "context": "Recording a design decision when a color is intentionally kept",
-  "estimatedMinutes": 4.5,
-  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
-  "whyItMatters": "When a lower-contrast color is kept intentionally, recording the reason makes the decision clear to the people who work with the design next.",
+  "context": "Making a documented tradeoff (when to keep a failing color)",
+  "estimatedMinutes": 3,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 0,
+    "quiz": 1
+  },
+  "whyItMatters": "Design is the continuous process of navigating conflicting constraints. When a lower-contrast color is kept intentionally, recording the reasoning transforms a silent error into a transparent, actionable decision.",
   "learningObjectives": [
-    "Recognize when contrast constraints can conflict with brand requirements.",
-    "Record intentional decisions for development handoff.",
-    "Differentiate a documented tradeoff from an ignored issue."
+    "Recognize situations where strict contrast constraints conflict with brand rules.",
+    "Record intentional design decisions for development teams.",
+    "Differentiate between an ignored error and a documented tradeoff."
   ],
   "lessonParagraphs": [
-    "A contrast tool can identify a measured issue, but it cannot know every project constraint. A brand palette or visual hierarchy may shape a decision to keep a color.",
-    "Silently ignoring a flagged issue can leave developers unsure whether it was seen or missed. It can also be raised again in a later review.",
-    "A documented tradeoff records the issue and the reason for keeping it. In Avene, the accountability loop lets a designer acknowledge an issue and capture a justification for the decision.",
-    "Documentation does not change the measured contrast. It makes the choice visible and helps the team understand what was evaluated."
+    "Accessibility tools accurately flag mathematical failures, but they possess no understanding of the broader context of a project. Sometimes, it becomes necessary to keep a lower-contrast color. The brand palette may be locked by strict client requirements, or a specific piece of text might be intentionally de-emphasized to preserve the overall visual hierarchy of a complex screen.",
+    "When a flagged contrast issue cannot be changed, simply ignoring the warning is risky. A silent failure generates confusion during developer handoff and risks being flagged repeatedly during future accessibility audits. The solution is to transform the failure into a documented tradeoff.",
+    "Using Avene, a flagged issue can be acknowledged while capturing the justification behind the decision. This record stores the exact colors involved, the date, and the specific reasoning. When this record is handed off to developers or project managers, they can see immediately that the contrast was not an accident or an oversight; it was an intentional, negotiated choice.",
+    "Documenting a tradeoff does not mean the contrast failure ceases to exist. It simply provides necessary transparency. It proves the issue was evaluated and a deliberate decision was made regarding the visual hierarchy or brand constraint. By keeping a written record, the integrity of the design system is protected, and clear communication is fostered across the entire team."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "n-L7mCih5Yg",
-    "title": "Gestalt Principles in Design: 7 Simple Rules for Better UI",
-    "publisher": "Eleken",
-    "startSeconds": 90,
-    "endSeconds": 168,
-    "durationSeconds": 78,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "Standard YouTube"
-  },
+  "video": null,
   "optionalArticle": null,
   "keyTakeaways": [
-    "Brand requirements and visual hierarchy can create design tradeoffs.",
-    "A silent failure can leave the next person unsure what happened.",
-    "A written decision records that an issue was considered."
+    "Mathematical contrast failures sometimes stem from strict brand constraints.",
+    "Ignoring a failure silently creates extensive confusion for developers.",
+    "Documenting a decision creates a transparent record of the tradeoff."
   ],
-  "reviewFlags": [],
-  "internalNote": "A documented decision does not change the underlying contrast measurement."
+  "reviewFlags": [
+    "Confirm if the feature in the study build requires a written reason to ignore an issue, or if it is optional, and adjust the lesson text to match the exact study priming."
+  ],
+  "forDevelopers": "Acknowledged decisions bypass automated warnings within the Avene tool but still reflect technical departures from WCAG 2.2 criteria."
 }

@@ -2,13 +2,26 @@
   "moduleId": "M02",
   "questions": [
     {
-      "questionId": "M02Q1",
+      "moduleId": "M02",
+      "questionId": "M02_Q1",
       "prompt": "What is a situationally induced impairment?",
       "options": [
-        { "id": "A", "text": "A permanent loss of vision due to aging." },
-        { "id": "B", "text": "A temporary restriction caused by the user's physical environment." },
-        { "id": "C", "text": "A software bug that prevents a screen reader from working." },
-        { "id": "D", "text": "A color palette that relies entirely on shades of blue." }
+        {
+          "id": "A",
+          "text": "A permanent loss of vision due to aging."
+        },
+        {
+          "id": "B",
+          "text": "A temporary restriction caused by the user's physical environment."
+        },
+        {
+          "id": "C",
+          "text": "A software bug that prevents a screen reader from working."
+        },
+        {
+          "id": "D",
+          "text": "A color palette that relies entirely on shades of blue."
+        }
       ],
       "correctOptionId": "B",
       "explanation": "Situational impairments occur when environmental factors, like sunlight or movement, temporarily limit usability.",
@@ -16,30 +29,56 @@
       "testedLearningPoint": "Define situationally induced impairments."
     },
     {
-      "questionId": "M02Q2",
+      "moduleId": "M02",
+      "questionId": "M02_Q2",
       "prompt": "How does direct sunlight impact a mobile screen?",
       "options": [
-        { "id": "A", "text": "It washes out the screen contrast by overpowering the emitted light." },
-        { "id": "B", "text": "It increases the contrast ratio by acting as a backlight." },
-        { "id": "C", "text": "It changes the font size to compensate for glare." },
-        { "id": "D", "text": "It causes the colors to become artificially over-saturated." }
+        {
+          "id": "A",
+          "text": "It washes out the screen contrast by overpowering the emitted light."
+        },
+        {
+          "id": "B",
+          "text": "It increases the contrast ratio by acting as a backlight."
+        },
+        {
+          "id": "C",
+          "text": "It changes the font size to compensate for glare."
+        },
+        {
+          "id": "D",
+          "text": "It causes the colors to become artificially over-saturated."
+        }
       ],
       "correctOptionId": "A",
-      "explanation": "Screen luminance cannot compete with direct sunlight, causing perceived contrast to drop dramatically.",
+      "explanation": "Screen luminance cannot compete with direct sunlight, causing perceived contrast to drop.",
       "hint": "Think about what happens to a screen when viewed outside on a bright day.",
       "testedLearningPoint": "Understand how ambient sunlight degrades screen visibility."
     },
     {
-      "questionId": "M02Q3",
+      "moduleId": "M02",
+      "questionId": "M02_Q3",
       "prompt": "Why is strong contrast critical for a user who is walking?",
       "options": [
-        { "id": "A", "text": "It stops the device from bouncing." },
-        { "id": "B", "text": "It conserves battery life while moving." },
-        { "id": "C", "text": "It provides a buffer against divided attention and visual instability." },
-        { "id": "D", "text": "It automatically increases the volume of screen readers." }
+        {
+          "id": "A",
+          "text": "It stops the device from bouncing."
+        },
+        {
+          "id": "B",
+          "text": "It conserves battery life while moving."
+        },
+        {
+          "id": "C",
+          "text": "It provides a buffer against divided attention and visual instability."
+        },
+        {
+          "id": "D",
+          "text": "It automatically increases the volume of screen readers."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "Walking divides attention and reduces reading precision, making bold, clear contrast useful for quick comprehension.",
+      "explanation": "Walking divides attention and reduces reading precision, making bold, clear contrast helpful for quick comprehension.",
       "hint": "Consider how physical motion affects the ability to focus on small details.",
       "testedLearningPoint": "Identify how physical movement affects reading precision."
     }

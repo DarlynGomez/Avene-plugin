@@ -2,34 +2,26 @@
   "id": "M02",
   "title": "Designing for the Real World",
   "category": "motor",
-  "context": "Situational impairments, including glare, sunlight, fatigue, and motion",
-  "estimatedMinutes": 4.5,
-  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
-  "whyItMatters": "A screen designed in a controlled room can become difficult to read outdoors or while someone is moving.",
+  "context": "Situational impairments (glare, bright sunlight, dim rooms, fatigue, being in motion)",
+  "estimatedMinutes": 3,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 0,
+    "quiz": 1
+  },
+  "whyItMatters": "The physical environment changes how a screen is perceived. A design carefully made in a controlled room can become unreadable outdoors.",
   "learningObjectives": [
     "Define situationally induced impairments.",
-    "Understand how ambient sunlight reduces screen visibility.",
-    "Identify how movement can affect reading precision."
+    "Understand how ambient sunlight degrades screen visibility.",
+    "Identify how physical movement affects reading precision."
   ],
   "lessonParagraphs": [
-    "People use mobile devices in changing environments, not only at a desk with steady lighting. The context can temporarily restrict someone's ability to see or interact with a device, creating a situational impairment.",
-    "Direct sunlight can overpower the light emitted by a phone display. As ambient light increases, perceived screen contrast drops, and text that relies on subtle grays can wash out.",
-    "Movement, noise, and temperature can also affect interaction. Walking divides attention and can reduce reading comprehension, motor accuracy, and visual stability.",
-    "Strong contrast helps a design handle changing light and motion. It can support a transition from a dim room to a bright, moving environment."
+    "When creating a screen, an assumption is often made that the audience is sitting at a desk with optimal lighting. In reality, mobile devices operate in rapidly fluctuating environments. These environmental shifts create what researchers call situationally induced impairments. A situational impairment indicates that the context itself restricts a person's ability to see or interact with a device, creating challenges similar to a physical impairment.",
+    "Ambient light serves as one of the most common causes of situational visual impairment. When a mobile phone is taken outdoors, the screen must compete with direct sunlight. Direct sunlight and high ambient illuminance wash out screen contrast by overpowering the light emitted by the display4. As ambient light increases, the perceived contrast of the screen drops. Text that relies on subtle grays will often wash out. Studies of situational impairments suggest bright sunlight can make a screen as hard to read as a mild visual impairment would.",
+    "Other situational factors include ambient temperature, noise, and physical movement. Walking creates a physical encumbrance that reduces reading comprehension and target accuracy. If a person is walking on a busy sidewalk in cold weather, their attention is divided, their motor accuracy decreases, and their visual stability is compromised.",
+    "Strong contrast acts as a buffer against these unpredictable environmental variables. By ensuring text colors are bold and distinct from their backgrounds, a more resilient interface is constructed. This resilience allows the interface to survive the transition from a dim living room to a bright, moving train, keeping the product highly functional in the real world."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "pnstAE4NtL4",
-    "title": "Alternatives to Low-Contrast Text",
-    "publisher": "Nielsen Norman Group",
-    "startSeconds": 0,
-    "endSeconds": 90,
-    "durationSeconds": 90,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "Standard YouTube"
-  },
+  "video": null,
   "optionalArticle": {
     "title": "Challenges of Situational Impairments during Interaction with Mobile Devices",
     "author": "Zhanna Sarsenbayeva",
@@ -37,10 +29,10 @@
     "minutesToRead": 5
   },
   "keyTakeaways": [
-    "Environments can create temporary situational impairments.",
+    "Environments create temporary, situational impairments.",
     "Bright sunlight can wash out screen contrast.",
-    "Strong contrast helps designs handle unpredictable lighting and motion."
+    "Strong contrast helps designs survive unpredictable lighting and motion."
   ],
   "reviewFlags": [],
-  "internalNote": "Situational impairments are not formally evaluated by automated tools."
+  "forDevelopers": "Relates to creating robust layouts that support accessibility guidelines in varying environmental contexts, though situational impairments are not formally evaluated by automated tools."
 }

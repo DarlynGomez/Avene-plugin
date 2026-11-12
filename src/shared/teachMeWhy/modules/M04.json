@@ -2,39 +2,32 @@
   "id": "M04",
   "title": "Text Size and Weight",
   "category": "visual",
-  "context": "Why large and bold text has a lower contrast threshold",
-  "estimatedMinutes": 4,
-  "timeBudgetMinutes": { "reading": 2, "video": 1, "quiz": 1 },
-  "whyItMatters": "Larger, thicker letterforms can be easier for the eye to resolve, allowing a lower contrast threshold.",
+  "context": "Text size and weight (why large and bold text have a lower threshold)",
+  "estimatedMinutes": 3,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 0,
+    "quiz": 1
+  },
+  "whyItMatters": "Large, heavy shapes are inherently easier for the human eye to perceive than thin, small shapes. Because of this physical difference, larger text can safely use a softer color palette.",
   "learningObjectives": [
-    "Recognize how text size affects visual perception.",
-    "Identify the 3:1 target for large text.",
-    "Define the size breakpoints used for large text."
+    "Recognize how physical size impacts visual perception.",
+    "Identify the 3 ratio threshold for large text.",
+    "Define the specific pixel sizes that qualify text as large."
   ],
   "lessonParagraphs": [
-    "Small, thin text needs a stronger difference from its background to remain clear. A large, bold headline has more visible surface area, so its shapes can be easier for the eye to resolve.",
-    "The research describes a 3:1 target for large text and a 4.5:1 target for standard text. The lower threshold for large text is tied to how its larger or thicker letterforms are perceived.",
-    "Text is considered large at 24 pixels in a regular weight, or about 18.5 pixels when bold. Below those dimensions, the standard text target applies.",
-    "Size-based thresholds offer room for expressive color choices in prominent text while keeping smaller details easier to read."
+    "Not all text carries the same visual weight. A small, thin font needs more contrast to stay clear. However, a bold headline naturally commands attention and is easier for the eye to resolve. Because large and heavy letterforms provide more surface area for the retina to track, the contrast rules governing them are more forgiving.",
+    "Standard text requires a contrast ratio of 4.5. Large text, however, lowers this requirement to a ratio of 3. This lower threshold grants greater flexibility, allowing the use of subtle, lower-contrast brand colors for prominent headings without sacrificing readability. W3C puts it this way: text that is larger and has wider strokes is easier to read at lower contrast.",
+    "Avene counts text as large at 24 pixels in a regular weight, or 18.66 pixels in a bold weight. SemiBold does not count; the font must be bold or thicker to qualify for the smaller threshold. Below these exact dimensions, the standard 4.5 ratio strictly applies, no matter how thick the font might appear at a glance.",
+    "This distinction allows a design to balance strict legibility in the fine details with softer, more expressive colors in the major typographic elements. By scaling the contrast requirement to the physical size of the text, a tradeoff can be navigated between distinct brand expression and universal readability."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "65G_twR47OQ",
-    "title": "Web Accessibility Perspectives: Large Links, Buttons, and Controls",
-    "publisher": "W3C Web Accessibility Initiative",
-    "startSeconds": 0,
-    "endSeconds": 50,
-    "durationSeconds": 50,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "W3C License"
-  },
+  "video": null,
   "optionalArticle": null,
   "keyTakeaways": [
-    "Larger, thicker text is easier to resolve.",
-    "Large text has a 3:1 target instead of 4.5:1.",
-    "The research defines large text as 24 pixels regular or about 18.5 pixels bold."
+    "Larger, thicker text requires less contrast to be read easily.",
+    "The threshold ratio drops from 4.5 to 3 for large text.",
+    "Avene counts text as large at 24 pixels regular or 18.66 pixels bold."
   ],
-  "reviewFlags": []
+  "reviewFlags": [],
+  "forDevelopers": "Details the specific size breakpoints required to apply the 3:1 ratio under WCAG 2.2 Success Criterion 1.4.3 Contrast (Minimum)."
 }

@@ -1,0 +1,86 @@
+{
+  "moduleId": "M12",
+  "questions": [
+    {
+      "moduleId": "M12",
+      "questionId": "M12_Q1",
+      "prompt": "What is the primary function of video captions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To provide a spoken narration of visual elements."
+        },
+        {
+          "id": "B",
+          "text": "To change the color palette of the video automatically."
+        },
+        {
+          "id": "C",
+          "text": "To provide a text version of the spoken words and essential sounds."
+        },
+        {
+          "id": "D",
+          "text": "To increase the loading speed of the video player."
+        }
+      ],
+      "correctOptionId": "C",
+      "explanation": "Captions convert the audio track of a video into readable text for users who cannot hear it.",
+      "hint": "Consider how spoken dialogue is represented on screen.",
+      "testedLearningPoint": "Understand the difference between captions and audio descriptions."
+    },
+    {
+      "moduleId": "M12",
+      "questionId": "M12_Q2",
+      "prompt": "Why is it risky to rely entirely on unedited automatic captions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They usually display in a font size that is too large."
+        },
+        {
+          "id": "B",
+          "text": "They often contain confusing or incorrect information and require human review."
+        },
+        {
+          "id": "C",
+          "text": "They are forbidden by accessibility guidelines."
+        },
+        {
+          "id": "D",
+          "text": "They drain the battery life of mobile devices too quickly."
+        }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Automatic captions frequently make mistakes, which can completely change the meaning of the spoken words without a manual review.",
+      "hint": "Think about how well computer software understands different accents or complex words.",
+      "testedLearningPoint": "Recognize why automatic captions require human review."
+    },
+    {
+      "moduleId": "M12",
+      "questionId": "M12_Q3",
+      "prompt": "Who benefits from audio descriptions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "People with low vision or blindness who need a spoken narration of on-screen visual elements."
+        },
+        {
+          "id": "B",
+          "text": "People who are watching a video in a loud, crowded room."
+        },
+        {
+          "id": "C",
+          "text": "Designers who are checking the contrast ratio of the video player."
+        },
+        {
+          "id": "D",
+          "text": "Developers who want to decrease the video file size."
+        }
+      ],
+      "correctOptionId": "A",
+      "explanation": "Audio descriptions provide critical context for visual actions that cannot be understood through the standard audio track alone.",
+      "hint": "Consider what happens when a video shows an important action but nobody speaks.",
+      "testedLearningPoint": "Identify who benefits from accessible multimedia."
+    }
+  ]
+}

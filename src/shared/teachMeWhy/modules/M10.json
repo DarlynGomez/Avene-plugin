@@ -2,42 +2,32 @@
   "id": "M10",
   "title": "How Human Vision Sees Contrast",
   "category": "visual",
-  "context": "Perceptual contrast algorithms and APCA",
-  "estimatedMinutes": 4,
-  "timeBudgetMinutes": { "reading": 2, "video": 1, "quiz": 1 },
-  "whyItMatters": "Measured contrast can sometimes feel different from perceived readability. Understanding that gap can help explain why a result may not match what the eye expects.",
+  "context": "Added Context - Perceptual contrast algorithms (APCA)",
+  "estimatedMinutes": 3,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 0,
+    "quiz": 1
+  },
+  "whyItMatters": "Some researchers argue the current formula does not match how people see contrast. Understanding that gap explains why some results can feel visually incorrect.",
   "learningObjectives": [
-    "Recognize limits described for current contrast mathematics.",
-    "Understand how polarity can affect perception.",
+    "Recognize the flaws in current contrast mathematics.",
+    "Understand how color polarity affects human perception.",
     "Learn about perceptual contrast approaches being explored."
   ],
   "lessonParagraphs": [
-    "A contrast tool may fail a combination that looks readable or pass one that feels muddy. The research describes this as a gap between a simple ratio and the way people perceive contrast.",
-    "The standard formula treats dark text on a light background and light text on a dark background by the same ratio method. The research says people may perceive those polarities differently.",
-    "The Accessible Perceptual Contrast Algorithm, or APCA, is described as a proposed approach that considers polarity and spatial characteristics such as font size and weight.",
-    "Avene still measures with its established thresholds. Visual inspection remains useful when a measured result does not match the designer's experience."
+    "A frustrating scenario frequently occurs where an automated tool fails a color combination that looks perfectly readable, while confidently passing a combination that feels muddy and illegible. This happens because the current mathematical standard for contrast has a limitation critics describe in how it models human vision.",
+    "The standard formula treats contrast as a simple ratio. It assumes that dark blue text on a white background is visually identical to white text on a dark blue background. However, human eyes perceive light text on a dark background (reverse polarity) differently. Critics of the formula argue it overrates some dark combinations and underrates some light-on-dark ones.",
+    "The Accessible Perceptual Contrast Algorithm (APCA) is a proposed approach that considers color polarity and spatial characteristics such as font size and weight. APCA's developers describe it as polarity-aware, utilizing different math depending on whether the text is light or dark. It is also spatially aware, generating a score that dictates how thick or large a font must be for a specific color pair to remain readable.",
+    "While current tools like Avene still measure against the established 4.5 and 3 thresholds for strict compliance, knowing about perceptual contrast relieves significant design frustration. It explains why the math sometimes feels inaccurate, and highlights why testing colors visually remains an essential, irreplaceable part of the design process."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "MnbMjdvVXjw",
-    "title": "4 Contrast - Design Principles For UI Designers",
-    "publisher": "Nerdy Eye",
-    "startSeconds": 90,
-    "endSeconds": 155,
-    "durationSeconds": 65,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "Standard YouTube"
-  },
+  "video": null,
   "optionalArticle": null,
   "keyTakeaways": [
-    "The research describes current contrast math as treating both text polarities alike.",
-    "People may perceive light-on-dark differently from dark-on-light.",
-    "Perceptual methods may connect contrast scores to type size and weight."
+    "Critics describe a limitation in current contrast math where it treats light and dark backgrounds identically.",
+    "Human vision perceives light text on a dark background differently than the reverse.",
+    "Perceptual methods may connect contrast scores directly to specific font weights and sizes."
   ],
-  "reviewFlags": [
-    "APCA is an experimental working draft and is not a legal standard. Keep this distinction clear if the module is presented."
-  ],
-  "internalNote": "The research describes APCA as a future perceptual approach, not the method currently used by Avene."
+  "reviewFlags": [],
+  "forDevelopers": "While Avene tests against standard WCAG 2.x math, APCA models are currently available in beta for perceptual testing alongside legal conformance."
 }

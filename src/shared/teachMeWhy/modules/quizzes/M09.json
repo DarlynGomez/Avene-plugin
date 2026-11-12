@@ -2,44 +2,83 @@
   "moduleId": "M09",
   "questions": [
     {
-      "questionId": "M09Q1",
+      "moduleId": "M09",
+      "questionId": "M09_Q1",
       "prompt": "Which of the following is considered a user interface component?",
       "options": [
-        { "id": "A", "text": "A decorative background texture." },
-        { "id": "B", "text": "A standard body text paragraph." },
-        { "id": "C", "text": "The border of a text input field." },
-        { "id": "D", "text": "An invisible metadata tag." }
+        {
+          "id": "A",
+          "text": "A decorative background texture."
+        },
+        {
+          "id": "B",
+          "text": "A standard body text paragraph."
+        },
+        {
+          "id": "C",
+          "text": "The border of a text input field."
+        },
+        {
+          "id": "D",
+          "text": "An invisible metadata tag."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "Borders, icons, and buttons are graphical components that need a clear boundary so interactions can be identified.",
+      "explanation": "Borders, icons, and buttons are graphical components that require a clear boundary so interactions can be identified.",
       "hint": "Think about the parts of a form that are actually clicked.",
       "testedLearningPoint": "Identify what qualifies as a user interface component."
     },
     {
-      "questionId": "M09Q2",
-      "prompt": "What is the minimum contrast ratio for non-text components like icons and borders?",
+      "moduleId": "M09",
+      "questionId": "M09_Q2",
+      "prompt": "What is the minimum contrast ratio required for non-text components like icons and borders?",
       "options": [
-        { "id": "A", "text": "2 to 1" },
-        { "id": "B", "text": "3 to 1" },
-        { "id": "C", "text": "4.5 to 1" },
-        { "id": "D", "text": "7 to 1" }
+        {
+          "id": "A",
+          "text": "2 to 1"
+        },
+        {
+          "id": "B",
+          "text": "3 to 1"
+        },
+        {
+          "id": "C",
+          "text": "4.5 to 1"
+        },
+        {
+          "id": "D",
+          "text": "7 to 1"
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "The research gives graphical objects and user interface states a threshold of 3 against adjacent colors.",
+      "explanation": "Graphical objects and user interface states require a threshold of 3 against their adjacent colors.",
       "hint": "It is the lower of the two standard thresholds.",
       "testedLearningPoint": "Understand the 3 ratio requirement for borders and icons."
     },
     {
-      "questionId": "M09Q3",
+      "moduleId": "M09",
+      "questionId": "M09_Q3",
       "prompt": "How can adjacent slices in a pie chart be made distinguishable?",
       "options": [
-        { "id": "A", "text": "Ensure the slices have contrast of at least 3, or add dark borders between them." },
-        { "id": "B", "text": "Make all the slices the exact same color." },
-        { "id": "C", "text": "Remove all labels and legends from the chart." },
-        { "id": "D", "text": "Ensure the slices have a contrast ratio of 1 to 1." }
+        {
+          "id": "A",
+          "text": "By ensuring the slices maintain a contrast ratio of at least 3, or by adding dark borders between them."
+        },
+        {
+          "id": "B",
+          "text": "By making all the slices the exact same color."
+        },
+        {
+          "id": "C",
+          "text": "By removing all labels and legends from the chart."
+        },
+        {
+          "id": "D",
+          "text": "By ensuring the slices have a contrast ratio of 1 to 1."
+        }
       ],
       "correctOptionId": "A",
-      "explanation": "If adjacent colors do not meet the stated ratio, they can blend together. A dark border can provide a boundary.",
+      "explanation": "If adjacent colors do not meet the ratio of 3, they blend together. A dark border provides the necessary boundary.",
       "hint": "Consider how to physically separate two similar colors touching each other.",
       "testedLearningPoint": "Apply contrast rules to data visualizations and charts."
     }

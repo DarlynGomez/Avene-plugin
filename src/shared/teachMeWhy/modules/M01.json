@@ -2,26 +2,30 @@
   "id": "M01",
   "title": "Why Text Contrast Matters",
   "category": "visual",
-  "context": "Low vision, aging eyes, and everyday reading",
+  "context": "Why text contrast matters (low vision, aging eyes, everyday reading)",
   "estimatedMinutes": 4.5,
-  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
-  "whyItMatters": "Contrast creates the boundary between a letter and its background. Without a clear boundary, reading can become tiring or difficult.",
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 1.5,
+    "quiz": 1
+  },
+  "whyItMatters": "Contrast provides the necessary boundary between a letter and its background, allowing the human eye to resolve shapes quickly. Without a clear boundary, reading becomes tiring or difficult for many readers.",
   "learningObjectives": [
-    "Understand how contrast affects readability for aging eyes and low vision.",
-    "Identify the 4.5:1 target for standard text.",
-    "Recognize how common low-contrast text is across digital design."
+    "Understand how contrast impacts readability for aging eyes and low vision.",
+    "Identify the 4.5 threshold for standard text readability.",
+    "Recognize the prevalence of low contrast issues across modern digital design."
   ],
   "lessonParagraphs": [
-    "Text contrast measures the difference in lightness between a letter and its background. A strong difference makes the letter's shape easier to resolve. A small difference makes the boundary blend into the background.",
-    "Contrast sensitivity can decrease with age, and people with low vision may rely on stronger contrast to distinguish digital content. The research document reports that 83.9 percent of home pages in a one-million-page analysis contained low-contrast text.",
-    "The target ratio for standard body text is 4.5:1. It is intended to account for reduced contrast sensitivity associated with moderate low vision and aging.",
-    "Checking a color pair is a way to keep the visual boundary intact while navigating aesthetic choices. A clearer boundary can reduce friction when reading."
+    "Clear text contrast establishes the foundation of digital readability. Contrast measures the difference in lightness between a foreground element, like a letter, and the background it sits on. When the difference is high, the boundary of the shape is sharp. When the difference is low, the boundary blends, forcing the human eye to work significantly harder to resolve the text.",
+    "This issue affects many people. As humans age, the eye naturally loses contrast sensitivity, requiring starker differences to read comfortably. Additionally, individuals navigating low vision rely on high contrast to distinguish digital content. Despite the critical nature of this design fundamental, low contrast remains the most widespread accessibility failure on the internet. According to the 2026 WebAIM Million report, 83.9 percent of homepages contained low contrast text, up from 79.1 percent in 20251.",
+    "To help text remain readable for many people, accessibility guidelines established a target ratio of 4.5 to 1 for normal body text. It is intended to compensate for the contrast sensitivity loss expected from moderate low vision or standard aging2.",
+    "Designing with contrast in mind is about navigating the tradeoff between aesthetic expression and universal readability. When checking a color pair, the designer is verifying that the visual boundary remains intact for someone who does not perceive the screen exactly as the creator does. Maintaining the 4.5 ratio helps vital information reach the audience without unnecessary friction or cognitive strain."
   ],
   "video": {
     "provider": "youtube",
     "videoId": "a9kNUv6N8Rk",
     "title": "Web Accessibility Perspectives: Colors with Good Contrast",
-    "publisher": "W3C Web Accessibility Initiative",
+    "publisher": "W3C Web Accessibility Initiative (WAI)",
     "startSeconds": 0,
     "endSeconds": 72,
     "durationSeconds": 72,
@@ -32,11 +36,10 @@
   },
   "optionalArticle": null,
   "keyTakeaways": [
-    "Contrast defines the visual boundary between text and its background.",
-    "Standard text has a 4.5:1 target.",
-    "The research document reports low contrast on over 80 percent of home pages."
+    "Contrast defines the visual boundary between text and backgrounds.",
+    "Normal text requires a ratio of at least 4.5 to be easily readable.",
+    "The 2026 WebAIM Million report found low contrast on over 80 percent of homepages."
   ],
-  "reviewFlags": [
-    "Verify the year attached to the 83.9 percent statistic. The lesson says 2026, but the source list links to the 2025 WebAIM Million report."
-  ]
+  "reviewFlags": [],
+  "forDevelopers": "This module references the mathematical principles outlined in WCAG 2.2 Success Criterion 1.4.3 Contrast (Minimum)."
 }

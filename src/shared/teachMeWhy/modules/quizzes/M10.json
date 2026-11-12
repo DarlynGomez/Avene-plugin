@@ -2,46 +2,85 @@
   "moduleId": "M10",
   "questions": [
     {
-      "questionId": "M10Q1",
-      "prompt": "What is a major flaw described in current contrast mathematics?",
+      "moduleId": "M10",
+      "questionId": "M10_Q1",
+      "prompt": "What is a limitation critics describe in current contrast mathematics?",
       "options": [
-        { "id": "A", "text": "It requires text to be extremely small to pass." },
-        { "id": "B", "text": "It treats light text on a dark background the same as dark text on a light background." },
-        { "id": "C", "text": "It only measures the color red." },
-        { "id": "D", "text": "It automatically fails any design that uses brand colors." }
+        {
+          "id": "A",
+          "text": "It requires text to be extremely small to pass."
+        },
+        {
+          "id": "B",
+          "text": "It treats light text on a dark background exactly the same as dark text on a light background."
+        },
+        {
+          "id": "C",
+          "text": "It only measures the color red."
+        },
+        {
+          "id": "D",
+          "text": "It automatically fails any design that uses brand colors."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "The research says current math is not polarity-aware and does not model reverse polarity differently.",
-      "hint": "Think about how the method handles inverted colors.",
+      "explanation": "Current math is not polarity-aware, meaning it does not model how human eyes perceive reverse polarity.",
+      "hint": "Think about how it handles inverting colors.",
       "testedLearningPoint": "Recognize the flaws in current contrast mathematics."
     },
     {
-      "questionId": "M10Q2",
+      "moduleId": "M10",
+      "questionId": "M10_Q2",
       "prompt": "What does it mean for a contrast algorithm to be polarity-aware?",
       "options": [
-        { "id": "A", "text": "It only works in freezing temperatures." },
-        { "id": "B", "text": "It uses different math depending on whether text is lighter or darker than the background." },
-        { "id": "C", "text": "It evaluates the emotional impact of a color palette." },
-        { "id": "D", "text": "It only evaluates black and white designs." }
+        {
+          "id": "A",
+          "text": "It only works in freezing temperatures."
+        },
+        {
+          "id": "B",
+          "text": "It uses different math depending on whether the text is lighter or darker than the background."
+        },
+        {
+          "id": "C",
+          "text": "It evaluates the emotional impact of a color palette."
+        },
+        {
+          "id": "D",
+          "text": "It only evaluates black and white designs."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "A polarity-aware model treats light-on-dark differently from dark-on-light to better model perception.",
+      "explanation": "A polarity-aware model understands that light-on-dark is visually different from dark-on-light, modeling human vision more accurately.",
       "hint": "It relates to which color is on top and which is on the bottom.",
       "testedLearningPoint": "Understand how color polarity affects human perception."
     },
     {
-      "questionId": "M10Q3",
-      "prompt": "How does the proposed APCA account for font size?",
+      "moduleId": "M10",
+      "questionId": "M10_Q3",
+      "prompt": "How does the proposed Accessible Perceptual Contrast Algorithm (APCA) handle font size?",
       "options": [
-        { "id": "A", "text": "It completely ignores font size." },
-        { "id": "B", "text": "It dictates that all fonts must be 12 pixels." },
-        { "id": "C", "text": "It generates scores that relate the color pair to the needed font size or thickness." },
-        { "id": "D", "text": "It forces mobile devices to zoom in automatically." }
+        {
+          "id": "A",
+          "text": "It completely ignores font size."
+        },
+        {
+          "id": "B",
+          "text": "It dictates that all fonts must be 12 pixels."
+        },
+        {
+          "id": "C",
+          "text": "It is spatially aware, generating scores that dictate how thick or large a font must be for a specific color pair."
+        },
+        {
+          "id": "D",
+          "text": "It forces mobile devices to zoom in automatically."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "The research describes APCA as spatially aware, tying contrast scores to typography details.",
+      "explanation": "APCA ties contrast scores directly to specific font weights and sizes, recognizing that physical size impacts readability.",
       "hint": "Think about how it pairs color scores with typography details.",
-      "testedLearningPoint": "Prepare for future, perceptually uniform contrast standards."
+      "testedLearningPoint": "Learn about perceptual contrast approaches being explored."
     }
   ]
 }

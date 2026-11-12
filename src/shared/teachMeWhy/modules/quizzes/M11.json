@@ -1,0 +1,86 @@
+{
+  "moduleId": "M11",
+  "questions": [
+    {
+      "moduleId": "M11",
+      "questionId": "M11_Q1",
+      "prompt": "What is the primary purpose of alternative text for images?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To improve the color contrast of an image."
+        },
+        {
+          "id": "B",
+          "text": "To allow assistive technologies to read a description of the image aloud."
+        },
+        {
+          "id": "C",
+          "text": "To make the image file size smaller for mobile devices."
+        },
+        {
+          "id": "D",
+          "text": "To replace the image with text on all screens automatically."
+        }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Alternative text provides a hidden description that screen readers can read aloud for users who cannot see the image.",
+      "hint": "Think about how a screen reader interacts with a visual element.",
+      "testedLearningPoint": "Understand the purpose of alternative text for images."
+    },
+    {
+      "moduleId": "M11",
+      "questionId": "M11_Q2",
+      "prompt": "According to the 2026 WebAIM Million report, how common is the issue of missing alt text?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It affects less than 10 percent of homepages."
+        },
+        {
+          "id": "B",
+          "text": "It is rarely found on modern websites."
+        },
+        {
+          "id": "C",
+          "text": "It affects 53.1 percent of homepages, making it the second most common failure."
+        },
+        {
+          "id": "D",
+          "text": "It affects exactly 100 percent of websites."
+        }
+      ],
+      "correctOptionId": "C",
+      "explanation": "The 2026 WebAIM Million report shows that 53.1 percent of web homepages fail to provide alternative text for images.",
+      "hint": "It represents one of the most widespread accessibility failures on the internet.",
+      "testedLearningPoint": "Recognize the prevalence of missing alt text across the web."
+    },
+    {
+      "moduleId": "M11",
+      "questionId": "M11_Q3",
+      "prompt": "How should a purely decorative image be handled?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It must have an extremely detailed description."
+        },
+        {
+          "id": "B",
+          "text": "It should always be removed from the page completely."
+        },
+        {
+          "id": "C",
+          "text": "It can be marked as decorative so that screen readers skip it."
+        },
+        {
+          "id": "D",
+          "text": "It requires an accompanying audio description file."
+        }
+      ],
+      "correctOptionId": "C",
+      "explanation": "If an image adds no meaning to a page, marking it as decorative allows screen reading software to ignore it without causing confusion.",
+      "hint": "Consider what information is actually lost if the image is ignored.",
+      "testedLearningPoint": "Identify when an image needs description versus when it is purely decorative."
+    }
+  ]
+}

@@ -22,6 +22,8 @@ const SESSION: StudySession = {
   exitedAt: null
 };
 
+const M01_VIDEO = "Web Accessibility Perspectives: Colors with Good Contrast";
+
 function setOnline(online: boolean) {
   Object.defineProperty(navigator, "onLine", { configurable: true, value: online });
   fireEvent(window, new Event(online ? "online" : "offline"));
@@ -38,7 +40,7 @@ describe("Teach Me Why module library", () => {
     );
     expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
     expect(screen.getByRole("searchbox", { name: "Search topics" })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "aging" } });
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "aging eyes" } });
     expect(screen.getAllByRole("button", { name: /Explore topic/ })).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: /Why Text Contrast Matters/ }));
     expect(onSelectModule).toHaveBeenCalledWith("M01");
@@ -50,7 +52,7 @@ describe("Teach Me Why module library", () => {
       screen.getByRole("region", { name: "Why Text Contrast Matters module" })
     ).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Lesson" })).toHaveTextContent(
-      "Text contrast measures the difference in lightness"
+      "Contrast measures the difference in lightness"
     );
     expect(
       screen.getByTitle("Web Accessibility Perspectives: Colors with Good Contrast")
@@ -65,7 +67,9 @@ describe("Teach Me Why module library", () => {
     expect(
       screen.getByRole("button", { name: /Contrast for Interface Parts/ })
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Text Size and Weight/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Placeholder and Decorative Text/ })
+    ).toBeInTheDocument();
   });
 
   it("enables optional article links online outside a study session", () => {
@@ -78,44 +82,58 @@ describe("Teach Me Why module library", () => {
     ).toHaveAttribute("href", "https://www.jorgegoncalves.com/docs/ozchi17.pdf");
   });
 
-  it("shows a local video placeholder offline with an option to retry, and disables article links", () => {
+  it("shows a local video placeholder offline with an option to retry", () => {
+    setOnline(false);
+    render(<ModuleLibrary selectedModuleId="M01" onSelectModule={() => {}} />);
+
+    expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Can't confirm an internet connection");
+    fireEvent.click(screen.getByRole("button", { name: "Load video" }));
+    expect(screen.getByTitle(M01_VIDEO)).toBeInTheDocument();
+  });
+
+  it("disables article links offline", () => {
     setOnline(false);
     render(<ModuleLibrary selectedModuleId="M02" onSelectModule={() => {}} />);
 
-    expect(screen.queryByTitle("Alternatives to Low-Contrast Text")).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("Can't confirm an internet connection");
-    fireEvent.click(screen.getByRole("button", { name: "Load video" }));
-    expect(screen.getByTitle("Alternatives to Low-Contrast Text")).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
     ).not.toBeInTheDocument();
     expect(screen.getByText(/unavailable offline/)).toBeInTheDocument();
   });
 
-  it("does not load embeds or external articles during an active study session", () => {
+  describe("during an active study session", () => {
     const state = {
       type: "STUDY_STATE" as const,
       session: SESSION,
       visibility: participantVisibility(SESSION),
       refusal: null
     };
-    render(
-      <StudyStateContext.Provider value={state}>
-        <ModuleLibrary selectedModuleId="M02" onSelectModule={() => {}} />
-      </StudyStateContext.Provider>
-    );
+    const open = (id: string) =>
+      render(
+        <StudyStateContext.Provider value={state}>
+          <ModuleLibrary selectedModuleId={id} onSelectModule={() => {}} />
+        </StudyStateContext.Provider>
+      );
 
-    expect(screen.queryByTitle("Alternatives to Low-Contrast Text")).not.toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "Videos are unavailable during study sessions."
-    );
-    expect(screen.queryByRole("button", { name: "Load video" })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByText(/is unavailable offline and during study sessions/)
-    ).toBeInTheDocument();
+    it("does not load an embed", () => {
+      open("M01");
+      expect(screen.queryByTitle(M01_VIDEO)).not.toBeInTheDocument();
+      expect(screen.getByRole("status")).toHaveTextContent(
+        "Videos are unavailable during study sessions."
+      );
+      expect(screen.queryByRole("button", { name: "Load video" })).not.toBeInTheDocument();
+    });
+
+    it("does not link the external article", () => {
+      open("M02");
+      expect(
+        screen.queryByRole("link", { name: /Challenges of Situational Impairments/ })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText(/is unavailable offline and during study sessions/)
+      ).toBeInTheDocument();
+    });
   });
 
   it("filters topics by the category tabs", () => {

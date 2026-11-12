@@ -2,41 +2,34 @@
   "id": "M07",
   "title": "Dark Mode Challenges",
   "category": "visual",
-  "context": "Brand colors and reverse polarity",
-  "estimatedMinutes": 4.5,
-  "timeBudgetMinutes": { "reading": 2, "video": 1.5, "quiz": 1 },
-  "whyItMatters": "A color chosen for a light background may lose its boundary on a dark surface, and extreme light-on-dark combinations can feel blurry.",
+  "context": "Dark mode and brand colors (common ways good palettes fail)",
+  "estimatedMinutes": 3,
+  "timeBudgetMinutes": {
+    "reading": 2,
+    "video": 0,
+    "quiz": 1
+  },
+  "whyItMatters": "Transitioning a design to dark mode is not as simple as mathematically inverting the background. Colors behave completely differently when placed on dark surfaces, often breaking established brand palettes.",
   "learningObjectives": [
-    "Understand why brand colors can fail on dark backgrounds.",
-    "Recognize the visual effect called halation.",
-    "Adapt colors for readability on dark surfaces."
+    "Understand why brand colors fail in reverse polarity.",
+    "Recognize the visual phenomenon of halation.",
+    "Identify methods to improve readability and reduce halation in dark mode."
   ],
   "lessonParagraphs": [
-    "A light interface cannot always be converted to dark mode by simply reversing its colors. Brand colors designed for white backgrounds can lose contrast when placed on dark gray.",
-    "Dark mode may need a separate, less saturated version of brand colors. Dark text on a dark surface can also lose its boundary.",
-    "Halation describes the appearance of bright light bleeding into a dark area. The research discusses how pure white text on pure black can look fuzzy for people with astigmatism.",
-    "Off-white text on dark gray can soften the extremes and reduce glare while remaining above the stated minimum. Dark mode involves balancing measured contrast with visual comfort."
+    "Dark mode enjoys popularity for reducing eye strain in dim environments and saving battery life on some displays. However, simply flipping a light interface to dark usually alters perceptual contrast.",
+    "Brand colors are typically formulated for white backgrounds. For example, a blue at 6 to 1 on white could drop to about 3 to 1 on a very dark gray, which may fall below the minimum. In dark mode, shadows disappear, and dark text on a dark background lacks a defining boundary. To resolve this, generating a separate, desaturated version of the brand colors often helps.",
+    "Another unique challenge of reverse polarity is halation. When pure white text is placed directly against a pure black background, the bright light from the text bleeds outward into the dark space. This creates an effect that can blur for some people with astigmatism6.",
+    "Because of halation, maximizing the contrast ratio is not always the optimal choice for dark mode. Softening the contrast by using off-white text on a dark gray background reduces the glare while safely remaining above the required 4.5 threshold. Designing for dark mode requires balancing mathematical contrast rules with optical comfort, which means dark mode often needs its own palette."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "muFMJedikys",
-    "title": "Dark Mode Readability Tips: How to Make Dark Mode UI More Accessible",
-    "publisher": "TemplateMonster",
-    "startSeconds": 25,
-    "endSeconds": 95,
-    "durationSeconds": 70,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "Standard YouTube"
-  },
+  "video": null,
   "optionalArticle": null,
   "keyTakeaways": [
-    "Colors designed for light backgrounds may not work on dark backgrounds.",
-    "Halation can make pure white text on pure black appear blurry.",
-    "Dark mode may need its own color palette."
+    "Brand colors built for light backgrounds can fail in dark mode.",
+    "Pure white text on pure black causes a blurring effect known as halation.",
+    "Dark mode often needs its own palette."
   ],
   "reviewFlags": [
-    "The source notes that perceptual algorithms handle dark-mode contrast differently and that the optimal levels remain debated."
-  ]
+    "Notes that perceptual algorithms handle dark mode math differently than standard guidelines, leading to ongoing industry debate regarding optimal contrast levels."
+  ],
+  "forDevelopers": "Relates to evaluating reverse polarity contrast under WCAG 2.2 standards."
 }

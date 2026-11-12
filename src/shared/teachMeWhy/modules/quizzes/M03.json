@@ -2,44 +2,83 @@
   "moduleId": "M03",
   "questions": [
     {
-      "questionId": "M03Q1",
-      "prompt": "Why is it risky to rely entirely on color to communicate an error?",
+      "moduleId": "M03",
+      "questionId": "M03_Q1",
+      "prompt": "Why is it dangerous to rely entirely on color to communicate an error?",
       "options": [
-        { "id": "A", "text": "Individuals with color vision deficiencies may not perceive the difference between the colors." },
-        { "id": "B", "text": "Color cannot be rendered correctly on mobile devices." },
-        { "id": "C", "text": "Red and green are universally considered positive colors." },
-        { "id": "D", "text": "Automated tools cannot measure the color red." }
+        {
+          "id": "A",
+          "text": "Individuals with color vision deficiencies may not perceive the difference between the colors."
+        },
+        {
+          "id": "B",
+          "text": "Color cannot be rendered correctly on mobile devices."
+        },
+        {
+          "id": "C",
+          "text": "Red and green are universally considered positive colors."
+        },
+        {
+          "id": "D",
+          "text": "Automated tools cannot measure the color red."
+        }
       ],
       "correctOptionId": "A",
-      "explanation": "If a hue is the only indicator, someone who cannot perceive that specific hue may miss the information.",
+      "explanation": "If a hue is the only indicator, someone who cannot perceive that specific hue may miss it.",
       "hint": "Think about how someone with red-green color blindness experiences an interface.",
       "testedLearningPoint": "Understand why color alone is insufficient for conveying information."
     },
     {
-      "questionId": "M03Q2",
+      "moduleId": "M03",
+      "questionId": "M03_Q2",
       "prompt": "How does lightness contrast assist users with color vision deficiencies?",
       "options": [
-        { "id": "A", "text": "It automatically shifts colors to a grayscale palette." },
-        { "id": "B", "text": "It provides a secondary visual cue that does not depend on hue perception." },
-        { "id": "C", "text": "It increases the physical size of the text elements." },
-        { "id": "D", "text": "It triggers an audio description of the color being used." }
+        {
+          "id": "A",
+          "text": "It automatically shifts colors to a grayscale palette."
+        },
+        {
+          "id": "B",
+          "text": "It provides a secondary visual cue that does not depend on hue perception."
+        },
+        {
+          "id": "C",
+          "text": "It increases the physical size of the text elements."
+        },
+        {
+          "id": "D",
+          "text": "It triggers an audio description of the color being used."
+        }
       ],
       "correctOptionId": "B",
-      "explanation": "Even if two hues look similar, a difference in lightness can keep them visibly distinct.",
+      "explanation": "Even if two hues look similar, a stark difference in their lightness ensures they remain visibly distinct.",
       "hint": "Focus on the difference between light and dark rather than red and blue.",
       "testedLearningPoint": "Identify how lightness contrast creates a secondary visual cue."
     },
     {
-      "questionId": "M03Q3",
-      "prompt": "Which is a safe way to indicate a text link?",
+      "moduleId": "M03",
+      "questionId": "M03_Q3",
+      "prompt": "Which of the following is a safe way to indicate a text link?",
       "options": [
-        { "id": "A", "text": "Making the link text slightly lighter than the body text." },
-        { "id": "B", "text": "Using only a bright blue color for the link." },
-        { "id": "C", "text": "Pairing a distinct color with a solid underline." },
-        { "id": "D", "text": "Removing the border from the element entirely." }
+        {
+          "id": "A",
+          "text": "Making the link text slightly lighter than the body text."
+        },
+        {
+          "id": "B",
+          "text": "Using only a bright blue color for the link."
+        },
+        {
+          "id": "C",
+          "text": "Pairing a distinct color with a solid underline."
+        },
+        {
+          "id": "D",
+          "text": "Removing the border from the element entirely."
+        }
       ],
       "correctOptionId": "C",
-      "explanation": "An underline adds a shape-based indicator, so the link can be recognized without relying only on color.",
+      "explanation": "An underline adds a shape-based indicator, ensuring the link is recognizable even without color.",
       "hint": "A robust design pairs color with an additional physical indicator.",
       "testedLearningPoint": "Combine color with other design elements to ensure clarity."
     }

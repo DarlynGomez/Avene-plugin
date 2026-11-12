@@ -8,7 +8,8 @@ import module07 from "./M07.json";
 import module08 from "./M08.json";
 import module09 from "./M09.json";
 import module10 from "./M10.json";
-import { module11 } from "./M11";
+import module11 from "./M11.json";
+import module12 from "./M12.json";
 import type { LearningModule, ModuleVideoData } from "./moduleTypes";
 
 const CATEGORIES = ["visual", "motor", "cognitive", "system"] as const;
@@ -40,5 +41,6 @@ export const LEARNING_MODULES: LearningModule[] = [
   toModule(module08),
   toModule(module09),
   toModule(module10),
-  module11
+  toModule(module11),
+  toModule(module12)
 ];

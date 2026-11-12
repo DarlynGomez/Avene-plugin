@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -152,8 +152,10 @@ describe("the server is unreachable", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(roleServerSession.unavailable).toBe(true));
     expect(screen.getByText("What kind of text is this?")).toBeInTheDocument();
+    // Only the question is checked, the topic library below it has its own words
+    const question = within(screen.getByRole("region", { name: "Kind of text" }));
     expect(
-      screen.queryByText(/error|could not|unreachable|failed|server/i)
+      question.queryByText(/error|could not|unreachable|failed|server/i)
     ).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(types()).not.toContain("ROLE_SERVER_RESULT");
@@ -183,7 +185,9 @@ describe("an answer from the server that is not a label", () => {
     expect(posted.find((m) => m.type === "ROLE_SERVER_RESULT")).toMatchObject({
       reply: { label: "unsure", reason: "unreachable" }
     });
-    expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole("region", { name: "Kind of text" })).queryByText(/error/i)
+    ).not.toBeInTheDocument();
   });
 
   it("passes a good label on to the sandbox, which keeps it", async () => {

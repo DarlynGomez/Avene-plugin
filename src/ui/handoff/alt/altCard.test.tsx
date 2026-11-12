@@ -97,7 +97,9 @@ describe("the question mark on an alt text card", () => {
       "aria-selected",
       "true"
     );
-    expect(await screen.findByRole("heading", { name: "Alt Text for Images" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "Alternative Text for Images" })
+    ).toBeInTheDocument();
     expect(region.scrollTop).toBe(0);
   });
 });
