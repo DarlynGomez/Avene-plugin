@@ -3,9 +3,9 @@ import { ArrowRight } from "lucide-react";
 import type { ExplanationView } from "../../../shared/teachMeWhy/explanationView";
 import styles from "./ExplanationCard.module.css";
 
-/** The one place the wording of the AI label lives, the wording is not yet confirmed with Dr. Tigwell */
+/** The one place the wording of the AI label lives */
 export const AI_LABEL =
-  "Drafted in advance with AI help and reviewed by the research team. No AI runs while you use this.";
+  "Drafted in advance with AI help and reviewed by the research team. This text is not generated while you use Avene.";
 
 const LIST_MARK = "- ";
 

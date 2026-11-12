@@ -1,4 +1,5 @@
 import { handleExplanationOrRole, isExplanationOrRole } from "./lifecycle/otherProtocols";
+import { refusePrecomputeInStudy } from "./roles/adapter/precomputeGate";
 import { requestRoleCommand } from "./roles/adapter/roleCommands";
 import { handleAdjustMessage } from "./lifecycle/adjustProtocol";
 import { isAdjustMessage } from "./lifecycle/isAdjustMessage";
@@ -116,6 +117,8 @@ if (figma.command === RESET_COMMAND) {
   void runReset();
 } else if (DEBUG_COMMANDS.includes(figma.command)) {
   void runDebugCommand(figma.command);
+} else if (refusePrecomputeInStudy(figma.command)) {
+  // Nothing else starts, the notice has been shown and the plugin is closing
 } else {
   requestRoleCommand(figma.command);
   startCalibrationUi();

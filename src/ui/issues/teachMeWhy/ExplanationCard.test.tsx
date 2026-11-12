@@ -54,11 +54,13 @@ describe("ExplanationCard text blocks", () => {
 });
 
 describe("the AI label", () => {
-  it("says the text was drafted with AI help and that no AI runs while it is used", () => {
+  it("says the text was drafted with AI help and is not generated while Avene is used", () => {
     expect(AI_LABEL).toBe(
-      "Drafted in advance with AI help and reviewed by the research team. No AI runs while you use this."
+      "Drafted in advance with AI help and reviewed by the research team. This text is not generated while you use Avene."
     );
     expect(AI_LABEL).not.toMatch(/hand/i);
+    // Live role suggestions do run in a study, so no participant text may say that no AI runs
+    expect(AI_LABEL).not.toMatch(/no AI/i);
   });
   it("shows for an approved entry and not for a fallback", () => {
     const shown = renderCard(view(1, "Move.\n\n- One."));
