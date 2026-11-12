@@ -9,7 +9,7 @@
     "video": 0,
     "quiz": 1
   },
-  "whyItMatters": "Text frequently sits over complex, changing photography or gradients. Automated tools struggle to evaluate these dynamic backgrounds, requiring manual design interventions to guarantee legibility.",
+  "whyItMatters": "Text frequently sits over complex, changing photography or gradients. Automated tools struggle to evaluate these dynamic backgrounds, requiring manual design interventions to help keep text legible.",
   "learningObjectives": [
     "Understand why tools report indeterminate results on images.",
     "Apply protective overlays to secure text visibility.",
@@ -17,7 +17,7 @@
   ],
   "lessonParagraphs": [
     "Checking contrast is simple when dark gray text sits on a solid white background. However, modern interfaces frequently place text over rich photography, video loops, or complex gradients. In these cases, automated contrast tools will often report an indeterminate status, indicating that they cannot tell if the text is readable.",
-    "Tools evaluate a specific point of color. An image is composed of thousands of wildly varying pixels. If text sits across a photograph, the contrast might measure perfectly in one corner but fail completely where a bright cloud passes behind the letters. Furthermore, if the image is dynamic and changes daily based on content management systems, a highly readable score today might become entirely illegible tomorrow.",
+    "Tools evaluate a specific point of color. An image is composed of thousands of wildly varying pixels. If text sits across a photograph, the contrast might measure perfectly in one corner but can fail where a bright cloud passes behind the letters. Furthermore, if the image is dynamic and changes daily based on content management systems, a highly readable score today might become hard to read tomorrow.",
     "When a tool reports an indeterminate background, the decision moves to the designer. A common solution is applying a scrim, which is a semi-transparent dark overlay placed directly between the image and the text. This overlay darkens the brightest parts of the image, helping give the text a more predictable background. Even with a scrim, an automated tool might still report the result as indeterminate, but visually, the text becomes much easier to read.",
     "Other strategies include using solid color blocks behind the text area or applying heavy drop shadows to the letters to artificially create a dark boundary. When working with unmeasurable backgrounds, the overarching goal is to design a resilient container that protects the text, ensuring it remains legible regardless of what visually complex element sits behind it."
   ],
@@ -25,7 +25,7 @@
   "optionalArticle": null,
   "keyTakeaways": [
     "Automated tools cannot reliably measure text over complex photographs.",
-    "Dynamic backgrounds can destroy legibility if the image changes.",
+    "Dynamic backgrounds can hurt legibility if the image changes.",
     "Use semi-transparent overlays (scrims) or solid blocks to protect text."
   ],
   "reviewFlags": [

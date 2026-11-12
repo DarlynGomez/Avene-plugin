@@ -18,18 +18,16 @@
   "lessonParagraphs": [
     "Accessibility tools accurately flag mathematical failures, but they possess no understanding of the broader context of a project. Sometimes, it becomes necessary to keep a lower-contrast color. The brand palette may be locked by strict client requirements, or a specific piece of text might be intentionally de-emphasized to preserve the overall visual hierarchy of a complex screen.",
     "When a flagged contrast issue cannot be changed, simply ignoring the warning is risky. A silent failure generates confusion during developer handoff and risks being flagged repeatedly during future accessibility audits. The solution is to transform the failure into a documented tradeoff.",
-    "Using Avene, a flagged issue can be ignored while capturing the justification behind the decision. This record stores the exact colors involved, the date, and the specific reasoning. When this record is handed off to developers or project managers, they can see immediately that the contrast was not an accident or an oversight; it was an intentional, negotiated choice.",
+    "In Avene, a flagged issue can be ignored only after you write a reason. The reason is saved with the colors involved and the date. When this record is handed off to developers or project managers, they can see immediately that the contrast was not an accident or an oversight; it was an intentional, negotiated choice.",
     "Documenting a tradeoff does not mean the contrast failure ceases to exist. It simply provides necessary transparency. It proves the issue was evaluated and a deliberate decision was made regarding the visual hierarchy or brand constraint. By keeping a written record, the integrity of the design system is protected, and clear communication is fostered across the entire team."
   ],
   "video": null,
   "optionalArticle": null,
   "keyTakeaways": [
     "Mathematical contrast failures sometimes stem from strict brand constraints.",
-    "Ignoring a failure silently creates extensive confusion for developers.",
+    "Ignoring a failure without a reason can cause confusion for developers.",
     "Documenting a decision creates a transparent record of the tradeoff."
   ],
-  "reviewFlags": [
-    "Confirm if the feature in the study build requires a written reason to ignore an issue, or if it is optional, and adjust the lesson text to match the exact study priming."
-  ],
+  "reviewFlags": [],
   "forDevelopers": "Ignored decisions bypass automated warnings within the Avene tool but still reflect technical departures from WCAG 2.2 criteria."
 }

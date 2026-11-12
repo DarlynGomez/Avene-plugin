@@ -4,7 +4,7 @@
     {
       "moduleId": "M03",
       "questionId": "M03_Q1",
-      "prompt": "Why is it dangerous to rely entirely on color to communicate an error?",
+      "prompt": "Why is it risky to rely only on color to communicate an error?",
       "options": [
         {
           "id": "A",

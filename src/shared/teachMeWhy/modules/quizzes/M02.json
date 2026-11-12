@@ -51,7 +51,7 @@
         }
       ],
       "correctOptionId": "A",
-      "explanation": "Screen luminance cannot compete with direct sunlight, causing perceived contrast to drop.",
+      "explanation": "Screen luminance can struggle to compete with direct sunlight, which can cause perceived contrast to drop.",
       "hint": "Think about what happens to a screen when viewed outside on a bright day.",
       "testedLearningPoint": "Understand how ambient sunlight degrades screen visibility."
     },

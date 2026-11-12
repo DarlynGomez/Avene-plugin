@@ -18,7 +18,7 @@
   "lessonParagraphs": [
     "Color frequently acts as a visual shorthand in digital design. A red outline implies an error, while a green button suggests a successful action. However, relying entirely on color to communicate meaning can exclude individuals with color vision deficiencies. If an interface utilizes only the color red to indicate a broken link, a person with red-green color blindness may perceive no difference between the broken link and standard body text.",
     "To solve this issue, secondary cues must be provided. This is exactly where lightness contrast becomes vital. While two colors might appear similar in hue to a color-blind user, a strong difference in their relative lightness will still be clearly visible. Establishing a distinct contrast ratio ensures that the elements remain separate and distinguishable, regardless of how the specific hues are processed by the eye.",
-    "A robust design pairs color with additional physical indicators. If a form field contains an error, changing the border to red is helpful, but adding an error icon or a bold underline makes it much more likely the message reaches everyone. Text links should never rely simply on being blue; an underline or a heavier font weight provides the necessary secondary signal.",
+    "A robust design pairs color with additional physical indicators. If a form field contains an error, changing the border to red is helpful, but adding an error icon or a bold underline makes it much more likely the message reaches everyone. Text links should not rely on being blue alone; an underline or a heavier font weight provides the necessary secondary signal.",
     "Securing a minimum contrast ratio of 4.5 for text locks in the lightness boundary. By treating color as a supplemental enhancement rather than the sole method of communication, intuitive experiences are created that do not break when viewed through different visual capabilities."
   ],
   "video": null,
@@ -26,7 +26,7 @@
   "keyTakeaways": [
     "Color alone cannot safely communicate errors or interactive states.",
     "Lightness contrast operates independently of hue perception.",
-    "Always pair color changes with shapes, underlines, or icons."
+    "Pair color changes with shapes, underlines, or icons."
   ],
   "reviewFlags": [],
   "forDevelopers": "This module directly supports WCAG 2.2 Success Criterion 1.4.1 Use of Color alongside 1.4.3 Contrast (Minimum)."

@@ -52,6 +52,12 @@ describe("parseCurriculum", () => {
     const { problems } = parseCurriculum(BLOCK.replace("Fourth paragraph.\n", ""));
     expect(problems).toContain("M01: lesson paragraph count is 3, expected 4");
   });
+  it("reads each Review flags line as its own flag", () => {
+    const { modules } = parseCurriculum(
+      BLOCK.replace("* Review flags: None.", "* Review flags: First.\n   * Review flags: Second.")
+    );
+    expect(modules[0].reviewFlags).toEqual(["First.", "Second."]);
+  });
   it("puts a flag in an array and a missing note nowhere", () => {
     const { modules } = parseCurriculum(
       BLOCK.replace("Review flags: None.", "Review flags: Check this.")

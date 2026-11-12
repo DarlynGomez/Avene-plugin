@@ -9,7 +9,7 @@
     "video": 0,
     "quiz": 1
   },
-  "whyItMatters": "Large, heavy shapes are inherently easier for the human eye to perceive than thin, small shapes. Because of this physical difference, larger text can safely use a softer color palette.",
+  "whyItMatters": "Large, heavy shapes are easier for the human eye to perceive than thin, small shapes. Because of this physical difference, larger text can safely use a softer color palette.",
   "learningObjectives": [
     "Recognize how physical size impacts visual perception.",
     "Identify the 3 ratio threshold for large text.",
@@ -18,7 +18,7 @@
   "lessonParagraphs": [
     "Not all text carries the same visual weight. A small, thin font needs more contrast to stay clear. However, a bold headline naturally commands attention and is easier for the eye to resolve. Because large and heavy letterforms provide more surface area for the retina to track, the contrast rules governing them are more forgiving.",
     "Standard text requires a contrast ratio of 4.5. Large text, however, lowers this requirement to a ratio of 3. This lower threshold grants greater flexibility, allowing the use of subtle, lower-contrast brand colors for prominent headings without sacrificing readability. W3C puts it this way: text that is larger and has wider strokes is easier to read at lower contrast.",
-    "Avene counts text as large at 24 pixels in a regular weight, or 18.66 pixels in a bold weight. SemiBold does not count; the font must be bold or thicker to qualify for the smaller threshold. Below these exact dimensions, the standard 4.5 ratio strictly applies, no matter how thick the font might appear at a glance.",
+    "Avene counts text as large at 24 pixels in a regular weight, or 18.66 pixels in a bold weight. SemiBold does not count; the font must be bold or thicker to qualify for the smaller threshold. Below these exact dimensions, the 4.5 to 1 minimum still applies, however thick the font looks at a glance.",
     "This distinction allows a design to balance strict legibility in the fine details with softer, more expressive colors in the major typographic elements. By scaling the contrast requirement to the physical size of the text, a tradeoff can be navigated between distinct brand expression and universal readability."
   ],
   "video": null,

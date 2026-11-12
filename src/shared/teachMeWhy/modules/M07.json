@@ -9,7 +9,7 @@
     "video": 0,
     "quiz": 1
   },
-  "whyItMatters": "Transitioning a design to dark mode is not as simple as mathematically inverting the background. Colors behave completely differently when placed on dark surfaces, often breaking established brand palettes.",
+  "whyItMatters": "Transitioning a design to dark mode is not as simple as mathematically inverting the background. Colors can behave differently when placed on dark surfaces, often breaking established brand palettes.",
   "learningObjectives": [
     "Understand why brand colors fail in reverse polarity.",
     "Recognize the visual phenomenon of halation.",
@@ -29,7 +29,8 @@
     "Dark mode often needs its own palette."
   ],
   "reviewFlags": [
-    "Notes that perceptual algorithms handle dark mode math differently than standard guidelines, leading to ongoing industry debate regarding optimal contrast levels."
+    "Notes that perceptual algorithms handle dark mode math differently than standard guidelines, leading to ongoing industry debate regarding optimal contrast levels.",
+    "Source needed for the claim that astigmatism can blur light text on dark backgrounds"
   ],
   "forDevelopers": "Relates to evaluating reverse polarity contrast under WCAG 2.2 standards."
 }

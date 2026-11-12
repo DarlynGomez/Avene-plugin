@@ -104,7 +104,12 @@ function parseOne(
   expectCount(problems, id, "learning objective", objectives.length, 3);
   expectCount(problems, id, "key takeaway", takeaways.length, 3);
   expectCount(problems, id, "lesson paragraph", paragraphs.length, id === "M11" ? 3 : 4);
-  const flags = one(fields, "Review flags:");
+  // A module may carry several flags, each on its own Review flags line, a line that says None is no flag
+  const flags = lines
+    .map(clean)
+    .filter((line) => line.startsWith("Review flags:"))
+    .map((line) => line.slice("Review flags:".length).trim())
+    .filter((flag) => flag !== "" && !/^None\.?$/i.test(flag));
   const note = one(fields, "Internal Note:");
   return {
     id,
@@ -122,7 +127,7 @@ function parseOne(
     video,
     optionalArticle: article,
     keyTakeaways: takeaways,
-    reviewFlags: flags === "" || /^None\.?$/i.test(flags) ? [] : [flags],
+    reviewFlags: flags,
     ...(note === "" ? {} : { internalNote: note }),
     forDevelopers: one(fields, "For developers:")
   };

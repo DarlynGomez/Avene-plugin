@@ -16,10 +16,10 @@
     "Differentiate between essential text and pure decoration."
   ],
   "lessonParagraphs": [
-    "Contrast rules apply strictly to text that conveys necessary information. However, guidelines offer targeted exemptions for text that is inactive or purely decorative.",
+    "Contrast rules still apply to text that conveys necessary information. However, guidelines offer targeted exemptions for text that is inactive or purely decorative.",
     "Placeholder text inside a form field serves as a frequent source of friction. Because placeholders are still text, they carry the same minimum contrast requirement as any other text on the screen. However, light gray placeholders are often chosen to look sleek, causing them to fall well below the 4.5 ratio. More importantly, placeholder text disappears the moment typing begins. Nielsen Norman Group points out this disappearance strains short-term memory and removes the ability to double-check formatting requirements. Instead of relying on placeholders, persistent, visible labels should be placed outside the input box.",
-    "Text inside an inactive, disabled button receives a specific exemption from contrast minimums. If a submit button remains disabled until a form is complete, it is perfectly acceptable for its text to be a faint, low-contrast color. This visual fading actively communicates that the element cannot currently be interacted with. However, if a control looks disabled but is actually meant to be clicked, the low contrast becomes a severe barrier.",
-    "Finally, purely decorative text is completely exempt. If a massive, faint letter \"A\" is placed in the background purely as a graphic texture, and it is not needed to understand the page, it carries no contrast requirement. The determining factor is whether the text carries meaning. If the text matters, the contrast matters."
+    "Text inside an inactive, disabled button receives a specific exemption from contrast minimums. If a submit button remains disabled until a form is complete, it is acceptable for its text to be a faint, low-contrast color. This visual fading actively communicates that the element cannot currently be interacted with. However, if a control looks disabled but is actually meant to be clicked, the low contrast becomes a barrier.",
+    "Finally, purely decorative text is exempt. If a massive, faint letter \"A\" is placed in the background purely as a graphic texture, and it is not needed to understand the page, it carries no contrast requirement. The determining factor is whether the text carries meaning. If the text matters, the contrast matters."
   ],
   "video": {
     "provider": "youtube",
