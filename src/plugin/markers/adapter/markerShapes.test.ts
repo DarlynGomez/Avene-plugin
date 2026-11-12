@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { CONTAINER_NAME, SHAPE_COLOR, shapeGeometry } from "../../../shared/markers/markerShape";
+import {
+  CONTAINER_NAME,
+  SHAPE_COLOR,
+  SHAPE_COLOR_DEFERRED,
+  shapeGeometry
+} from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import { isMarkerNodeId, forgetMarkerNodes } from "./markerNodeRegistry";
 import { MARKER_TAG_KEY, parseTag } from "./markerTags";
@@ -16,6 +21,7 @@ const marker = (signature: string, screenId: string, nodeId: string): Marker => 
 });
 
 const BOX = { x: 100, y: 200, width: 80, height: 20 };
+const WHITE = { r: 1, g: 1, b: 1 };
 const DESIGNER_NOTE: Annotation = { label: "Spacing is intentional here" };
 let fake: ReturnType<typeof createFakeFigma>;
 
@@ -34,7 +40,7 @@ afterEach(() => {
 
 const drawn = (): FakeNode[] =>
   [...fake.nodes.values()].filter((node) => parseTag(node.getPluginData(MARKER_TAG_KEY))?.kind);
-const shapesOnCanvas = () => drawn().filter((node) => node.type === "ELLIPSE");
+const shapesOnCanvas = () => drawn().filter((node) => node.type === "POLYGON");
 const containers = () => drawn().filter((node) => node.type === "FRAME");
 const markerAnnotations = (node: FakeNode) => node.annotations.filter((a) => a.categoryId);
 
@@ -55,6 +61,78 @@ describe("the dot and the ring", () => {
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
     expect(shape).toMatchObject({ width: 12, height: 12, strokeWeight: 2, strokeAlign: "INSIDE" });
+  });
+
+  it("draws a failing marker as a triangle in the warning red with a white outline", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
+
+    const [shape] = shapesOnCanvas();
+    expect(shape).toMatchObject({ pointCount: 3, width: 12, height: 12 });
+    expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
+    expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
+  });
+
+  it("draws an important failing marker as a diamond in the same red, with a white outline", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show(
+      "A",
+      [{ ...marker("r1", "A", "1:1"), important: true }],
+      "dot"
+    );
+
+    const [shape] = shapesOnCanvas();
+    expect(shape).toMatchObject({ pointCount: 4, width: 12, height: 12 });
+    expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
+    expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
+  });
+
+  it("draws the marker of a deferred root as a triangle in a muted gray, in the same place and size", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show(
+      "A",
+      [{ ...marker("r1", "A", "1:1"), deferred: true }],
+      "dot"
+    );
+
+    const [shape] = shapesOnCanvas();
+    const expected = shapeGeometry("dot", BOX, 1);
+    expect(shape).toMatchObject({ x: expected.x, y: expected.y, width: 12, height: 12 });
+    expect(shape).toMatchObject({ pointCount: 3 });
+    expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
+    expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
+    expect(SHAPE_COLOR_DEFERRED.r).toBeCloseTo(SHAPE_COLOR_DEFERRED.g, 2);
+    expect(SHAPE_COLOR_DEFERRED.r).toBeCloseTo(SHAPE_COLOR_DEFERRED.b, 2);
+  });
+
+  it("changes the same shape in place when its root is deferred, important or back to failing, without a new shape", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 3 });
+    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
+
+    await renderer.show("A", [{ ...marker("r1", "A", "1:1"), deferred: true }], "dot");
+    expect(shapesOnCanvas()).toHaveLength(1);
+    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
+
+    await renderer.show("A", [{ ...marker("r1", "A", "1:1"), important: true }], "dot");
+    expect(shapesOnCanvas()).toHaveLength(1);
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 4 });
+    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
+
+    await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 3 });
+  });
+
+  it("draws a deferred ring with the muted gray on its stroke", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show(
+      "A",
+      [{ ...marker("r1", "A", "1:1"), deferred: true }],
+      "ring"
+    );
+    expect(shapesOnCanvas()[0]?.strokes).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
   });
 
   it("sits just outside the top left corner of the layer, never over it", async () => {
@@ -227,7 +305,7 @@ describe("switching style", () => {
   it("keeps a designer's annotation and a designer's own shape through a whole cycle", async () => {
     const node = fake.addNode("1:1", [DESIGNER_NOTE], "", BOX);
     const mine = fake.addNode("D:1", [], "", BOX);
-    mine.type = "ELLIPSE";
+    mine.type = "POLYGON";
     fake.page.children.push(mine);
     const renderer = createMarkerRenderer("s1");
     const markers = [marker("r1", "A", "1:1")];
@@ -287,7 +365,7 @@ describe("undo and duplicates", () => {
     await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
     const original = shapesOnCanvas()[0] as FakeNode;
     const copy = fake.addNode("copy:1", [], original.getPluginData(MARKER_TAG_KEY));
-    copy.type = "ELLIPSE";
+    copy.type = "POLYGON";
     fake.page.children.push(copy);
 
     await renderer.sweepOrphans();
@@ -298,9 +376,9 @@ describe("undo and duplicates", () => {
 
   it("leaves a shape that has no tag of ours, and another user's, alone", async () => {
     const plain = fake.addNode("D:1");
-    plain.type = "ELLIPSE";
+    plain.type = "POLYGON";
     const theirs = fake.addNode("T:1", [], tag("u2", "x", { kind: "shape", target: "9:9" }));
-    theirs.type = "ELLIPSE";
+    theirs.type = "POLYGON";
     await createMarkerRenderer("s1").sweepOrphans();
 
     expect(plain.removed).toBe(false);

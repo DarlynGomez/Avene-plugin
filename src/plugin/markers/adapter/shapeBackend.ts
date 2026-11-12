@@ -1,4 +1,10 @@
-import { nearlyEqual, shapeGeometry } from "../../../shared/markers/markerShape";
+import {
+  MARKER_LOOKS,
+  markerKind,
+  nearlyEqual,
+  shapeGeometry,
+  type MarkerLook
+} from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import type { BackendResult } from "./annotationBackend";
 import { findTaggedNodes } from "./markerCategory";
@@ -6,17 +12,29 @@ import { rememberMarkerNode } from "./markerNodeRegistry";
 import { makeContainer, paintShape, tagOf, type ShapeStyle } from "./shapeLayers";
 import { MARKER_TAG_KEY, parseTag } from "./markerTags";
 
+/** Whether the shape already has the color its marker wants, so a layer that changed kind is painted again */
+function hasColor(shape: PolygonNode, style: ShapeStyle, want: MarkerLook["color"]): boolean {
+  const paints = (style === "dot" ? shape.fills : shape.strokes) as readonly Paint[];
+  const paint = paints[0];
+  if (!paint || paint.type !== "SOLID") return false;
+  return (
+    nearlyEqual(paint.color.r, want.r) &&
+    nearlyEqual(paint.color.g, want.g) &&
+    nearlyEqual(paint.color.b, want.b)
+  );
+}
+
 function removeNode(node: BaseNode): void {
   if (!node.removed) node.remove();
 }
 
 /**
- * The dot and ring styles, ellipses inside one locked frame at the top of the page
+ * The dot and ring styles, triangles and diamonds inside one frame at the top of the page
  * Everything it draws is tagged with the owner and the session, and everything is removed again on
  * a swap, a style change, markers off, close, and the launch sweep
  */
 export function createShapeBackend(sessionId: string) {
-  const shapes = new Map<string, EllipseNode>();
+  const shapes = new Map<string, PolygonNode>();
   let container: FrameNode | null = null;
 
   function ensureContainer(id: string): FrameNode {
@@ -31,7 +49,7 @@ export function createShapeBackend(sessionId: string) {
     wanted: readonly Marker[],
     style: ShapeStyle
   ): Promise<BackendResult> {
-    const created = new Map<string, EllipseNode>();
+    const created = new Map<string, PolygonNode>();
     let wrote = false;
     const wantedByNode = new Map(wanted.map((marker) => [marker.nodeId, marker]));
 
@@ -48,9 +66,10 @@ export function createShapeBackend(sessionId: string) {
       if (!box) continue;
       const frame = ensureContainer(id);
       const geometry = shapeGeometry(style, box, figma.viewport.zoom);
+      const look = MARKER_LOOKS[markerKind(marker)];
       let shape = shapes.get(marker.nodeId);
       if (!shape) {
-        shape = figma.createEllipse();
+        shape = figma.createPolygon();
         shape.name = "Avene marker";
         shape.setPluginData(MARKER_TAG_KEY, tagOf(id, sessionId, "shape", marker.nodeId));
         frame.appendChild(shape);
@@ -66,12 +85,15 @@ export function createShapeBackend(sessionId: string) {
         !nearlyEqual(shape.y, y) ||
         !nearlyEqual(shape.width, geometry.size) ||
         !nearlyEqual(shape.strokeWeight as number, geometry.strokeWeight) ||
-        (shape.fills as readonly Paint[]).length !== (geometry.filled ? 1 : 0);
+        (shape.fills as readonly Paint[]).length !== (geometry.filled ? 1 : 0) ||
+        shape.pointCount !== look.points ||
+        !hasColor(shape, style, look.color);
       if (differs) {
         shape.resize(geometry.size, geometry.size);
         shape.x = x;
         shape.y = y;
-        paintShape(shape, style, geometry.strokeWeight);
+        shape.pointCount = look.points;
+        paintShape(shape, style, geometry.strokeWeight, look.color);
         wrote = true;
       }
     }

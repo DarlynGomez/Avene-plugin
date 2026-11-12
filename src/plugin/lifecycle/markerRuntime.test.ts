@@ -197,18 +197,34 @@ describe("markers with no session", () => {
     expect(t2.annotations).toEqual([]);
   });
 
-  it("follow the issue list, so a deferred root loses its marker", async () => {
+  it("follow the issue list, so an ignored root loses its marker", async () => {
     const m = await load(true);
     await m.runtime.startMarkers();
     m.runtime.markersOnIssues(ISSUES);
     await settle();
+    m.runtime.markersOnIssues([
+      issue("contrast:T1", "T1", "F1", "ignored"),
+      ISSUES[1] as IssueSummary
+    ]);
+    await settle();
+
+    expect(t1.annotations).toEqual([]);
+  });
+
+  it("keep the marker of a deferred root on its layer, so deferring does not take it off the canvas", async () => {
+    const m = await load(true);
+    await m.runtime.startMarkers();
+    m.runtime.markersOnIssues(ISSUES);
+    await settle();
+    const before = t1.annotations.length;
     m.runtime.markersOnIssues([
       issue("contrast:T1", "T1", "F1", "deferred"),
       ISSUES[1] as IssueSummary
     ]);
     await settle();
 
-    expect(t1.annotations).toEqual([]);
+    expect(before).toBeGreaterThan(0);
+    expect(t1.annotations.length).toBeGreaterThan(0);
   });
 
   it("tell the panel to scroll to the root of a selected marked layer and never set the selection", async () => {
@@ -374,7 +390,7 @@ describe("reconciling against the canvas", () => {
     m.runtime.markersOnIssues(ISSUES);
     await settle();
     m.runtime.markersOnIssues([
-      issue("contrast:T1", "T1", "F1", "deferred"),
+      issue("contrast:T1", "T1", "F1", "ignored"),
       ISSUES[1] as IssueSummary
     ]);
     await settle();
@@ -429,7 +445,7 @@ describe("reconciling against the canvas", () => {
 });
 
 describe("the marker style in use", () => {
-  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "POLYGON");
   const containers = () => [...fake.nodes.values()].filter((node) => node.type === "FRAME");
 
   async function shown(style: MarkerStyle | "default") {
@@ -506,7 +522,7 @@ describe("the marker style in use", () => {
 });
 
 describe("clicking a dot or a ring", () => {
-  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "POLYGON");
   const selectedMessages = () => posted.filter((entry) => entry.type === "MARKER_SELECTED");
 
   async function withDot(style: MarkerStyle = "dot") {
@@ -592,7 +608,7 @@ describe("clicking a dot or a ring", () => {
 });
 
 describe("dots and rings holding their size on screen", () => {
-  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "POLYGON");
   const writes = () =>
     fake.calls.filter((call) => /^(annotations|create|remove|tag):/.test(call)).length;
 
@@ -721,7 +737,7 @@ describe("dots and rings holding their size on screen", () => {
 });
 
 describe("markers in a study session with the flag off", () => {
-  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "POLYGON");
   const frames = () => [...fake.nodes.values()].filter((node) => node.type === "FRAME");
   const onCanvas = () => shapes().length + frames().length;
 
@@ -838,7 +854,7 @@ describe("markers in a study session with the flag off", () => {
 });
 
 describe("ending a block removes every dot and the frame before it says the block ended", () => {
-  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "ELLIPSE");
+  const shapes = () => [...fake.nodes.values()].filter((node) => node.type === "POLYGON");
   const frames = () => [...fake.nodes.values()].filter((node) => node.type === "FRAME");
 
   /** What is on the canvas at the moment the reply that says the block ended is sent */
@@ -900,7 +916,7 @@ describe("ending a block removes every dot and the frame before it says the bloc
       [],
       JSON.stringify({ userId: "u1", sessionId: "old", kind: "shape", target: "T1" })
     );
-    stray.type = "ELLIPSE";
+    stray.type = "POLYGON";
     fake.page.children.push(stray);
 
     const { seen, end } = watchEnd(m);

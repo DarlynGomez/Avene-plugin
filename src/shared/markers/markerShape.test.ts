@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
+import { contrastRatio } from "../colour/contrastRatio";
 import {
   DOT_STROKE,
+  MARKER_LOOKS,
+  SHAPE_STROKE_WHITE,
+  markerKind,
+  type MarkerKind,
   ZOOM_CHANGE_RATIO,
   ZOOM_POLL_MS,
   zoomChanged,
@@ -90,5 +95,44 @@ describe("zoomChanged", () => {
   it("polls often enough to feel live and not so often it costs anything", () => {
     expect(ZOOM_POLL_MS).toBeGreaterThanOrEqual(80);
     expect(ZOOM_POLL_MS).toBeLessThanOrEqual(250);
+  });
+});
+
+describe("the look of each kind of marker", () => {
+  const KINDS = Object.keys(MARKER_LOOKS) as MarkerKind[];
+  const pair = (kind: MarkerKind) =>
+    `${MARKER_LOOKS[kind].points}|${Object.values(MARKER_LOOKS[kind].color).join(",")}`;
+
+  it("is a triangle for a failing marker, a diamond for an important one, a gray triangle for a deferred one", () => {
+    expect(MARKER_LOOKS.fail.points).toBe(3);
+    expect(MARKER_LOOKS.important.points).toBe(4);
+    expect(MARKER_LOOKS.deferred.points).toBe(3);
+    expect(MARKER_LOOKS.fail.color).toEqual(MARKER_LOOKS.important.color);
+    expect(MARKER_LOOKS.deferred.color).not.toEqual(MARKER_LOOKS.fail.color);
+  });
+
+  it("never gives two kinds the same shape and color pair", () => {
+    expect(new Set(KINDS.map(pair)).size).toBe(KINDS.length);
+  });
+
+  it("lets the shape alone tell a failing marker from an important one, and the color alone only a deferred one", () => {
+    expect(MARKER_LOOKS.fail.points).not.toBe(MARKER_LOOKS.important.points);
+    expect(MARKER_LOOKS.fail.points).toBe(MARKER_LOOKS.deferred.points);
+  });
+
+  it("keeps every fill readable against the white outline, which is what makes it work on any background", () => {
+    for (const kind of KINDS) {
+      expect(
+        contrastRatio(MARKER_LOOKS[kind].color, SHAPE_STROKE_WHITE),
+        kind
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("is chosen by the root: deferred first, then important, otherwise failing", () => {
+    expect(markerKind({})).toBe("fail");
+    expect(markerKind({ important: true })).toBe("important");
+    expect(markerKind({ deferred: true })).toBe("deferred");
+    expect(markerKind({ deferred: true, important: true })).toBe("deferred");
   });
 });

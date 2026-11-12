@@ -1,8 +1,5 @@
-import {
-  CONTAINER_NAME,
-  SHAPE_COLOR,
-  SHAPE_STROKE_WHITE
-} from "../../../shared/markers/markerShape";
+import { CONTAINER_NAME, SHAPE_STROKE_WHITE } from "../../../shared/markers/markerShape";
+import type { MarkerLook } from "../../../shared/markers/markerShape";
 import type { MarkerStyle } from "../../../shared/markers/markerStyle";
 import { rememberMarkerNode } from "./markerNodeRegistry";
 import { MARKER_TAG_KEY, serializeTag, type MarkerTag } from "./markerTags";
@@ -36,17 +33,20 @@ export function makeContainer(userId: string, sessionId: string): FrameNode {
   return frame;
 }
 
-export function paintShape(shape: EllipseNode, style: ShapeStyle, weight: number): void {
-  const solid = (color: { r: number; g: number; b: number }): SolidPaint => ({
-    type: "SOLID",
-    color
-  });
+/** The outline is white for every kind, so the shape reads against a light or a dark background alike */
+export function paintShape(
+  shape: PolygonNode,
+  style: ShapeStyle,
+  weight: number,
+  color: MarkerLook["color"]
+): void {
+  const solid = (paint: MarkerLook["color"]): SolidPaint => ({ type: "SOLID", color: paint });
   if (style === "dot") {
-    shape.fills = [solid(SHAPE_COLOR)];
+    shape.fills = [solid(color)];
     shape.strokes = [solid(SHAPE_STROKE_WHITE)];
   } else {
     shape.fills = [];
-    shape.strokes = [solid(SHAPE_COLOR)];
+    shape.strokes = [solid(color)];
   }
   shape.strokeWeight = weight;
   shape.strokeAlign = "INSIDE";

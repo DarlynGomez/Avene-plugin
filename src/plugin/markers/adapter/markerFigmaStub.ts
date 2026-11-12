@@ -169,7 +169,7 @@ export function createFakeFigma(options: Options = {}) {
   }
 
   /** What a layer drawn by the plugin looks like to the stand in, added to the page like figma does */
-  function create(type: "FRAME" | "ELLIPSE"): FakeNode {
+  function create(type: "FRAME" | "POLYGON"): FakeNode {
     if (state.readOnly) throw new Error(READ_ONLY);
     const node = build(`${type === "FRAME" ? "frame" : "shape"}:${nextShape++}`, type, [], "");
     const target = (globalThis as unknown as { figma: { currentPage: typeof page } }).figma
@@ -211,7 +211,7 @@ export function createFakeFigma(options: Options = {}) {
       },
       getNodeByIdAsync: async (id: string) => nodes.get(id) ?? null,
       createFrame: () => create("FRAME"),
-      createEllipse: () => create("ELLIPSE"),
+      createPolygon: () => create("POLYGON"),
       currentPage: page,
       viewport: {
         get zoom() {

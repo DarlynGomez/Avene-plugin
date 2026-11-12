@@ -9,9 +9,32 @@ export const SHAPE_GAP = 2;
 
 /** The muted red the plugin already uses for warnings, Figma does not expose its category colours */
 export const SHAPE_COLOR = { r: 0.659, g: 0.278, b: 0.122 };
+/** A deferred marker stays on the canvas in a muted gray, its white outline keeps it visible on any background */
+export const SHAPE_COLOR_DEFERRED = { r: 0.43, g: 0.43, b: 0.43 };
 export const SHAPE_STROKE_WHITE = { r: 1, g: 1, b: 1 };
 
 export const CONTAINER_NAME = "Avene markers (temporary)";
+
+/** What kind of marker a root gets, a failing one, an important failing one, or a deferred one */
+export type MarkerKind = "fail" | "important" | "deferred";
+
+export interface MarkerLook {
+  /** Corners of the polygon, 3 is a triangle and 4 is a diamond */
+  points: 3 | 4;
+  color: { r: number; g: number; b: number };
+}
+
+/** Every kind differs from every other in its corners or its color, and the white outline is shared by all */
+export const MARKER_LOOKS: Readonly<Record<MarkerKind, MarkerLook>> = {
+  fail: { points: 3, color: SHAPE_COLOR },
+  important: { points: 4, color: SHAPE_COLOR },
+  deferred: { points: 3, color: SHAPE_COLOR_DEFERRED }
+};
+
+export function markerKind(marker: { deferred?: boolean; important?: boolean }): MarkerKind {
+  if (marker.deferred) return "deferred";
+  return marker.important ? "important" : "fail";
+}
 
 export interface TargetBox {
   x: number;
