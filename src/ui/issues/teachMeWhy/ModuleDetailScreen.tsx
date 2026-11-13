@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef, type KeyboardEvent } from "react";
+import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowLeft } from "lucide-react";
 
 import type { LearningModule } from "../../../shared/teachMeWhy/modules/moduleTypes";
 import { ModuleLessonView } from "./ModuleLessonView";
+import { LessonQuiz } from "./quiz/LessonQuiz";
 import styles from "./ModuleDetailScreen.module.css";
 
 interface ModuleDetailScreenProps {
@@ -14,16 +15,19 @@ interface ModuleDetailScreenProps {
 
 export function ModuleDetailScreen({ module, onBack, onBackToIssue }: ModuleDetailScreenProps) {
   const screen = useRef<HTMLElement>(null);
+  // The quiz takes the lesson's place, and its back control and Escape return to the lesson
+  const [quizOpen, setQuizOpen] = useState(false);
+  const back = quizOpen ? () => setQuizOpen(false) : onBack;
 
   useLayoutEffect(() => {
     screen.current?.scrollIntoView?.({ block: "start" });
-  }, []);
+  }, [quizOpen]);
 
   // Escape closes the lesson as the Back button does, and the caller puts focus back on what opened it
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== "Escape") return;
     event.stopPropagation();
-    onBack();
+    back();
   }
 
   return (
@@ -34,9 +38,9 @@ export function ModuleDetailScreen({ module, onBack, onBackToIssue }: ModuleDeta
       onKeyDown={onKeyDown}
     >
       <div className={styles.backRow}>
-        <button type="button" className={styles.back} onClick={onBack}>
+        <button type="button" className={styles.back} onClick={back}>
           <ArrowLeft className={styles.icon} size={16} aria-hidden="true" />
-          <span>All topics</span>
+          <span>{quizOpen ? "Back to lesson" : "All topics"}</span>
         </button>
         {onBackToIssue && (
           <button type="button" className={styles.toIssue} onClick={onBackToIssue}>
@@ -44,7 +48,11 @@ export function ModuleDetailScreen({ module, onBack, onBackToIssue }: ModuleDeta
           </button>
         )}
       </div>
-      <ModuleLessonView module={module} />
+      {quizOpen ? (
+        <LessonQuiz module={module} onBackToLesson={() => setQuizOpen(false)} />
+      ) : (
+        <ModuleLessonView module={module} onStartQuiz={() => setQuizOpen(true)} />
+      )}
     </section>
   );
 }

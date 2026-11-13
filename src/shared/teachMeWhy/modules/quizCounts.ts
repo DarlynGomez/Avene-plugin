@@ -11,7 +11,9 @@ import quiz10 from "./quizzes/M10.json";
 import quiz11 from "./quizzes/M11.json";
 import quiz12 from "./quizzes/M12.json";
 
-const QUIZZES: readonly { moduleId: string; questions: readonly unknown[] }[] = [
+import type { QuizFile } from "./curriculum/parseQuizzes";
+
+const QUIZZES: readonly QuizFile[] = [
   quiz01,
   quiz02,
   quiz03,
@@ -30,4 +32,27 @@ const QUIZZES: readonly { moduleId: string; questions: readonly unknown[] }[] = 
 export function quizQuestionCount(moduleId: string): number | null {
   const quiz = QUIZZES.find((candidate) => candidate.moduleId === moduleId);
   return quiz ? quiz.questions.length : null;
+}
+
+/** A question as the quiz screen shows it, the tested learning point is for the research team only */
+export interface QuizScreenQuestion {
+  questionId: string;
+  prompt: string;
+  options: readonly { id: string; text: string }[];
+  correctOptionId: string;
+  explanation: string;
+  hint: string;
+}
+
+/** The questions of a lesson's quiz in order, empty for a lesson with no quiz */
+export function quizQuestions(moduleId: string): QuizScreenQuestion[] {
+  const quiz = QUIZZES.find((candidate) => candidate.moduleId === moduleId);
+  return (quiz?.questions ?? []).map((question) => ({
+    questionId: question.questionId,
+    prompt: question.prompt,
+    options: question.options.map((option) => ({ id: option.id, text: option.text })),
+    correctOptionId: question.correctOptionId,
+    explanation: question.explanation,
+    hint: question.hint
+  }));
 }

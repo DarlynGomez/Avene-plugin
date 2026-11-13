@@ -60,7 +60,7 @@ describe("the lesson page in the study build, which is what a plain run is", () 
     ]);
   });
 
-  it("lists the objectives in order, and the takeaways with the quiz count from the quiz file", () => {
+  it("lists the objectives in order, and the takeaways with the quiz count and the Start button", () => {
     show();
     const learn = screen.getByRole("region", { name: "What you will learn" });
     expect(within(learn).getByRole("list").tagName).toBe("OL");
@@ -73,7 +73,7 @@ describe("the lesson page in the study build, which is what a plain run is", () 
     );
     expect(within(takeaways).getByText("Check your understanding")).toBeInTheDocument();
     expect(within(takeaways).getByText("3 questions")).toBeInTheDocument();
-    expect(within(takeaways).queryByRole("button")).toBeNull();
+    expect(within(takeaways).getByRole("button", { name: "Start" })).toBeInTheDocument();
   });
 
   it("shows the callout paragraph inside its card, once, with a real table", () => {

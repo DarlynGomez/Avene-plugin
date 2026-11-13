@@ -16,7 +16,13 @@ import styles from "./lesson/Lesson.module.css";
  * The study build shows no clip and no link, nothing in it reaches the network
  * When it opens, focus moves to its heading so a keyboard or screen reader starts at the lesson
  */
-export function ModuleLessonView({ module }: { module: LearningModule }) {
+export function ModuleLessonView({
+  module,
+  onStartQuiz
+}: {
+  module: LearningModule;
+  onStartQuiz?: () => void;
+}) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus();
@@ -42,6 +48,7 @@ export function ModuleLessonView({ module }: { module: LearningModule }) {
         id={module.id}
         takeaways={module.keyTakeaways}
         questions={quizQuestionCount(module.id)}
+        onStart={onStartQuiz}
       />
     </article>
   );

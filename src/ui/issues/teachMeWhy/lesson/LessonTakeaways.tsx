@@ -7,10 +7,12 @@ interface LessonTakeawaysProps {
   takeaways: readonly string[];
   /** Null when the lesson has no quiz, then the quiz row is left out */
   questions: number | null;
+  /** Opens the quiz, the row shows no button without it */
+  onStart?: () => void;
 }
 
-/** The last block: what to remember, and how many questions check it, with no quiz screen to open yet */
-export function LessonTakeaways({ id, takeaways, questions }: LessonTakeawaysProps) {
+/** The last block: what to remember, how many questions check it, and the button that starts them */
+export function LessonTakeaways({ id, takeaways, questions, onStart }: LessonTakeawaysProps) {
   const heading = `${id}-takeaways`;
   return (
     <section className={styles.dark} aria-labelledby={heading}>
@@ -27,10 +29,17 @@ export function LessonTakeaways({ id, takeaways, questions }: LessonTakeawaysPro
       </ul>
       {questions !== null && (
         <div className={styles.quiz}>
-          <p className={styles.quizTitle}>Check your understanding</p>
-          <p className={styles.quizMeta}>
-            {questions} {questions === 1 ? "question" : "questions"}
-          </p>
+          <div>
+            <p className={styles.quizTitle}>Check your understanding</p>
+            <p className={styles.quizMeta}>
+              {questions} {questions === 1 ? "question" : "questions"}
+            </p>
+          </div>
+          {onStart && (
+            <button type="button" className={styles.start} onClick={onStart}>
+              Start
+            </button>
+          )}
         </div>
       )}
     </section>

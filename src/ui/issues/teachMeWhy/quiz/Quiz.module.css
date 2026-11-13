@@ -1,0 +1,215 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-lesson-side);
+  border: var(--size-hairline) solid var(--color-lesson-hairline);
+  border-radius: var(--radius-lesson-card);
+  background: var(--color-card);
+}
+
+.prompt {
+  margin: 0;
+  font-size: var(--font-size-lesson-lead);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--font-line-height-lesson-card-title);
+  overflow-wrap: anywhere;
+}
+
+.prompt:focus {
+  outline: none;
+}
+
+.prompt:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-lesson-ink);
+  outline-offset: var(--size-focus-offset);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-target-min);
+  padding: var(--space-1) var(--space-2);
+  border: var(--size-hairline) solid var(--color-lesson-hairline);
+  border-radius: var(--radius-lesson-button);
+  font-size: var(--font-size-lesson-list);
+  line-height: var(--font-line-height-lesson-list);
+  cursor: pointer;
+}
+
+.option:has(input:checked) {
+  border-color: var(--color-lesson-ink);
+}
+
+.option:has(input:focus-visible) {
+  outline: var(--size-focus-ring) solid var(--color-lesson-ink);
+  outline-offset: var(--size-focus-offset);
+}
+
+.option:has(input:disabled) {
+  cursor: default;
+}
+
+.option input {
+  flex: none;
+  margin: 0;
+  accent-color: var(--color-lesson-ink);
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.right {
+  border-color: var(--color-lesson-accent);
+  color: var(--color-lesson-accent);
+}
+
+.wrong {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+/* A picked answer keeps the right or wrong color over the plain picked border */
+.right:has(input:checked) {
+  border-width: var(--size-selection-ring);
+  border-color: var(--color-lesson-accent);
+}
+
+.wrong:has(input:checked) {
+  border-width: var(--size-selection-ring);
+  border-color: var(--color-warning);
+}
+
+.markIcon {
+  flex: none;
+  stroke-width: var(--size-lesson-icon-stroke);
+  stroke-linecap: round;
+}
+
+.tag {
+  font-size: var(--font-size-lesson-meta);
+  font-weight: var(--font-weight-semibold);
+}
+
+.hint,
+.explanation,
+.reviewPrompt {
+  margin: 0;
+  color: var(--color-lesson-secondary);
+  font-size: var(--font-size-lesson-list);
+  line-height: var(--font-line-height-lesson-list);
+}
+
+.feedback:empty {
+  display: none;
+}
+
+.feedback {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.verdictRight,
+.verdictWrong {
+  margin: 0;
+  font-size: var(--font-size-lesson-card-title);
+  font-weight: var(--font-weight-semibold);
+}
+
+.verdictRight {
+  color: var(--color-lesson-accent);
+}
+
+.verdictWrong {
+  color: var(--color-warning);
+}
+
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reviewItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: var(--size-hairline) solid var(--color-lesson-hairline);
+}
+
+.reviewPrompt {
+  color: var(--color-lesson-ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.primary,
+.secondary,
+.textButton {
+  min-height: var(--size-target-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-lesson-button);
+  font-family: var(--font-body);
+  font-size: var(--font-size-lesson-list);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.primary {
+  align-self: flex-start;
+  border: var(--size-hairline) solid var(--color-lesson-ink);
+  background: var(--color-lesson-ink);
+  color: var(--color-lesson-paper);
+}
+
+.primary:disabled {
+  border-color: var(--color-lesson-hairline);
+  background: var(--color-lesson-hairline);
+  color: var(--color-lesson-secondary);
+  cursor: default;
+}
+
+.secondary {
+  border: var(--size-hairline) solid var(--color-lesson-hairline);
+  background: var(--color-card);
+  color: var(--color-lesson-ink);
+}
+
+.textButton {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-lesson-ink);
+  font-weight: var(--font-weight-regular);
+  text-decoration: underline;
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.textButton:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-lesson-ink);
+  outline-offset: var(--size-focus-offset);
+}

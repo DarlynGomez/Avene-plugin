@@ -23,7 +23,15 @@ const PAIRS: [string, keyof typeof TOKEN_VALUES, keyof typeof TOKEN_VALUES][] = 
   ["on-dark accent on ink", "--color-lesson-on-dark-accent", "--color-lesson-ink"],
   ["on-dark secondary on ink", "--color-lesson-on-dark-secondary", "--color-lesson-ink"],
   ["white on the duration chip", "--color-card", "--color-lesson-chip"],
-  ["secondary on the count pill", "--color-lesson-secondary", "--color-lesson-pill"]
+  ["secondary on the count pill", "--color-lesson-secondary", "--color-lesson-pill"],
+  ["quiz right answer, accent on white", "--color-lesson-accent", "--color-card"],
+  ["quiz wrong answer, warning on white", "--color-warning", "--color-card"],
+  [
+    "disabled quiz button, secondary on hairline",
+    "--color-lesson-secondary",
+    "--color-lesson-hairline"
+  ],
+  ["Start button, ink on paper", "--color-lesson-ink", "--color-lesson-paper"]
 ];
 
 describe("the lesson page colors", () => {
