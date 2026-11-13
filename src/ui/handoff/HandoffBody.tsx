@@ -62,6 +62,7 @@ export function HandoffBody({ data, actions }: HandoffBodyProps) {
         doc={doc}
         audience={audience}
         chosenText={drafts.chosenText}
+        buildId={data.build ?? null}
         onShow={showOnCanvas}
         onAddQuestion={() => setSheet("question")}
       />

@@ -1,4 +1,5 @@
 import type { HandoffDataMessage } from "../../shared/handoff/handoffMessages";
+import { BUILD_INFO } from "../buildInfo";
 import { loadDecisions } from "../accountability/decisionStore";
 import { loadIssues } from "../accountability/issueStore";
 import { loadAdjustLog } from "../adjust/adapter/adjustLogging";
@@ -18,6 +19,7 @@ export async function buildHandoffData(): Promise<HandoffDataMessage> {
   return {
     type: "HANDOFF_DATA",
     generatedAt: new Date().toISOString(),
+    build: BUILD_INFO.commit,
     fileName: figma.root.name,
     issues: await buildDisplayList(await loadIssues()),
     decisions: loadDecisions(),

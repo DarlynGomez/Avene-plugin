@@ -1,8 +1,11 @@
 import { Copy } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { buildItems } from "../../shared/handoff/buildItems";
+import { NOT_REVIEWED_LINE } from "../../shared/handoff/fixedLines";
 import { ALL_FORMATS, FORMAT_NAMES, rawText, type Format } from "../../shared/handoff/formats";
+import { buildHandoffTable } from "../../shared/handoff/tableModel";
+import { renderTableText } from "../../shared/handoff/tableText";
 import type { ChosenText } from "../../shared/handoff/compose";
 import type { Audience, AudienceDoc, HandoffInput } from "../../shared/handoff/types";
 import { copyText } from "../study/downloadFile";
@@ -12,6 +15,7 @@ import { CardsView } from "./CardsView";
 import styles from "./Document.module.css";
 import base from "./Handoff.module.css";
 import { FormatTabs } from "./FormatTabs";
+import { HandoffTable } from "./HandoffTable";
 import { StepCard } from "./StepCard";
 import { TicketCards } from "./TicketCards";
 import { ViewToggle, type View } from "./ViewToggle";
@@ -21,6 +25,8 @@ interface HandoffDocumentProps {
   doc: AudienceDoc;
   audience: Audience;
   chosenText: ChosenText;
+  /** The build that made the data, for the line under the table title */
+  buildId?: string | null;
   onShow: (nodeIds: readonly string[]) => void;
   onAddQuestion: () => void;
 }
@@ -31,18 +37,29 @@ export function HandoffDocument({
   doc,
   audience,
   chosenText,
+  buildId = null,
   onShow,
   onAddQuestion
 }: HandoffDocumentProps) {
   const [format, setFormat] = useState<Format>("spec");
-  const [view, setView] = useState<View>("cards");
+  const [view, setView] = useState<View>("table");
   const [status, setStatus] = useState("");
   const text = rawText(format, input, audience, chosenText, null);
+  const model = useMemo(
+    () => buildHandoffTable(input, audience, buildId),
+    [input, audience, buildId]
+  );
+  const asTable = view === "table" && format === "spec";
   const kept = buildItems(input).items.filter((item) => item.kind === "left").length;
 
   /** One click, template text only: an AI draft is never copied without a reviewer's name, so it waits for the review */
   async function quickCopy() {
-    const copied = await copyText(rawText(format, input, audience, {}, null, true));
+    // The table on screen copies as a plain text table of the same rows, the other views copy their own text
+    const copied = await copyText(
+      asTable
+        ? `${renderTableText(model)}\n\n${NOT_REVIEWED_LINE}`
+        : rawText(format, input, audience, {}, null, true)
+    );
     setStatus(
       copied
         ? "Copied. It says it has not been reviewed."
@@ -66,6 +83,8 @@ export function HandoffDocument({
         >
           {text}
         </pre>
+      ) : asTable ? (
+        <HandoffTable model={model} onShow={onShow} />
       ) : format === "ticket" ? (
         <TicketCards input={input} audience={audience} />
       ) : format === "brief" ? (

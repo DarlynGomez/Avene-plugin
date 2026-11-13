@@ -21,6 +21,8 @@ beforeEach(() => {
   });
   render(<HandoffTab />);
   act(() => emit(handoffData()));
+  // The table is the first view now, these tests are about the cards and the text
+  fireEvent.click(screen.getByRole("button", { name: "Cards" }));
 });
 afterEach(() => {
   cleanup();
@@ -31,7 +33,7 @@ const pick = (name: string) => fireEvent.click(screen.getByRole("radio", { name 
 const cards = (who = "developers") => screen.getByLabelText(`Cards for ${who}`);
 
 describe("cards", () => {
-  it("are the first view: a summary, numbered sections, a count on the action section", () => {
+  it("show a summary, numbered sections, a count on the action section", () => {
     expect(within(cards()).getByRole("heading", { name: "Summary" })).toBeInTheDocument();
     expect(
       within(cards()).getByRole("heading", { name: /^1\. Needs developer action/ })
@@ -120,6 +122,36 @@ describe("open questions", () => {
       nodeId: "1:1",
       notes: [{ category: "question", text: "Does focus return?", owner: "PM" }]
     });
+  });
+});
+
+describe("the table view", () => {
+  beforeEach(() => fireEvent.click(screen.getByRole("button", { name: "Table" })));
+
+  it("shows a real table of the same items the cards do", () => {
+    expect(screen.getByRole("button", { name: "Table" })).toHaveAttribute("aria-pressed", "true");
+    const table = screen.getByRole("table", { name: /Text contrast/ });
+    expect(within(table).getByRole("rowheader", { name: "Helper text" })).toBeInTheDocument();
+    expect(within(table).getByRole("rowheader", { name: "Price label" })).toBeInTheDocument();
+    expect(screen.queryByLabelText("Cards for developers")).toBeNull();
+  });
+
+  it("finds a row's layers in the file", () => {
+    fireEvent.click(screen.getByRole("button", { name: "Show Helper text on the canvas" }));
+    expect(posted.at(-1)).toEqual({ type: "SHOW_ON_CANVAS", nodeIds: ["1:1"] });
+  });
+
+  it("copies a plain text table of the same rows, and says it was not reviewed", async () => {
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Quick copy raw" }));
+    });
+    const copied = String(vi.mocked(copyText).mock.calls[0][0]);
+    expect(copied).toContain("## Text contrast");
+    expect(copied).toMatch(/Element +\| Location/);
+    expect(copied).toContain("Helper text");
+    expect(copied).toContain("Price label");
+    expect(copied).toContain("Not covered by this check");
+    expect(copied.trimEnd().endsWith("Not yet reviewed by a person.")).toBe(true);
   });
 });
 

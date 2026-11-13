@@ -1,15 +1,15 @@
-import { LayoutGrid, Terminal } from "lucide-react";
+import { LayoutGrid, Table, Terminal } from "lucide-react";
 
 import styles from "./Document.module.css";
 
-export type View = "cards" | "text";
+export type View = "table" | "cards" | "text";
 
 interface ViewToggleProps {
   value: View;
   onChange: (view: View) => void;
 }
 
-/** Cards to scan, or the exact text that will be copied */
+/** A table to read across, cards to scan, or the exact text that will be copied */
 export function ViewToggle({ value, onChange }: ViewToggleProps) {
   const button = (view: View, label: string, Icon: typeof LayoutGrid) => (
     <button
@@ -24,6 +24,7 @@ export function ViewToggle({ value, onChange }: ViewToggleProps) {
   );
   return (
     <div className={styles.toggle} role="group" aria-label="How to show the document">
+      {button("table", "Table", Table)}
       {button("cards", "Cards", LayoutGrid)}
       {button("text", "Text", Terminal)}
     </div>

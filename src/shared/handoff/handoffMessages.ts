@@ -38,6 +38,8 @@ export type HandoffUiMessage =
 export interface HandoffDataMessage {
   type: "HANDOFF_DATA";
   generatedAt: string;
+  /** The build that made it, so a printed table can say which one, absent in older data */
+  build?: string;
   fileName: string;
   issues: IssueSummary[];
   decisions: Record<string, RootDecision>;

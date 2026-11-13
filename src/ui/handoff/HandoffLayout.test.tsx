@@ -89,6 +89,7 @@ describe("who it is for", () => {
     expect(
       screen.queryByText(/A clear report of what was checked and decided/)
     ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     expect(screen.getByLabelText("Cards for developers")).toHaveTextContent("Detected:");
     fireEvent.click(screen.getByRole("radio", { name: "Client" }));
     expect(screen.getByRole("radio", { name: "Client" })).toBeChecked();
@@ -103,6 +104,7 @@ describe("who it is for", () => {
     const pm = screen.getByRole("radio", { name: "Product managers" });
     pm.focus();
     fireEvent.click(pm);
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     expect(screen.getByLabelText("Cards for product managers")).toBeInTheDocument();
   });
 });
