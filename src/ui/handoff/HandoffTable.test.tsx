@@ -102,13 +102,12 @@ function show(count: 0 | 1 | 5, onShow: (ids: readonly string[]) => void = () =>
 }
 
 describe("with nothing in it", () => {
-  it("says so in one sentence, shows no group, and still shows the footer and the build", () => {
+  it("says so in one sentence, shows no group, and still shows the footer", () => {
     show(0);
     expect(screen.getByText("No findings to hand off yet.")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading")).not.toBeInTheDocument();
     expect(screen.getByText(/^Not covered by this check/)).toBeInTheDocument();
-    expect(screen.getByText("Build 5c37f7b")).toBeInTheDocument();
     expect(screen.getByText("0 need action")).toBeInTheDocument();
   });
 });
@@ -212,17 +211,18 @@ describe("with five items", () => {
     expect(screen.getByText("No alt text yet")).toBeInTheDocument();
   });
 
-  it("shows the footer once, and the build as its own line after it", () => {
+  it("shows the footer once, and no build id on the screen", () => {
     show(5);
     expect(screen.getAllByText(/^Not covered by this check/)).toHaveLength(1);
-    expect(screen.getByText("Build 5c37f7b").previousElementSibling).toHaveTextContent(
-      /^Not covered/
-    );
+    expect(screen.queryByText(/^Build /)).toBeNull();
   });
 
-  it("holds no shape, no badge and no image", () => {
+  it("holds no shape, no badge and no image, only the magnifier inside each Show button", () => {
     const { container } = show(5);
-    expect(container.querySelector("svg, img")).toBeNull();
+    expect(container.querySelector("img")).toBeNull();
+    const icons = [...container.querySelectorAll("svg")];
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) expect(icon.closest("button")).not.toBeNull();
     expect(container.textContent).not.toMatch(/\bNone\b/);
   });
 });
@@ -262,8 +262,12 @@ describe("the layout", () => {
     expect(ratio("--color-ink", "--color-background")).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("makes Show look like a link and gives it a visible focus ring", () => {
-    expect(css).toMatch(/\.show\s*\{[^}]*text-decoration:\s*underline/);
+  it("draws Show as a magnifier named for its row, with a visible focus ring", () => {
+    const { container } = show(1);
+    const button = screen.getByRole("button", { name: "Show Card caption in Figma" });
+    expect(button).toHaveTextContent("");
+    expect(button.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(container.querySelectorAll("button svg")).toHaveLength(1);
     expect(css).toMatch(/\.show:focus-visible\s*\{[^}]*outline/);
   });
 });

@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+
 import type { HandoffTableModel, TableGroup, TableRow } from "../../shared/handoff/tableTypes";
 import styles from "./HandoffTable.module.css";
 
@@ -6,7 +8,7 @@ interface HandoffTableProps {
   onShow: (nodeIds: readonly string[]) => void;
 }
 
-/** The element's name, then where it is, anything short to know about it, and the link that finds it */
+/** The element's name, then where it is, anything short to know about it, and the magnifier that finds it */
 function ElementBlock({ row, onShow }: { row: TableRow; onShow: HandoffTableProps["onShow"] }) {
   const facts = [row.location, ...row.details].filter((part) => part !== "");
   return (
@@ -23,7 +25,7 @@ function ElementBlock({ row, onShow }: { row: TableRow; onShow: HandoffTableProp
           disabled={row.nodeIds.length === 0}
           aria-label={`Show ${row.element} in Figma`}
         >
-          Show
+          <Search size={14} aria-hidden="true" />
         </button>
       </span>
     </>
@@ -133,7 +135,6 @@ export function HandoffTable({ model, onShow }: HandoffTableProps) {
       ))}
       <footer className={styles.footer}>
         <p>{footer.notCovered}</p>
-        {header.buildId && <p className={styles.build}>Build {header.buildId}</p>}
       </footer>
     </article>
   );
