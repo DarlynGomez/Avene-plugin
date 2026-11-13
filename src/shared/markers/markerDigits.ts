@@ -32,8 +32,8 @@ export function countText(count: number | undefined): string | null {
 
 /** How big one glyph unit is on the marker, fewer characters get bigger glyphs so they stay readable */
 export function glyphScale(characters: number): number {
-  if (characters <= 1) return 1.5;
-  return characters === 2 ? 1.1 : 0.65;
+  if (characters <= 1) return 1.05;
+  return characters === 2 ? 0.8 : 0.5;
 }
 
 export interface DigitPath {
@@ -72,6 +72,6 @@ export function digitPath(text: string, scale: number): DigitPath {
     data: parts.join(" "),
     width: widthUnits * scale,
     height: GLYPH_HEIGHT * scale,
-    strokeWeight: characters >= 3 ? 0.9 : 1.2
+    strokeWeight: characters >= 3 ? 0.6 : 0.8
   };
 }

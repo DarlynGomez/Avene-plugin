@@ -218,14 +218,16 @@ describe("buildMarkerSet", () => {
       ]);
 
     it("has a marker on every open layer of the screen, and none on an ignored one or another screen", () => {
-      const markers = buildMarkerSet([grouped()], "A", [], "r1");
+      const markers = buildMarkerSet([grouped()], "A", [], { signature: "r1", nodeId: "1:1" });
       expect(markers.map((m) => m.nodeId)).toEqual(["1:1", "1:2"]);
       expect(new Set(markers.map((m) => m.signature))).toEqual(new Set(["r1"]));
       expect(markers.map((m) => m.issueId)).toEqual(["contrast:1:1", "contrast:1:2"]);
     });
 
     it("is one marker as before when it was not the root that was clicked", () => {
-      expect(buildMarkerSet([grouped()], "A", [], "other")).toHaveLength(1);
+      expect(
+        buildMarkerSet([grouped()], "A", [], { signature: "other", nodeId: "1:1" })
+      ).toHaveLength(1);
       expect(buildMarkerSet([grouped()], "A", [])).toHaveLength(1);
     });
 
@@ -235,14 +237,14 @@ describe("buildMarkerSet", () => {
         [instance("1:1", "A", "deferred", 0), instance("1:2", "A", "deferred", 1)],
         "deferred"
       );
-      const markers = buildMarkerSet([deferred], "A", [], "r1");
+      const markers = buildMarkerSet([deferred], "A", [], { signature: "r1", nodeId: "1:1" });
       expect(markers).toHaveLength(2);
       expect(markers.every((m) => m.deferred === true)).toBe(true);
     });
   });
 
   describe("the count of a group", () => {
-    it("is on every marker of a group, as the number of open layers on the screen", () => {
+    it("is the number of open layers on the screen, on the marker clicked only and not on the ones that open beside it", () => {
       const roots = [
         root("r1", [
           instance("1:1", "A", "open", 0),
@@ -252,7 +254,15 @@ describe("buildMarkerSet", () => {
         ])
       ];
       expect(buildMarkerSet(roots, "A", [])[0]).toMatchObject({ count: 2 });
-      expect(buildMarkerSet(roots, "A", [], "r1").map((m) => m.count)).toEqual([2, 2]);
+      const clicked = (nodeId: string) => ({ signature: "r1", nodeId });
+      expect(buildMarkerSet(roots, "A", [], clicked("1:1")).map((m) => m.count)).toEqual([
+        2,
+        undefined
+      ]);
+      expect(buildMarkerSet(roots, "A", [], clicked("1:2")).map((m) => m.count)).toEqual([
+        undefined,
+        2
+      ]);
     });
 
     it("is absent for a root with one layer on the screen, even when it has others on another screen", () => {

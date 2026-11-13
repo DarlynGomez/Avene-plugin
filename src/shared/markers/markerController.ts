@@ -1,7 +1,7 @@
 import type { Root } from "../grouping/groupingTypes";
 import { SCREEN_DWELL_MS, type SelectionEvent } from "./currentScreen";
 import { ANNOTATION_RECONCILE_MS, type MarkerControllerDeps } from "./markerControllerTypes";
-import { buildMarkerSet, type Marker } from "./markerSet";
+import { buildMarkerSet, type ExpandedMarker, type Marker } from "./markerSet";
 import type { MarkerStyle } from "./markerStyle";
 import { createScreenTracker } from "./screenTracker";
 
@@ -14,7 +14,7 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   let roots: readonly Root[] = [];
   let designerOrder: readonly string[] = [];
   // The root whose layers are all marked, set by a click on one of its markers and cleared by any other click
-  let expandedSignature: string | null = null;
+  let expanded: ExpandedMarker | null = null;
   let markers: Marker[] = [];
   let active = false;
   let shownScreen: string | null = null;
@@ -36,7 +36,7 @@ export function createMarkerController(deps: MarkerControllerDeps) {
       return;
     }
     const screen = tracker.currentScreenId();
-    const next = buildMarkerSet(roots, screen, designerOrder, expandedSignature);
+    const next = buildMarkerSet(roots, screen, designerOrder, expanded);
     const style = deps.style();
     const result = await deps.renderer.show(screen ?? "", next, style, undoStep);
     if (!result.written) {
@@ -83,17 +83,17 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   return {
     /**
      * A designer selection moves the screen after the dwell, a plugin one changes nothing
-     * Clicking a marker passes its root as expand, and every layer of that root is then marked
+     * Clicking a marker passes its root and its layer as expand, and every layer of that root is then marked, with the number on the clicked one only
      */
     onSelection(
       event: SelectionEvent,
       selectedNodeIds: readonly string[],
-      expand: string | null = null
+      expand: ExpandedMarker | null = null
     ): void {
       if (event.origin === "plugin") {
         return;
       }
-      expandedSignature = expand;
+      expanded = expand;
       designerOrder = selectedNodeIds;
       tracker.onSelection(event);
       waitOutDwell();

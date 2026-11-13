@@ -570,7 +570,8 @@ describe("clicking a dot or a ring", () => {
     await m.listener.handleSelectionChange(false);
     await settle();
     expect(shapes()).toHaveLength(2);
-    expect(numbers()).toHaveLength(2);
+    // Only the marker clicked keeps its number, the one that opened beside it has none
+    expect(numbers()).toHaveLength(1);
 
     selection = [shapes()[1]];
     await m.listener.handleSelectionChange(false);

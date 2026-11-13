@@ -13,6 +13,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
   let visible = options.visible ?? true;
   let launch = options.launch === undefined ? "A" : options.launch;
   const shows: { screen: string; nodes: string[] }[] = [];
+  const counts: (number | undefined)[][] = [];
   const styles: MarkerStyle[] = [];
   const undoFlags: boolean[] = [];
   const events: [MarkerStateChange, number][] = [];
@@ -31,6 +32,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
       ) => {
         undoFlags.push(undo ?? true);
         shows.push({ screen, nodes: markers.map((marker) => marker.nodeId) });
+        counts.push(markers.map((marker) => marker.count));
         if (showStyle) styles.push(showStyle);
         return result;
       }
@@ -63,6 +65,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
     controller,
     renderer,
     shows,
+    counts,
     styles,
     undoFlags,
     stateStyles,
@@ -434,7 +437,7 @@ describe("clicking a marker of a group of issues", () => {
     await t.controller.idle();
     expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "3:1"]);
 
-    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    t.controller.onSelection(designer("A"), ["1:1"], { signature: "r1", nodeId: "1:1" });
     await t.controller.idle();
     expect(t.shows.at(-1)).toEqual({ screen: "A", nodes: ["1:1", "1:2", "1:3", "3:1"] });
   });
@@ -442,12 +445,12 @@ describe("clicking a marker of a group of issues", () => {
   it("keeps them while a marker of the same group is clicked, and moves on to another group's", async () => {
     const t = setup();
     t.controller.onRoots(GROUPED);
-    t.controller.onSelection(designer("A"), ["1:1"], "r1");
-    t.controller.onSelection(designer("A"), ["1:2"], "r1");
+    t.controller.onSelection(designer("A"), ["1:1"], { signature: "r1", nodeId: "1:1" });
+    t.controller.onSelection(designer("A"), ["1:2"], { signature: "r1", nodeId: "1:2" });
     await t.controller.idle();
     expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "1:2", "1:3", "3:1"]);
 
-    t.controller.onSelection(designer("A"), ["3:1"], "r2");
+    t.controller.onSelection(designer("A"), ["3:1"], { signature: "r2", nodeId: "3:1" });
     await t.controller.idle();
     expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "3:1"]);
   });
@@ -455,7 +458,7 @@ describe("clicking a marker of a group of issues", () => {
   it("puts the group back to one marker when the designer clicks anything else", async () => {
     const t = setup();
     t.controller.onRoots(GROUPED);
-    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    t.controller.onSelection(designer("A"), ["1:1"], { signature: "r1", nodeId: "1:1" });
     await t.controller.idle();
     t.controller.onSelection(designer("A"), ["9:9"]);
     await t.controller.idle();
@@ -465,10 +468,26 @@ describe("clicking a marker of a group of issues", () => {
   it("is not changed by a selection the plugin made", async () => {
     const t = setup();
     t.controller.onRoots(GROUPED);
-    t.controller.onSelection(designer("A"), ["1:1"], "r1");
+    t.controller.onSelection(designer("A"), ["1:1"], { signature: "r1", nodeId: "1:1" });
     await t.controller.idle();
     t.controller.onSelection(plugin("A"), ["9:9"]);
     await t.controller.idle();
     expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "1:2", "1:3", "3:1"]);
+  });
+
+  it("keeps the number on the marker clicked only, and moves it to the next one clicked", async () => {
+    const t = setup();
+    t.controller.onRoots(GROUPED);
+    await t.controller.idle();
+    expect(t.counts.at(-1)).toEqual([3, undefined]);
+
+    t.controller.onSelection(designer("A"), ["1:1"], { signature: "r1", nodeId: "1:1" });
+    await t.controller.idle();
+    expect(t.shows.at(-1)?.nodes).toEqual(["1:1", "1:2", "1:3", "3:1"]);
+    expect(t.counts.at(-1)).toEqual([3, undefined, undefined, undefined]);
+
+    t.controller.onSelection(designer("A"), ["1:2"], { signature: "r1", nodeId: "1:2" });
+    await t.controller.idle();
+    expect(t.counts.at(-1)).toEqual([undefined, 3, undefined, undefined]);
   });
 });
