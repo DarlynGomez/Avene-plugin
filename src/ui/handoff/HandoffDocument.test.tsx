@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, waitFor, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -171,6 +171,38 @@ describe("the table view", () => {
     click.mockRestore();
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
     expect(screen.queryByRole("button", { name: "Download HTML" })).toBeNull();
+  });
+
+  it("offers the table as a named tagged PDF, and only while the table shows", async () => {
+    const blobs: Blob[] = [];
+    Object.assign(URL, {
+      createObjectURL: vi.fn((blob: Blob) => {
+        blobs.push(blob);
+        return "blob:pdf";
+      }),
+      revokeObjectURL: vi.fn()
+    });
+    const names: string[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+      this: HTMLAnchorElement
+    ) {
+      names.push(this.download);
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Download PDF" }));
+    });
+    await waitFor(() => expect(blobs).toHaveLength(1));
+    expect(blobs[0].type).toBe("application/pdf");
+    expect(names[0]).toMatch(/^avene-handoff-\d{4}-\d{2}-\d{2}\.pdf$/);
+    const head = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(blobs[0].slice(0, 8));
+    });
+    expect(head).toMatch(/^%PDF-1\.7/);
+    click.mockRestore();
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    expect(screen.queryByRole("button", { name: "Download PDF" })).toBeNull();
   });
 
   it("finds a row's layers in the file", () => {
