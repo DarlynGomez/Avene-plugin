@@ -102,12 +102,12 @@ function show(count: 0 | 1 | 5, onShow: (ids: readonly string[]) => void = () =>
 }
 
 describe("with nothing in it", () => {
-  it("says so in one sentence, shows no group, and still shows the footer", () => {
+  it("says so in one sentence, shows no group", () => {
     show(0);
     expect(screen.getByText("No findings to hand off yet.")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(screen.queryByRole("heading")).not.toBeInTheDocument();
-    expect(screen.getByText(/^Not covered by this check/)).toBeInTheDocument();
+    expect(screen.queryByText(/Not covered by this check/)).toBeNull();
     expect(screen.getByText("0 need action")).toBeInTheDocument();
   });
 });
@@ -211,9 +211,9 @@ describe("with five items", () => {
     expect(screen.getByText("No alt text yet")).toBeInTheDocument();
   });
 
-  it("shows the footer once, and no build id on the screen", () => {
+  it("shows no footer and no build id on the screen", () => {
     show(5);
-    expect(screen.getAllByText(/^Not covered by this check/)).toHaveLength(1);
+    expect(screen.queryByText(/Not covered by this check/)).toBeNull();
     expect(screen.queryByText(/^Build /)).toBeNull();
   });
 

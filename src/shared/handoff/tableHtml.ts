@@ -77,7 +77,7 @@ ${g.rows.map((row) => itemRows(row, contrast)).join("\n")}
  * The colors come from the caller so the page uses the plugin's own palette
  */
 export function buildTableHtml(model: HandoffTableModel, theme: HtmlTheme): string {
-  const { header, footer } = model;
+  const { header } = model;
   const title = header.title.trim() === "" ? "Untitled file" : header.title;
   return `<!doctype html>
 <html lang="en">
@@ -97,7 +97,6 @@ export function buildTableHtml(model: HandoffTableModel, theme: HtmlTheme): stri
 ${model.empty ? `<p class="lead">${e(model.empty)}</p>` : ""}
 ${model.groups.map(group).join("\n")}
 <footer>
-<p>${e(footer.notCovered)}</p>
 <p>${e(NOT_REVIEWED_LINE)}</p>${header.buildId ? `\n<p>Build ${e(header.buildId)}</p>` : ""}
 </footer>
 </main>

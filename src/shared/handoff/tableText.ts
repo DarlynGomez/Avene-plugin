@@ -50,13 +50,12 @@ function textTable(group: TableGroup): string[] {
 
 /** The plain text of the model, the same groups, order and fields as the screen and nothing the screen does not show */
 export function renderTableText(model: HandoffTableModel): string {
-  const { header, footer } = model;
+  const { header } = model;
   const out = [header.title, header.subtitle, countsLine(header.counts)];
   if (model.empty) out.push("", model.empty);
   for (const group of model.groups) {
     out.push("", `${group.title} (${group.rows.length})`, ...textTable(group));
   }
-  out.push("", footer.notCovered);
-  if (header.buildId) out.push(`Build ${header.buildId}`);
+  if (header.buildId) out.push("", `Build ${header.buildId}`);
   return out.join("\n");
 }

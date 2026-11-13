@@ -124,7 +124,7 @@ describe("the exported page", () => {
     ]) {
       expect(text).toContain(word);
     }
-    expect(text).toContain("Not covered by this check");
+    expect(text).not.toContain("Not covered by this check");
     expect(text).toContain("Not yet reviewed by a person.");
     expect(text).toContain("Build abc1234");
     expect(text).toContain("2 need action, 3 decided");

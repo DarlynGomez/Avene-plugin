@@ -112,22 +112,21 @@ describe("renderTableText", () => {
     expect(body).not.toMatch(/\bNone\b/);
   });
 
-  it("ends with the Not covered note, without its label, and then the build", () => {
+  it("ends with the build and holds no Not covered note", () => {
     const lines = text().split("\n");
-    expect(lines.at(-2)).toMatch(/^Not covered by this check: keyboard behavior/);
     expect(lines.at(-1)).toBe("Build abc1234");
-    expect(text(mixed(), null).split("\n").at(-1)).toMatch(/^Not covered by this check/);
+    expect(text()).not.toContain("Not covered by this check");
+    expect(text(mixed(), null)).not.toContain("Build ");
   });
 
   it("keeps a pipe in a cell from breaking the columns", () => {
     expect(text(input({ findings: [finding({ nodeName: "A | B" })] }))).toContain("A/B");
   });
 
-  it("says there is nothing when there is nothing, and still ends with the footer", () => {
+  it("says there is nothing when there is nothing", () => {
     const empty = text(input(), "abc1234");
     expect(empty).toContain("No findings to hand off yet.");
     expect(empty).not.toMatch(/\(\d+\)/);
-    expect(empty).toContain("Not covered by this check");
   });
 });
 

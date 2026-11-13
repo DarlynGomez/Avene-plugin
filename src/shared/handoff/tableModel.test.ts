@@ -63,7 +63,7 @@ function five(): HandoffInput {
 describe("a handoff with nothing in it", () => {
   const model = buildHandoffTable(input(), "developer", "abc1234");
 
-  it("has no groups, one clear sentence, and still the footer", () => {
+  it("has no groups, one clear sentence", () => {
     expect(model.groups).toEqual([]);
     expect(model.empty).toBe("No findings to hand off yet.");
     expect(model.empty).toBe(EMPTY_TABLE_SENTENCE);

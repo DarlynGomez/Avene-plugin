@@ -189,7 +189,7 @@ describe("the table view", () => {
     expect(copied).toMatch(/Element +\| Location +\| Contrast +\| Status +\| Detail/);
     expect(copied).toContain("Helper text");
     expect(copied).toContain("Price label");
-    expect(copied).toContain("Not covered by this check");
+    expect(copied).not.toContain("Not covered by this check");
     expect(copied.trimEnd().endsWith("Not yet reviewed by a person.")).toBe(true);
   });
 });

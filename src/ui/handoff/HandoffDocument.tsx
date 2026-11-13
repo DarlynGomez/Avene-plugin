@@ -84,7 +84,6 @@ export function HandoffDocument({
       buildTableHtml(model, theme),
       "text/html;charset=utf-8"
     );
-    setStatus("The file was offered for download. Your computer decides where it goes.");
   }
 
   return (

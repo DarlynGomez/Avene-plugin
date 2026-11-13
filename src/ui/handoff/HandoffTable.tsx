@@ -116,7 +116,7 @@ function Group({ group, onShow }: { group: TableGroup; onShow: HandoffTableProps
 
 /** The model as a document: the file as the title, a section for each kind of issue, and the footer once */
 export function HandoffTable({ model, onShow }: HandoffTableProps) {
-  const { header, footer } = model;
+  const { header } = model;
   return (
     <article className={styles.wrap} aria-labelledby="handoff-title">
       <header>
@@ -133,9 +133,6 @@ export function HandoffTable({ model, onShow }: HandoffTableProps) {
       {model.groups.map((group) => (
         <Group key={group.id} group={group} onShow={onShow} />
       ))}
-      <footer className={styles.footer}>
-        <p>{footer.notCovered}</p>
-      </footer>
     </article>
   );
 }

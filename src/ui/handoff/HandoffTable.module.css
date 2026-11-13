@@ -205,19 +205,6 @@
   cursor: default;
 }
 
-.footer {
-  padding-top: var(--space-2);
-  border-top: var(--size-hairline) solid var(--color-line);
-  color: var(--color-muted);
-  font-size: var(--font-size-severity-label);
-  line-height: var(--font-line-height-option-description);
-}
-
-.footer p {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
 .build {
   margin-top: var(--space-1);
 }
