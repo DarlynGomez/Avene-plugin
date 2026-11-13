@@ -1,6 +1,7 @@
 {
   "id": "M01",
   "title": "Why Text Contrast Matters",
+  "subtitle": "Low vision, aging eyes, and everyday reading",
   "category": "visual",
   "context": "Why text contrast matters (low vision, aging eyes, everyday reading)",
   "estimatedMinutes": 4.5,
@@ -30,11 +31,16 @@
     "endSeconds": 72,
     "durationSeconds": 72,
     "captionsAvailable": true,
-    "transcriptAvailable": null,
+    "transcriptAvailable": true,
     "embeddingAllowed": true,
     "license": "W3C License"
   },
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Understanding Success Criterion 1.4.3: Contrast (Minimum)",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Contrast defines the visual boundary between text and backgrounds.",
     "Normal text requires a ratio of at least 4.5 to be easily readable.",

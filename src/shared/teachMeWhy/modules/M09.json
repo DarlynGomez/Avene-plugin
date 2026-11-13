@@ -1,12 +1,13 @@
 {
   "id": "M09",
   "title": "Contrast for Interface Parts",
+  "subtitle": "Inputs, borders, and charts",
   "category": "visual",
   "context": "Non-text contrast for inputs, borders, and charts",
-  "estimatedMinutes": 4.5,
+  "estimatedMinutes": 3,
   "timeBudgetMinutes": {
     "reading": 2,
-    "video": 1.5,
+    "video": 0,
     "quiz": 1
   },
   "whyItMatters": "Text is not the only element requiring visibility. If the border of a text input or the slice of a data chart cannot be perceived, the product cannot be used.",
@@ -21,20 +22,13 @@
     "This requirement also heavily impacts data visualization. In a pie chart, if two adjacent slices exhibit a contrast ratio lower than 3, they will blend together for many readers, making the chart hard to read. This is resolved by ensuring the colors are distinct in lightness, or by adding a stark, dark border directly between the slices.",
     "There is a notable exception: if the component features another visible cue, the boundary contrast is less strict. If a button lacks a border entirely but contains high-contrast text that clearly indicates its purpose, it remains highly usable. Evaluating non-text contrast ensures that the structural boundaries of a layout remain as resilient as the words inside them."
   ],
-  "video": {
-    "provider": "youtube",
-    "videoId": "rxaF9XzStOU",
-    "title": "Contrast in Charts",
-    "publisher": "Nielsen Norman Group",
-    "startSeconds": 0,
-    "endSeconds": 70,
-    "durationSeconds": 70,
-    "captionsAvailable": true,
-    "transcriptAvailable": null,
-    "embeddingAllowed": true,
-    "license": "Standard YouTube"
+  "video": null,
+  "optionalArticle": {
+    "title": "Understanding Success Criterion 1.4.11: Non-text Contrast",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+    "minutesToRead": null
   },
-  "optionalArticle": null,
   "keyTakeaways": [
     "Icons, borders, and input fields require a minimum contrast ratio of 3.",
     "Adjacent colors in charts and graphs must maintain this visual boundary.",

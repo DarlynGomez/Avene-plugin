@@ -1,0 +1,94 @@
+{
+  "M01": {
+    "subtitle": "Low vision, aging eyes, and everyday reading",
+    "optionalArticle": {
+      "title": "Understanding Success Criterion 1.4.3: Contrast (Minimum)",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "minutesToRead": null
+    },
+    "video": { "transcriptAvailable": true }
+  },
+  "M02": {
+    "subtitle": "Glare, bright sunlight, dim rooms, fatigue, and being in motion",
+    "optionalArticle": {
+      "title": "It's not just the light: Understanding the factors causing situational visual impairments during mobile interaction",
+      "author": "Garreth W. Tigwell, David R. Flatla, and Rachel Menzies",
+      "url": "https://discovery.dundee.ac.uk/en/publications/its-not-just-the-light-understanding-the-factors-causing-situatio/",
+      "minutesToRead": null
+    }
+  },
+  "M03": {
+    "subtitle": "Color vision differences and why color alone is not enough",
+    "optionalArticle": {
+      "title": "Understanding Success Criterion 1.4.1: Use of Color",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+      "minutesToRead": null
+    }
+  },
+  "M04": {
+    "subtitle": "Why large and bold text have a lower threshold",
+    "optionalArticle": {
+      "title": "Understanding Success Criterion 1.4.3: Contrast (Minimum)",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "minutesToRead": null
+    },
+    "callout": {
+      "label": "The size rule",
+      "paragraphIndex": 2,
+      "caption": "Which text counts as large",
+      "columns": ["Sample", "Size and weight", "Needs"],
+      "rows": [
+        { "sample": { "px": 24, "weight": 400 }, "size": "24 px, regular", "note": "Counts as large", "needs": "3:1" },
+        { "sample": { "px": 18.66, "weight": 700 }, "size": "18.66 px, bold", "note": "Counts as large", "needs": "3:1" },
+        { "sample": { "px": 18.66, "weight": 600 }, "size": "18.66 px, SemiBold", "note": "Does not count", "needs": "4.5:1" },
+        { "sample": { "px": 14, "weight": 400 }, "size": "14 px, regular", "note": "Does not count", "needs": "4.5:1" }
+      ]
+    }
+  },
+  "M05": { "subtitle": "Gradients, images, and overlays" },
+  "M06": {
+    "subtitle": "When the rules differ for placeholder, disabled, and decorative text",
+    "optionalArticle": {
+      "title": "Placeholders in Form Fields Are Harmful",
+      "author": "Katie Sherwin, Nielsen Norman Group",
+      "url": "https://www.nngroup.com/articles/form-design-placeholders/",
+      "minutesToRead": null
+    }
+  },
+  "M07": { "subtitle": "Common ways good palettes fail" },
+  "M08": { "subtitle": "When to keep a failing color" },
+  "M09": {
+    "subtitle": "Inputs, borders, and charts",
+    "optionalArticle": {
+      "title": "Understanding Success Criterion 1.4.11: Non-text Contrast",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+      "minutesToRead": null
+    },
+    "video": null,
+    "timeBudgetMinutes": { "video": 0 }
+  },
+  "M10": { "subtitle": "Perceptual contrast and APCA" },
+  "M11": {
+    "subtitle": "Missing alternative text for images",
+    "optionalArticle": {
+      "title": "Images Tutorial",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/tutorials/images/",
+      "minutesToRead": null
+    }
+  },
+  "M12": {
+    "subtitle": "Video captions and audio descriptions",
+    "optionalArticle": {
+      "title": "Making Audio and Video Media Accessible",
+      "author": "W3C Web Accessibility Initiative (WAI)",
+      "url": "https://www.w3.org/WAI/media/av/",
+      "minutesToRead": null
+    },
+    "video": { "transcriptAvailable": true }
+  }
+}

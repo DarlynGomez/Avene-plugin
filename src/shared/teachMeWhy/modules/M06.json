@@ -1,6 +1,7 @@
 {
   "id": "M06",
   "title": "Placeholder and Decorative Text",
+  "subtitle": "When the rules differ for placeholder, disabled, and decorative text",
   "category": "cognitive",
   "context": "Placeholder, disabled and decorative text (when rules differ)",
   "estimatedMinutes": 4.5,
@@ -34,7 +35,12 @@
     "embeddingAllowed": true,
     "license": "Standard YouTube"
   },
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Placeholders in Form Fields Are Harmful",
+    "author": "Katie Sherwin, Nielsen Norman Group",
+    "url": "https://www.nngroup.com/articles/form-design-placeholders/",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Placeholder text often fails contrast and heavily strains user memory.",
     "Truly disabled and inactive buttons are exempt from contrast rules.",

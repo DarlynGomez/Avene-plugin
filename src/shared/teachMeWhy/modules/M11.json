@@ -1,6 +1,7 @@
 {
   "id": "M11",
   "title": "Alternative Text for Images",
+  "subtitle": "Missing alternative text for images",
   "category": "visual",
   "context": "Missing alternative text for images",
   "estimatedMinutes": 3,
@@ -21,7 +22,12 @@
     "Avene flags missing alternative text, helping designers catch this common issue. Understanding alt text is essential for holistic design. Providing a text alternative ensures that the core message of a layout reaches everyone, regardless of how they access the content."
   ],
   "video": null,
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Images Tutorial",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/tutorials/images/",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Alternative text allows screen readers to describe images to users.",
     "The 2026 WebAIM Million report found missing alt text on 53.1 percent of web homepages.",

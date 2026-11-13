@@ -1,6 +1,7 @@
 {
   "id": "M04",
   "title": "Text Size and Weight",
+  "subtitle": "Why large and bold text have a lower threshold",
   "category": "visual",
   "context": "Text size and weight (why large and bold text have a lower threshold)",
   "estimatedMinutes": 3,
@@ -21,8 +22,61 @@
     "Avene counts text as large at 24 pixels in a regular weight, or 18.66 pixels in a bold weight. SemiBold does not count; the font must be bold or thicker to qualify for the smaller threshold. Below these exact dimensions, the 4.5 to 1 minimum still applies, however thick the font looks at a glance.",
     "This distinction allows a design to balance strict legibility in the fine details with softer, more expressive colors in the major typographic elements. By scaling the contrast requirement to the physical size of the text, a tradeoff can be navigated between distinct brand expression and universal readability."
   ],
+  "callout": {
+    "label": "The size rule",
+    "paragraphIndex": 2,
+    "caption": "Which text counts as large",
+    "columns": [
+      "Sample",
+      "Size and weight",
+      "Needs"
+    ],
+    "rows": [
+      {
+        "sample": {
+          "px": 24,
+          "weight": 400
+        },
+        "size": "24 px, regular",
+        "note": "Counts as large",
+        "needs": "3:1"
+      },
+      {
+        "sample": {
+          "px": 18.66,
+          "weight": 700
+        },
+        "size": "18.66 px, bold",
+        "note": "Counts as large",
+        "needs": "3:1"
+      },
+      {
+        "sample": {
+          "px": 18.66,
+          "weight": 600
+        },
+        "size": "18.66 px, SemiBold",
+        "note": "Does not count",
+        "needs": "4.5:1"
+      },
+      {
+        "sample": {
+          "px": 14,
+          "weight": 400
+        },
+        "size": "14 px, regular",
+        "note": "Does not count",
+        "needs": "4.5:1"
+      }
+    ]
+  },
   "video": null,
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Understanding Success Criterion 1.4.3: Contrast (Minimum)",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Larger, thicker text requires less contrast to be read easily.",
     "The threshold ratio drops from 4.5 to 3 for large text.",

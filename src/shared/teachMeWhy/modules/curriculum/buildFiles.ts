@@ -1,5 +1,6 @@
 import type { LearningModule } from "../moduleTypes";
 import { parseCurriculum, type ParsedModule } from "./parseModules";
+import { applyExtra, extraProblems, type LessonExtras } from "./lessonExtras";
 import { parseQuizzes } from "./parseQuizzes";
 
 /** Used for a module the repo does not hold yet, the document names no category */
@@ -11,6 +12,11 @@ export interface BuildResult {
   problems: string[];
 }
 
+/** What the curriculum document itself states, it is not edited here */
+export const DOCUMENT_TOTAL_MINUTES = 41.5;
+/** The total once the committed extras are laid over the document, M09 lost its video */
+export const CURRICULUM_TOTAL_MINUTES = 40;
+
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
 
 function moduleFile(parsed: ParsedModule, kept: Record<string, unknown> | undefined): unknown {
@@ -18,6 +24,7 @@ function moduleFile(parsed: ParsedModule, kept: Record<string, unknown> | undefi
   return {
     id: rest.id,
     title: rest.title,
+    ...(rest.subtitle === undefined ? {} : { subtitle: rest.subtitle }),
     category: kept?.category ?? DEFAULT_CATEGORY,
     context: rest.context,
     estimatedMinutes: rest.estimatedMinutes,
@@ -25,6 +32,7 @@ function moduleFile(parsed: ParsedModule, kept: Record<string, unknown> | undefi
     whyItMatters: rest.whyItMatters,
     learningObjectives: rest.learningObjectives,
     lessonParagraphs: rest.lessonParagraphs,
+    ...(rest.callout === undefined ? {} : { callout: rest.callout }),
     video: rest.video,
     optionalArticle: rest.optionalArticle,
     keyTakeaways: rest.keyTakeaways,
@@ -40,15 +48,22 @@ function moduleFile(parsed: ParsedModule, kept: Record<string, unknown> | undefi
  */
 export function buildCurriculumFiles(
   text: string,
-  existing: Record<string, Record<string, unknown>>
+  existing: Record<string, Record<string, unknown>>,
+  extras: LessonExtras = {}
 ): BuildResult {
   const lessons = parseCurriculum(text);
   const quizzes = parseQuizzes(text);
   const problems = [...lessons.problems, ...quizzes.problems];
   const total = lessons.modules.reduce((sum, module) => sum + module.estimatedMinutes, 0);
-  if (lessons.statedTotalMinutes !== 41.5)
-    problems.push("the introduction does not state 41.5 minutes");
-  if (total !== 41.5) problems.push(`the module minutes add up to ${total}, not 41.5`);
+  if (lessons.statedTotalMinutes !== DOCUMENT_TOTAL_MINUTES)
+    problems.push(`the introduction does not state ${DOCUMENT_TOTAL_MINUTES} minutes`);
+  if (total !== DOCUMENT_TOTAL_MINUTES)
+    problems.push(`the module minutes add up to ${total}, not ${DOCUMENT_TOTAL_MINUTES}`);
+  for (const id of Object.keys(extras)) {
+    const module = lessons.modules.find((candidate) => candidate.id === id);
+    if (!module) problems.push(`${id}: has extras and is not a lesson`);
+    else problems.push(...extraProblems(id, extras[id], module));
+  }
   for (const module of lessons.modules) {
     const { reading, video, quiz } = module.timeBudgetMinutes;
     if (reading + video + quiz !== module.estimatedMinutes) {
@@ -62,14 +77,22 @@ export function buildCurriculumFiles(
     problems.push(`${lessons.modules.length} modules, expected 12`);
   if (problems.length > 0) return { files: {}, problems };
 
+  const modules = lessons.modules.map((module) => applyExtra(module, extras[module.id]));
+  const merged = modules.reduce((sum, module) => sum + module.estimatedMinutes, 0);
+  if (merged !== CURRICULUM_TOTAL_MINUTES)
+    return {
+      files: {},
+      problems: [`the lessons add up to ${merged}, not ${CURRICULUM_TOTAL_MINUTES}`]
+    };
+
   const files: Record<string, string> = {};
-  for (const module of lessons.modules) {
+  for (const module of modules) {
     files[`${module.id}.json`] = json(moduleFile(module, existing[module.id]));
   }
   for (const quiz of quizzes.files) files[`quizzes/${quiz.moduleId}.json`] = json(quiz);
   files["index.json"] = json({
     schemaVersion: 1,
-    reportedTotalMinutes: 41.5,
+    reportedTotalMinutes: CURRICULUM_TOTAL_MINUTES,
     modules: lessons.modules.map((module) => ({
       id: module.id,
       file: `${module.id}.json`,

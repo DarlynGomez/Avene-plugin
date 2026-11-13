@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { buildCurriculumFiles } from "./buildFiles";
+import type { LessonExtras } from "./lessonExtras";
 import { parseArticle, parseVideo } from "./parseMedia";
 import { parseCurriculum } from "./parseModules";
 import { parseQuizzes } from "./parseQuizzes";
@@ -136,7 +137,14 @@ describe("the generated files match the curriculum document", () => {
         unknown
       >;
     }
-    const { files, problems } = buildCurriculumFiles(readFileSync(SOURCE, "utf8"), existing);
+    const extras = JSON.parse(
+      readFileSync(`${DIR}/curriculum/lessonExtras.json`, "utf8")
+    ) as LessonExtras;
+    const { files, problems } = buildCurriculumFiles(
+      readFileSync(SOURCE, "utf8"),
+      existing,
+      extras
+    );
     expect(problems).toEqual([]);
     expect(Object.keys(files)).toHaveLength(25);
     for (const [name, text] of Object.entries(files)) {

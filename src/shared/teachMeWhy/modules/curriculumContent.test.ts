@@ -55,16 +55,16 @@ describe("the quizzes", () => {
 });
 
 describe("the time budgets", () => {
-  it("add up to each lesson's total, and the lessons add up to 41.5 minutes", () => {
+  it("add up to each lesson's total, and the lessons add up to 40 minutes", () => {
     for (const module of LEARNING_MODULES) {
       const { reading, video, quiz } = module.timeBudgetMinutes;
       expect(reading + video + quiz, module.id).toBe(module.estimatedMinutes);
     }
-    expect(LEARNING_MODULES.reduce((sum, module) => sum + module.estimatedMinutes, 0)).toBe(41.5);
+    expect(LEARNING_MODULES.reduce((sum, module) => sum + module.estimatedMinutes, 0)).toBe(40);
   });
   it("are listed in the manifest with its reported total and no review flags", () => {
     const index = read("index.json") as Record<string, unknown> & { modules: { id: string }[] };
-    expect(index.reportedTotalMinutes).toBe(41.5);
+    expect(index.reportedTotalMinutes).toBe(40);
     expect(index.reviewFlags).toBeUndefined();
     expect(index.modules.map((entry) => entry.id)).toEqual(LEARNING_MODULES.map((m) => m.id));
   });

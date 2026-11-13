@@ -1,6 +1,7 @@
 {
   "id": "M02",
   "title": "Designing for the Real World",
+  "subtitle": "Glare, bright sunlight, dim rooms, fatigue, and being in motion",
   "category": "motor",
   "context": "Situational impairments (glare, bright sunlight, dim rooms, fatigue, being in motion)",
   "estimatedMinutes": 3,
@@ -23,10 +24,10 @@
   ],
   "video": null,
   "optionalArticle": {
-    "title": "Challenges of Situational Impairments during Interaction with Mobile Devices",
-    "author": "Zhanna Sarsenbayeva",
-    "url": "https://www.jorgegoncalves.com/docs/ozchi17.pdf",
-    "minutesToRead": 5
+    "title": "It's not just the light: Understanding the factors causing situational visual impairments during mobile interaction",
+    "author": "Garreth W. Tigwell, David R. Flatla, and Rachel Menzies",
+    "url": "https://discovery.dundee.ac.uk/en/publications/its-not-just-the-light-understanding-the-factors-causing-situatio/",
+    "minutesToRead": null
   },
   "keyTakeaways": [
     "Environments create temporary, situational impairments.",

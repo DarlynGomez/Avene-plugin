@@ -1,6 +1,7 @@
 {
   "id": "M12",
   "title": "Making Multimedia Accessible",
+  "subtitle": "Video captions and audio descriptions",
   "category": "visual",
   "context": "Video captions and audio descriptions",
   "estimatedMinutes": 4,
@@ -30,11 +31,16 @@
     "endSeconds": 60,
     "durationSeconds": 60,
     "captionsAvailable": true,
-    "transcriptAvailable": null,
+    "transcriptAvailable": true,
     "embeddingAllowed": true,
     "license": "W3C License"
   },
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Making Audio and Video Media Accessible",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/media/av/",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Captions provide a text version of spoken words and essential sounds.",
     "Audio descriptions provide a spoken narration of visual actions.",

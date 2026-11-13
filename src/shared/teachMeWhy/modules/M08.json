@@ -1,6 +1,7 @@
 {
   "id": "M08",
   "title": "Documenting a Tradeoff",
+  "subtitle": "When to keep a failing color",
   "category": "system",
   "context": "Making a documented tradeoff (when to keep a failing color)",
   "estimatedMinutes": 3,

@@ -1,6 +1,7 @@
 {
   "id": "M03",
   "title": "Beyond Just Color",
+  "subtitle": "Color vision differences and why color alone is not enough",
   "category": "visual",
   "context": "Color vision differences and why color alone is not enough",
   "estimatedMinutes": 3,
@@ -22,7 +23,12 @@
     "Securing a minimum contrast ratio of 4.5 for text locks in the lightness boundary. By treating color as a supplemental enhancement rather than the sole method of communication, intuitive experiences are created that do not break when viewed through different visual capabilities."
   ],
   "video": null,
-  "optionalArticle": null,
+  "optionalArticle": {
+    "title": "Understanding Success Criterion 1.4.1: Use of Color",
+    "author": "W3C Web Accessibility Initiative (WAI)",
+    "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+    "minutesToRead": null
+  },
   "keyTakeaways": [
     "Color alone cannot safely communicate errors or interactive states.",
     "Lightness contrast operates independently of hue perception.",

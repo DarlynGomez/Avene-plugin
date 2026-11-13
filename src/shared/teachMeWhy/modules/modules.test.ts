@@ -12,21 +12,27 @@ describe("the lessons", () => {
     }
   });
 
-  it("have a YouTube video or none, and only M01, M06, M09 and M12 have one", () => {
+  it("have a YouTube video or none, and only M01, M06 and M12 have one now that M09 lost its video", () => {
     for (const module of LEARNING_MODULES) {
       if (module.video) expect(module.video.provider, module.id).toBe("youtube");
     }
     expect(LEARNING_MODULES.filter((module) => module.video !== null).map((m) => m.id)).toEqual([
       "M01",
       "M06",
-      "M09",
       "M12"
     ]);
   });
 
-  it("have an article only on M02", () => {
+  it("have an article on every lesson but M05, M07, M08 and M10", () => {
     expect(LEARNING_MODULES.filter((m) => m.optionalArticle !== null).map((m) => m.id)).toEqual([
-      "M02"
+      "M01",
+      "M02",
+      "M03",
+      "M04",
+      "M06",
+      "M09",
+      "M11",
+      "M12"
     ]);
   });
 });
