@@ -1,4 +1,3 @@
-import { NOT_REVIEWED_LINE } from "./fixedLines";
 import { htmlStyle, type HtmlTheme } from "./tableHtmlStyle";
 import { countsLine } from "./tableText";
 import type { HandoffTableModel, TableGroup, TableNote, TableRow } from "./tableTypes";
@@ -25,7 +24,7 @@ const e = escapeHtml;
 
 function status(row: TableRow): string {
   const tone = row.status.needsAction ? "strong" : "quiet";
-  return `<td class="fit right ${tone}"><span class="shape shape-${row.status.kind}" aria-hidden="true"></span>${e(row.status.text)}</td>`;
+  return `<td class="fit right ${tone}">${e(row.status.text)}</td>`;
 }
 
 function note(item: TableNote): string {
@@ -34,11 +33,15 @@ function note(item: TableNote): string {
 
 function itemRows(row: TableRow, contrast: boolean): string {
   const facts = [row.location, ...row.details].filter((part) => part !== "");
+  const open = row.link
+    ? `<a href="${e(row.link)}" aria-label="Open in Figma: ${e(row.element)}">Open in Figma</a>`
+    : "";
   const needs = row.contrast?.required
     ? `<span class="needs">needs ${e(row.contrast.required)}</span>`
     : "";
+  const where = [facts.length > 0 ? e(facts.join(" · ")) : "", open].filter((part) => part !== "");
   const cells = [
-    `<th scope="row">${e(row.element)}${facts.length > 0 ? `<span class="where">${e(facts.join(" · "))}</span>` : ""}</th>`,
+    `<th scope="row">${e(row.element)}${where.length > 0 ? `<span class="where">${where.join(" · ")}</span>` : ""}</th>`,
     ...(contrast
       ? [
           `<td class="fit"><span class="measured">${e(row.contrast?.measured ?? "")}</span>${needs}</td>`
@@ -93,12 +96,11 @@ export function buildTableHtml(model: HandoffTableModel, theme: HtmlTheme): stri
 <h1>${e(title)}</h1>
 <p class="muted">${e(header.subtitle)}</p>
 <p class="muted lead"><strong class="strong">${header.counts.needAction} need action</strong>${e(countsLine(header.counts).slice(`${header.counts.needAction} need action`.length))}</p>
+<p class="muted">${e(header.review)}</p>
 </header>
 ${model.empty ? `<p class="lead">${e(model.empty)}</p>` : ""}
 ${model.groups.map(group).join("\n")}
-<footer>
-<p>${e(NOT_REVIEWED_LINE)}</p>${header.buildId ? `\n<p>Build ${e(header.buildId)}</p>` : ""}
-</footer>
+${header.buildId ? `<footer>\n<p>Build ${e(header.buildId)}</p>\n</footer>` : ""}
 </main>
 </body>
 </html>

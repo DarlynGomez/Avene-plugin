@@ -1,6 +1,8 @@
 import { altRows } from "./tableAltRows";
 import { buildItems } from "./buildItems";
 import { CHECKS_LINE, NOT_COVERED_LINE } from "./fixedLines";
+import { NOT_REVIEWED_LINE } from "./fixedLines";
+import { nodeLink, parseFileUrl } from "./links";
 import { shortDate } from "./tableFormat";
 import { adjustedRow, ignoredRow, openRow } from "./tableRows";
 import {
@@ -38,6 +40,12 @@ function needsActionFirst(rows: readonly TableRow[]): TableRow[] {
   ];
 }
 
+/** A link to the first layer of a row, when the file address is known */
+function withLink(row: TableRow, ref: ReturnType<typeof parseFileUrl>): TableRow {
+  const link = row.nodeIds.length > 0 ? nodeLink(ref, row.nodeIds[0]) : null;
+  return link ? { ...row, link } : row;
+}
+
 /** The screens that have rows, in the order they first appear */
 function screensOf(rows: readonly TableRow[]): string[] {
   return [...new Set(rows.map((row) => row.location).filter((name) => name !== ""))];
@@ -52,6 +60,7 @@ export function buildHandoffTable(
   audience: Audience,
   buildId: string | null = null
 ): HandoffTableModel {
+  const ref = parseFileUrl(input.fileUrl);
   const groups: TableGroup[] = (
     [
       { id: "contrast", rows: contrastRows(input, audience) },
@@ -62,7 +71,7 @@ export function buildHandoffTable(
     .map((group) => ({
       id: group.id,
       title: TITLES[group.id],
-      rows: needsActionFirst(group.rows)
+      rows: needsActionFirst(group.rows).map((row) => withLink(row, ref))
     }));
   const rows = groups.flatMap((group) => group.rows);
   const screens = screensOf(rows);
@@ -82,6 +91,9 @@ export function buildHandoffTable(
       date,
       screens,
       buildId,
+      review: input.reviewer
+        ? `Reviewed by ${input.reviewer.name}, ${shortDate(input.reviewer.date)}`
+        : NOT_REVIEWED_LINE,
       counts: {
         rows: rows.length,
         groups: groups.length,

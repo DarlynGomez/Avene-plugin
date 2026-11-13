@@ -403,3 +403,30 @@ describe("deferred layers", () => {
     expect(model.header.counts.needAction + model.header.counts.decided).toBe(rows.length);
   });
 });
+
+describe("the review line and the link on a row", () => {
+  it("says not reviewed until someone has, then who reviewed it and when", () => {
+    expect(buildHandoffTable(input(), "developer").header.review).toBe(
+      "Not yet reviewed by a person."
+    );
+    const reviewed = buildHandoffTable(
+      input({ reviewer: { name: "Priya N.", date: "2026-11-13T10:00:00.000Z" } }),
+      "developer"
+    );
+    expect(reviewed.header.review).toBe("Reviewed by Priya N., 13 Nov 2026");
+  });
+
+  it("links each row to its first layer when a file address was pasted, and to nothing otherwise", () => {
+    const rowsOf = (fileUrl?: string) =>
+      buildHandoffTable({ ...five(), ...(fileUrl ? { fileUrl } : {}) }, "developer").groups.flatMap(
+        (g) => g.rows
+      );
+    for (const row of rowsOf()) expect(row.link).toBeUndefined();
+    const linked = rowsOf("https://www.figma.com/design/AbC123xyz/My-file");
+    expect(linked.every((row) => row.link?.includes("?node-id="))).toBe(true);
+    expect(linked.find((r) => r.element === "Continue button")?.link).toBe(
+      "https://www.figma.com/design/AbC123xyz/My-file?node-id=5-1"
+    );
+    expect(rowsOf("not a figma address").every((row) => row.link === undefined)).toBe(true);
+  });
+});

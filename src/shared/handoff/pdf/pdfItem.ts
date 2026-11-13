@@ -1,10 +1,10 @@
 import type { PdfStruct } from "pdfkit";
 
 import type { TableRow } from "../tableTypes";
-import { BOTTOM, drawText, heightOf, leaf, newPage, node, type Ctx } from "./pdfDraw";
+import { BOTTOM, drawLink, drawText, leaf, newPage, node, type Ctx } from "./pdfDraw";
 import { BODY, innerWidth, PAD, SMALL, type Columns } from "./pdfLayout";
 import { detailLines, drawDetailRow, sizeOf } from "./pdfDetail";
-import { drawRule, drawShape } from "./pdfShape";
+import { drawRule } from "./pdfRule";
 
 function drawMainRow(
   c: Ctx,
@@ -13,7 +13,8 @@ function drawMainRow(
   row: TableRow,
   top: number,
   facts: string,
-  nameH: number
+  nameH: number,
+  whereH: number
 ): void {
   const { theme } = c;
   const w0 = innerWidth(cols, 0);
@@ -21,16 +22,21 @@ function drawMainRow(
   const { status } = row;
   const font = status.needsAction ? "Bold" : "Body";
   node(c, table, "TR", {}, (tr) => {
-    leaf(
-      c,
-      tr,
-      "TH",
-      () => {
+    node(c, tr, "TH", { scope: "Row" }, (th) => {
+      th.add(() => {
         drawText(c, "Bold", BODY, theme.ink, row.element, cols.x[0] + PAD, top, w0);
         if (facts) drawText(c, "Body", SMALL, theme.muted, facts, cols.x[0] + PAD, top + nameH, w0);
-      },
-      { scope: "Row" }
-    );
+      });
+      const { link } = row;
+      if (!link) return;
+      node(c, th, "P", {}, (p) =>
+        node(c, p, "Link", {}, (owner) =>
+          owner.add(() =>
+            drawLink(c, owner, row.element, link, cols.x[0] + PAD, top + nameH + whereH)
+          )
+        )
+      );
+    });
     if (cols.contrast) {
       leaf(c, tr, "TD", () => {
         drawText(
@@ -73,15 +79,6 @@ function drawMainRow(
       );
     });
   });
-  const lineH = heightOf(c, font, BODY, status.text, 200);
-  c.doc.font(font).fontSize(BODY);
-  const wordWidth = c.doc.widthOfString(c.clean(status.text));
-  drawShape(
-    c,
-    status.kind,
-    cols.x[last] + cols.w[last] - PAD - wordWidth - 10,
-    top + (lineH - 9) / 2
-  );
 }
 
 /** One item as two rows, moved whole to the next page when it would not fit, and the page it landed on is reported */
@@ -104,7 +101,7 @@ export function drawItem(
   }
   const top = c.y;
   if (!first && !breakBefore) drawRule(c, c.y);
-  drawMainRow(c, table, cols, row, top + PAD, facts, size.nameH);
+  drawMainRow(c, table, cols, row, top + PAD, facts, size.nameH, size.whereH);
   c.y += size.main;
   if (lines.length > 0) {
     drawDetailRow(c, table, cols, lines);

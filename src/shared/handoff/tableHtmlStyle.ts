@@ -17,7 +17,8 @@ main { max-width: 52rem; margin: 0 auto; padding: 2rem 1rem 3rem; }
 h1 { margin: 0 0 0.25rem; font-size: 1.5rem; line-height: 1.25; overflow-wrap: anywhere; }
 h2 { margin: 2rem 0 0.5rem; font-size: 1.125rem; break-after: avoid; }
 p { margin: 0; overflow-wrap: anywhere; }
-.muted, .count, caption, thead th, .note, .where, .needs, footer { color: ${t.muted}; }
+.muted, .count, caption, thead th, .note, .where, .needs, a { color: ${t.ink}; text-decoration: underline; }
+footer { color: ${t.muted}; }
 .count { font-weight: 400; }
 .lead { margin-top: 0.25rem; }
 table { width: 100%; border-collapse: collapse; background: ${t.card}; border: 1px solid ${t.line}; }
@@ -36,12 +37,6 @@ tbody th { font-weight: 600; }
 .detail { padding-top: 0; }
 .line, .quiet.line { display: block; }
 .note { margin-top: 0.25rem; }
-.shape { display: inline-block; width: 0.6em; height: 0.6em; margin-right: 0.4em; border: 0.14em solid currentColor; background: transparent; vertical-align: baseline; }
-.shape-open { border-radius: 50%; background: currentColor; }
-.shape-needsCheck { border-radius: 50%; }
-.shape-adjusted { background: currentColor; }
-.shape-ignored { height: 0; border-width: 0.07em 0; }
-.shape-decided { border-radius: 0.1em; }
 footer { margin-top: 2rem; padding-top: 0.75rem; border-top: 1px solid ${t.line}; font-size: 0.875rem; }
 footer p + p { margin-top: 0.25rem; }
 @media print {

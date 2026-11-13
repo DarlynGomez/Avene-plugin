@@ -32,6 +32,8 @@ export interface TableRow {
   detail: { text: string; muted: boolean } | null;
   /** Further lines under the detail, in the order they print */
   notes: readonly TableNote[];
+  /** Opens the first layer of the row in the file, present only when the designer pasted the file address */
+  link?: string;
   /** The layers the row is about, so a panel can select them */
   nodeIds: readonly string[];
 }
@@ -52,6 +54,8 @@ export interface TableHeader {
   date: string;
   screens: readonly string[];
   buildId: string | null;
+  /** Not yet reviewed by a person, or who reviewed it and when, for whoever receives a copy */
+  review: string;
   /** Deferred layers are not rows, they are only counted so the header does not hide them */
   counts: {
     rows: number;

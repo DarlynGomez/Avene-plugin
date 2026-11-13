@@ -25,18 +25,23 @@ const detailText = (row: TableRow) =>
     .filter((part) => part !== "")
     .join(" · ");
 
-function cellsFor(group: TableGroup, row: TableRow): string[] {
+function cellsFor(group: TableGroup, row: TableRow, withLink: boolean): string[] {
   const parts =
     group.id === "contrast"
       ? [row.element, place(row), contrastText(row), row.status.text, detailText(row)]
       : [row.element, place(row), row.status.text, detailText(row)];
-  return parts.map(cleaned);
+  return [...parts, ...(withLink ? [row.link ?? ""] : [])].map(cleaned);
 }
 
 /** Columns lined up with pipes, so it reads as a table pasted into a ticket or a document */
 function textTable(group: TableGroup): string[] {
-  const head = group.id === "contrast" ? HEAD_CONTRAST : HEAD_ALT;
-  const body = group.rows.map((row) => cellsFor(group, row));
+  // The link column appears only when a file address was pasted, so a copy never holds an empty one
+  const withLink = group.rows.some((row) => row.link);
+  const head = [
+    ...(group.id === "contrast" ? HEAD_CONTRAST : HEAD_ALT),
+    ...(withLink ? ["Link"] : [])
+  ];
+  const body = group.rows.map((row) => cellsFor(group, row, withLink));
   const widths = head.map((name, i) =>
     Math.max(name.length, ...body.map((cell) => cell[i].length))
   );
@@ -51,7 +56,7 @@ function textTable(group: TableGroup): string[] {
 /** The plain text of the model, the same groups, order and fields as the screen and nothing the screen does not show */
 export function renderTableText(model: HandoffTableModel): string {
   const { header } = model;
-  const out = [header.title, header.subtitle, countsLine(header.counts)];
+  const out = [header.title, header.subtitle, countsLine(header.counts), header.review];
   if (model.empty) out.push("", model.empty);
   for (const group of model.groups) {
     out.push("", `${group.title} (${group.rows.length})`, ...textTable(group));

@@ -25,6 +25,14 @@ declare module "pdfkit" {
     text(text: string, x?: number, y?: number, options?: Record<string, unknown>): PdfDoc;
     widthOfString(text: string): number;
     heightOfString(text: string, options?: Record<string, unknown>): number;
+    link(
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      url: string,
+      options?: Record<string, unknown>
+    ): PdfDoc;
     rect(x: number, y: number, w: number, h: number): PdfDoc;
     circle(x: number, y: number, r: number): PdfDoc;
     moveTo(x: number, y: number): PdfDoc;

@@ -123,12 +123,12 @@ describe("the tag sequence of the file", () => {
       "  H1",
       "  P",
       "  P",
+      "  P",
       "  Sect",
       "    H2",
       "    Table",
       ...indent(TABLE_HEAD3, 6),
-      ...indent(ROW3, 6),
-      "  P"
+      ...indent(ROW3, 6)
     ]);
   });
 
@@ -137,6 +137,7 @@ describe("the tag sequence of the file", () => {
     expect(tree).toEqual([
       "Document",
       "  H1",
+      "  P",
       "  P",
       "  P",
       "  Sect",
@@ -157,8 +158,7 @@ describe("the tag sequence of the file", () => {
       ...indent(["TR", "  TH:Row", "  TD"], 6),
       ...indent(DETAIL(2), 6),
       ...indent(["TR", "  TH:Row", "  TD"], 6),
-      ...indent(DETAIL(2), 6),
-      "  P"
+      ...indent(DETAIL(2), 6)
     ]);
   });
 
@@ -199,7 +199,7 @@ describe("what the file says about itself", () => {
 });
 
 describe("the pages", () => {
-  it("never splits a row across pages, and puts a header and a page number on every page as artifacts", async () => {
+  it("never splits a row across pages, with a page number on every page and a running header from page 2, as artifacts", async () => {
     const placed: ItemPlacement[] = [];
     const bytes = await make(long(45), placed);
     const info = facts(bytes);
@@ -211,7 +211,8 @@ describe("the pages", () => {
     }
     expect(placed.map((p) => p.page)).toEqual([...placed.map((p) => p.page)].sort((a, b) => a - b));
     expect(new Set(placed.map((p) => p.page)).size).toBe(info.pages);
-    expect(info.pagination).toBe(info.pages * 2);
+    // The page number is on every page, the running header only from the second
+    expect(info.pagination).toBe(info.pages * 2 - 1);
   });
 
   it("keeps one table and one heading when the rows run onto more pages", async () => {
@@ -236,5 +237,31 @@ describe("characters the font does not have", () => {
   it("still makes the whole file with such a name", async () => {
     const bytes = await make(input({ findings: [finding({ nodeName: "日本語 ❤ café" })] }));
     expect(outline(structureTree(bytes)).filter((l) => l.trim() === "TH:Row")).toHaveLength(1);
+  });
+});
+
+describe("a link to the layer", () => {
+  const withAddress = (source: HandoffInput) =>
+    input({ ...source, fileUrl: "https://www.figma.com/design/AbC123xyz/My-file" });
+
+  it("is a Link inside a paragraph in the row header, only when the file address is known", async () => {
+    const none = outline(structureTree(await make(input({ findings: [finding()] }))));
+    expect(none.some((l) => l.trim() === "Link")).toBe(false);
+    const tree = outline(structureTree(await make(withAddress(input({ findings: [finding()] })))));
+    const at = tree.findIndex((l) => l.trim() === "Link");
+    expect(at).toBeGreaterThan(0);
+    expect(tree[at - 1].trim()).toBe("P");
+    expect(tree[at - 2].trim()).toBe("TH:Row");
+  });
+
+  it("says who reviewed it in place of the not reviewed line, when someone did", async () => {
+    const model = buildHandoffTable(
+      input({ findings: [finding()], reviewer: { name: "Priya N.", date: AT } }),
+      "developer"
+    );
+    expect(model.header.review).toBe("Reviewed by Priya N., 27 Oct 2026");
+    expect(buildHandoffTable(input(), "developer").header.review).toBe(
+      "Not yet reviewed by a person."
+    );
   });
 });

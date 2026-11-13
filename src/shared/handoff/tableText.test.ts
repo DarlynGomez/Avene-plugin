@@ -145,3 +145,31 @@ describe("the count line of the copied text", () => {
     expect(deferred).toContain("1 need action, 0 decided, 1 deferred, not listed");
   });
 });
+
+describe("the review line and the link column of the copied text", () => {
+  it("puts the review line right under the count line, and who reviewed it when someone did", () => {
+    const plain = renderTableText(buildHandoffTable(input({ findings: [finding()] }), "developer"));
+    expect(plain.split("\n")[3]).toBe("Not yet reviewed by a person.");
+    const reviewed = renderTableText(
+      buildHandoffTable(
+        input({ findings: [finding()], reviewer: { name: "Priya N.", date: AT } }),
+        "developer"
+      )
+    );
+    expect(reviewed.split("\n")[3]).toBe("Reviewed by Priya N., 27 Oct 2026");
+    expect(reviewed).not.toContain("Not yet reviewed");
+  });
+
+  it("adds a Link column only when a file address was pasted", () => {
+    const base = input({ findings: [finding()] });
+    expect(renderTableText(buildHandoffTable(base, "developer"))).not.toMatch(/\| Link/);
+    const linked = renderTableText(
+      buildHandoffTable(
+        { ...base, fileUrl: "https://www.figma.com/design/AbC123xyz/My-file" },
+        "developer"
+      )
+    );
+    expect(linked).toMatch(/\| Link/);
+    expect(linked).toContain("https://www.figma.com/design/AbC123xyz/My-file?node-id=1-1");
+  });
+});

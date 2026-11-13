@@ -1,6 +1,5 @@
 import PDFDocument, { type PdfStruct } from "pdfkit";
 
-import { NOT_REVIEWED_LINE } from "../fixedLines";
 import type { HtmlTheme } from "../tableHtmlStyle";
 import { countsLine } from "../tableText";
 import type { HandoffTableModel } from "../tableTypes";
@@ -107,6 +106,7 @@ export function buildTablePdf(
     c.y += 4;
     paragraph(c, root, "P", "Body", 10, theme.muted, header.subtitle);
     paragraph(c, root, "P", "Body", 10, theme.muted, countsLine(header.counts));
+    paragraph(c, root, "P", "Body", 10, theme.muted, header.review);
     c.y += 8;
     if (model.empty) paragraph(c, root, "P", "Body", 10, theme.ink, model.empty);
     for (const group of model.groups) {
@@ -119,7 +119,6 @@ export function buildTablePdf(
       });
       c.y += 14;
     }
-    paragraph(c, root, "P", "Body", 9, theme.muted, NOT_REVIEWED_LINE);
   });
   listEveryGlyph(doc);
   doc.end();

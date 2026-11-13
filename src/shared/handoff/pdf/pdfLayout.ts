@@ -6,6 +6,8 @@ export const FIT = 84;
 export const BODY = 10;
 export const SMALL = 9;
 export const GAP = 2;
+/** The line that holds a link under a row's location */
+export const LINK_HEIGHT = 13;
 
 export interface Columns {
   contrast: boolean;

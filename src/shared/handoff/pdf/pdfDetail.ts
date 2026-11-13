@@ -2,7 +2,7 @@ import type { PdfStruct } from "pdfkit";
 
 import type { TableRow } from "../tableTypes";
 import { CONTENT_WIDTH, drawText, heightOf, leaf, node, PAGE, type Ctx } from "./pdfDraw";
-import { BODY, GAP, innerWidth, PAD, SMALL, type Columns } from "./pdfLayout";
+import { BODY, GAP, innerWidth, LINK_HEIGHT, PAD, SMALL, type Columns } from "./pdfLayout";
 
 export interface Line {
   text: string;
@@ -59,15 +59,16 @@ export function sizeOf(
   row: TableRow,
   facts: string,
   lines: Line[]
-): ItemSize & { nameH: number } {
+): ItemSize & { nameH: number; whereH: number } {
   const w0 = innerWidth(cols, 0);
   const nameH = heightOf(c, "Bold", BODY, row.element, w0);
   const whereH = facts ? heightOf(c, "Body", SMALL, facts, w0) : 0;
   const needsH = row.contrast?.required ? SMALL * 1.3 : 0;
-  const main = Math.max(nameH + whereH, BODY * 1.3 + needsH) + PAD;
+  const linkH = row.link ? LINK_HEIGHT : 0;
+  const main = Math.max(nameH + whereH + linkH, BODY * 1.3 + needsH) + PAD;
   const detail = lines.reduce(
     (sum, l) => sum + heightOf(c, "Body", l.size, l.text, CONTENT_WIDTH - 2 * PAD) + GAP,
     0
   );
-  return { main, detail, total: main + detail + PAD, nameH };
+  return { main, detail, total: main + detail + PAD, nameH, whereH };
 }

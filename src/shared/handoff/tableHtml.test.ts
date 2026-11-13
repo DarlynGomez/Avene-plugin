@@ -106,11 +106,41 @@ describe("the exported page", () => {
     for (const th of heads) expect(["col", "row"]).toContain(th.getAttribute("scope"));
   });
 
-  it("prints the status as text with a shape that is hidden from a screen reader", () => {
-    const doc = parse(html(5));
+  it("prints the status as plain text, with no shape drawn beside it", () => {
+    const raw = html(5);
+    const doc = parse(raw);
     const open = [...doc.querySelectorAll("td")].find((td) => td.textContent === "Open");
-    expect(open?.querySelector('.shape[aria-hidden="true"]')).not.toBeNull();
-    expect(doc.querySelectorAll(".shape").length).toBe(doc.querySelectorAll("td .shape").length);
+    expect(open).toBeDefined();
+    expect(open?.children).toHaveLength(0);
+    expect(raw).not.toMatch(/shape/);
+  });
+
+  it("puts the review line under the count line, and who reviewed it when someone did", () => {
+    const lines = [...parse(html(5)).querySelectorAll("header p")].map((p) => p.textContent);
+    expect(lines.at(-1)).toBe("Not yet reviewed by a person.");
+    const model = buildHandoffTable(
+      input({ findings: [finding()], reviewer: { name: "Priya N.", date: AT } }),
+      "developer"
+    );
+    const reviewed = parse(buildTableHtml(model, THEME)).querySelectorAll("header p");
+    expect(reviewed[reviewed.length - 1].textContent).toBe("Reviewed by Priya N., 27 Oct 2026");
+  });
+
+  it("links a row to its layer only when the file address is known, and escapes the link", () => {
+    expect(parse(html(1)).querySelector("a")).toBeNull();
+    const model = buildHandoffTable(
+      input({
+        findings: [finding({ nodeName: "Card" })],
+        fileUrl: "https://www.figma.com/design/AbC123xyz/My-file"
+      }),
+      "developer"
+    );
+    const link = parse(buildTableHtml(model, THEME)).querySelector("tbody th a");
+    expect(link?.getAttribute("href")).toBe(
+      "https://www.figma.com/design/AbC123xyz/My-file?node-id=1-1"
+    );
+    expect(link?.textContent).toBe("Open in Figma");
+    expect(link?.getAttribute("aria-label")).toBe("Open in Figma: Card");
   });
 
   it("has the same words as the screen model, the footer and the not reviewed line", () => {

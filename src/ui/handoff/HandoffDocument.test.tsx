@@ -222,7 +222,8 @@ describe("the table view", () => {
     expect(copied).toContain("Helper text");
     expect(copied).toContain("Price label");
     expect(copied).not.toContain("Not covered by this check");
-    expect(copied.trimEnd().endsWith("Not yet reviewed by a person.")).toBe(true);
+    // Under the count line, where a receiver reads it first
+    expect(copied.split("\n")[3]).toBe("Not yet reviewed by a person.");
   });
 });
 

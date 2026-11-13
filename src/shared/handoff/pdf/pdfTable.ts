@@ -4,7 +4,7 @@ import type { TableGroup } from "../tableTypes";
 import { artifact, CONTENT_WIDTH, drawText, heightOf, leaf, node, PAGE, type Ctx } from "./pdfDraw";
 import { drawItem } from "./pdfItem";
 import { columnsFor, innerWidth, PAD, SMALL, type Columns } from "./pdfLayout";
-import { drawRule } from "./pdfShape";
+import { drawRule } from "./pdfRule";
 
 export interface ItemPlacement {
   page: number;

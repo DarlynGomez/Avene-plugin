@@ -2,7 +2,6 @@ import { Copy, Download, FileText } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { buildItems } from "../../shared/handoff/buildItems";
-import { NOT_REVIEWED_LINE } from "../../shared/handoff/fixedLines";
 import { ALL_FORMATS, FORMAT_NAMES, rawText, type Format } from "../../shared/handoff/formats";
 import { buildHandoffTable } from "../../shared/handoff/tableModel";
 import { renderTableText } from "../../shared/handoff/tableText";
@@ -57,9 +56,7 @@ export function HandoffDocument({
   async function quickCopy() {
     // The table on screen copies as a plain text table of the same rows, the other views copy their own text
     const copied = await copyText(
-      asTable
-        ? `${renderTableText(model)}\n\n${NOT_REVIEWED_LINE}`
-        : rawText(format, input, audience, {}, null, true)
+      asTable ? renderTableText(model) : rawText(format, input, audience, {}, null, true)
     );
     setStatus(
       copied

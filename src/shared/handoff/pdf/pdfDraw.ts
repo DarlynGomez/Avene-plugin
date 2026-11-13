@@ -40,6 +40,29 @@ export function drawText(
   c.doc.font(font).fontSize(size).fillColor(color).text(c.clean(text), x, y, { width, align });
 }
 
+/** A link to a layer in the file: the words underlined, and an annotation tagged as part of the Link element */
+export function drawLink(
+  c: Ctx,
+  owner: PdfStruct,
+  label: string,
+  url: string,
+  x: number,
+  y: number
+): void {
+  const text = "Open in Figma";
+  const { doc } = c;
+  doc
+    .font("Body")
+    .fontSize(9)
+    .fillColor(c.theme.ink)
+    .text(text, x, y, { underline: true, lineBreak: false });
+  // A tagged link needs words for what it opens, kept as a PDF string object so it is written as text
+  doc.link(x, y, doc.widthOfString(text), 12, url, {
+    structParent: owner,
+    Contents: Object(`Open in Figma: ${c.clean(label)}`)
+  });
+}
+
 /** One structure element under a parent, or under the document when there is none, ended when the body is done */
 export function node(
   c: Ctx,
@@ -83,9 +106,12 @@ export function furniture(c: Ctx): void {
   const { margins } = doc.page;
   const saved = margins.bottom;
   margins.bottom = 0;
-  artifact(c, { type: "Pagination" }, () => {
-    drawText(c, "Body", 9, theme.muted, c.title, PAGE.margin, 30, CONTENT_WIDTH - 60);
-  });
+  // The first page already opens with the title, so the running header starts on the second
+  if (c.page > 1) {
+    artifact(c, { type: "Pagination" }, () => {
+      drawText(c, "Body", 9, theme.muted, c.title, PAGE.margin, 30, CONTENT_WIDTH - 60);
+    });
+  }
   artifact(c, { type: "Pagination" }, () => {
     drawText(
       c,
