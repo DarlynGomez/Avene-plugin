@@ -39,8 +39,8 @@ const hexToRgb = (hex: string) => ({
  * people who see little difference between red and orange
  */
 export const SEVERITY_COLORS: Readonly<Record<Severity, { r: number; g: number; b: number }>> = {
-  high: hexToRgb("#8E1B1B"),
-  medium: hexToRgb("#A64B08"),
+  high: hexToRgb("#A72020"),
+  medium: hexToRgb("#BD580A"),
   low: hexToRgb("#2878A3")
 };
 

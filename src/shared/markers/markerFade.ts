@@ -1,5 +1,5 @@
 /** How long a deferred marker takes to fade from solid to its faintest, one number to change */
-export const FADE_FULL_MS = 30 * 60 * 1000;
+export const FADE_FULL_MS = 1 * 60 * 1000;
 
 /** The faintest a deferred fill gets, below this the shape would be lost on a light page */
 export const FADE_FLOOR = 0.35;
