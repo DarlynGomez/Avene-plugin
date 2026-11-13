@@ -1,9 +1,4 @@
-import {
-  MARKER_LOOKS,
-  markerKind,
-  nearlyEqual,
-  shapeGeometry
-} from "../../../shared/markers/markerShape";
+import { markerLook, nearlyEqual, shapeGeometry } from "../../../shared/markers/markerShape";
 import type { Marker } from "../../../shared/markers/markerSet";
 import type { BackendResult } from "./annotationBackend";
 import { findTaggedNodes } from "./markerCategory";
@@ -56,7 +51,7 @@ export function createShapeBackend(sessionId: string) {
       if (!box) continue;
       const frame = ensureContainer(id);
       const geometry = shapeGeometry(style, box, figma.viewport.zoom);
-      const look = MARKER_LOOKS[markerKind(marker)];
+      const look = markerLook(marker);
       let shape = shapes.get(marker.nodeId);
       if (!shape) {
         shape = figma.createPolygon();
@@ -77,13 +72,13 @@ export function createShapeBackend(sessionId: string) {
         !nearlyEqual(shape.strokeWeight as number, geometry.strokeWeight) ||
         (shape.fills as readonly Paint[]).length !== (geometry.filled ? 1 : 0) ||
         shape.pointCount !== look.points ||
-        !hasColor(shape, style, look.color);
+        !hasColor(shape, style, look);
       if (differs) {
         shape.resize(geometry.size, geometry.size);
         shape.x = x;
         shape.y = y;
         shape.pointCount = look.points;
-        paintShape(shape, style, geometry.strokeWeight, look.color);
+        paintShape(shape, style, geometry.strokeWeight, look);
         wrote = true;
       }
       // The number of a group goes in the middle, drawn after the shape so it sits above it

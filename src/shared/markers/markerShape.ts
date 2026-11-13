@@ -1,3 +1,4 @@
+import type { Severity } from "../issues/issueTypes";
 import type { MarkerStyle } from "./markerStyle";
 
 /** Canvas units at 100 percent zoom */
@@ -19,22 +20,56 @@ export const CONTAINER_NAME = "Avene markers (temporary)";
 /** What kind of marker a root gets, a failing one, an important failing one, or a deferred one */
 export type MarkerKind = "fail" | "important" | "deferred";
 
-export interface MarkerLook {
-  /** Corners of the polygon, 3 is a triangle and 4 is a diamond */
-  points: 3 | 4;
-  color: { r: number; g: number; b: number };
-}
-
-/** Every kind differs from every other in its corners or its color, and the white outline is shared by all */
-export const MARKER_LOOKS: Readonly<Record<MarkerKind, MarkerLook>> = {
-  fail: { points: 3, color: SHAPE_COLOR },
-  important: { points: 4, color: SHAPE_COLOR },
-  deferred: { points: 3, color: SHAPE_COLOR_DEFERRED }
+/** Corners of the polygon, 3 is a triangle, 4 a diamond and 5 a pentagon, the shape says the kind */
+export const MARKER_POINTS: Readonly<Record<MarkerKind, 3 | 4 | 5>> = {
+  fail: 4,
+  important: 5,
+  deferred: 4
 };
+
+const hexToRgb = (hex: string) => ({
+  r: Number((parseInt(hex.slice(1, 3), 16) / 255).toFixed(3)),
+  g: Number((parseInt(hex.slice(3, 5), 16) / 255).toFixed(3)),
+  b: Number((parseInt(hex.slice(5, 7), 16) / 255).toFixed(3))
+});
+
+/**
+ * The fill of a failing marker by how bad the failure is, darker as it gets worse
+ * Each reaches 4.5 to 1 against the white outline, and the steps in lightness keep them apart for
+ * people who see little difference between red and orange
+ */
+export const SEVERITY_COLORS: Readonly<Record<Severity, { r: number; g: number; b: number }>> = {
+  high: hexToRgb("#8E1B1B"),
+  medium: hexToRgb("#A64B08"),
+  low: hexToRgb("#2878A3")
+};
+
+export interface MarkerLook {
+  points: 3 | 4 | 5;
+  color: { r: number; g: number; b: number };
+  /** The fill opacity, below 1 only for a deferred marker that has been put off for a while */
+  opacity: number;
+}
 
 export function markerKind(marker: { deferred?: boolean; important?: boolean }): MarkerKind {
   if (marker.deferred) return "deferred";
   return marker.important ? "important" : "fail";
+}
+
+/** The shape, color and fill opacity of one marker, the white outline is the same for all of them */
+export function markerLook(marker: {
+  deferred?: boolean;
+  important?: boolean;
+  severity?: Severity;
+  opacity?: number;
+}): MarkerLook {
+  const kind = markerKind(marker);
+  const failing = marker.severity ? SEVERITY_COLORS[marker.severity] : SHAPE_COLOR;
+  return {
+    points: MARKER_POINTS[kind],
+    color: kind === "deferred" ? SHAPE_COLOR_DEFERRED : failing,
+    opacity: marker.opacity ?? 1
+  };
 }
 
 export interface TargetBox {

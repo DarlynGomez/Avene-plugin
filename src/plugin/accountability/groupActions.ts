@@ -50,7 +50,7 @@ export function deferRoot(
   issueIds: readonly string[]
 ): GroupTransitionResult {
   const eligible = issueIds.filter((id) => record[id]?.state === "open");
-  return applyToEach(record, eligible, deferIssue);
+  return applyToEach(record, eligible, (issue) => deferIssue(issue, new Date().toISOString()));
 }
 
 /** Marks everything important, the state machine decides which can change */

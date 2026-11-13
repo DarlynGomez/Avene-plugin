@@ -31,6 +31,13 @@ describe("isIssue", () => {
     ).toBe(true);
   });
 
+  it("accepts a deferral time as text and rejects anything else", () => {
+    expect(isIssue({ ...VALID, state: "deferred", deferredAt: "2026-11-13T10:00:00.000Z" })).toBe(
+      true
+    );
+    expect(isIssue({ ...VALID, state: "deferred", deferredAt: 5 })).toBe(false);
+  });
+
   it.each(["id", "ruleId", "nodeId", "lastDetectedAt"])("rejects a missing %s", (field) => {
     const withMissingField = Object.fromEntries(
       Object.entries(VALID).filter(([key]) => key !== field)

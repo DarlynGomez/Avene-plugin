@@ -40,6 +40,7 @@ function toPersistedFields(issue: Issue): PersistedIssueFields {
     lastDetectedAt: issue.lastDetectedAt,
     ignoredReason: issue.ignoredReason,
     ignoredAt: issue.ignoredAt,
+    deferredAt: issue.deferredAt,
     severityAtIgnore: issue.severityAtIgnore,
     changedSinceIgnore: issue.changedSinceIgnore
   };

@@ -35,12 +35,12 @@ const FLAGGABLE_FROM: ReadonlySet<IssueState> = new Set(["open", "deferred"]);
 const IGNORABLE_FROM: ReadonlySet<IssueState> = new Set(["open", "deferred", "important"]);
 const REOPENABLE_FROM: ReadonlySet<IssueState> = new Set(["deferred", "important", "ignored"]);
 
-/** open or important to deferred: put off, not dismissed */
-export function deferIssue(issue: Issue): TransitionOutcome {
+/** open or important to deferred: put off, not dismissed, the time is kept so its marker can fade */
+export function deferIssue(issue: Issue, at?: string): TransitionOutcome {
   if (!DEFERRABLE_FROM.has(issue.state)) {
     return rejected(`Cannot defer an issue in state '${issue.state}'`);
   }
-  return accepted({ ...issue, state: "deferred" });
+  return accepted({ ...issue, state: "deferred", deferredAt: at });
 }
 
 /** open or deferred to important: designer-flagged, steady, never fades */
@@ -48,7 +48,7 @@ export function flagImportant(issue: Issue): TransitionOutcome {
   if (!FLAGGABLE_FROM.has(issue.state)) {
     return rejected(`Cannot flag an issue in state '${issue.state}' as important`);
   }
-  return accepted({ ...issue, state: "important" });
+  return accepted({ ...issue, state: "important", deferredAt: undefined });
 }
 
 /** Needs a non empty reason, checked here so a bad message cannot skip it */
@@ -62,6 +62,7 @@ export function ignoreIssue(issue: Issue, reason: string, at: string): Transitio
   return accepted({
     ...issue,
     state: "ignored",
+    deferredAt: undefined,
     ignoredReason: reason,
     ignoredAt: at,
     severityAtIgnore: issue.severityAtLastDetection,
@@ -74,7 +75,7 @@ export function reopenIssue(issue: Issue): TransitionOutcome {
   if (!REOPENABLE_FROM.has(issue.state)) {
     return rejected(`Cannot reopen an issue in state '${issue.state}'`);
   }
-  return accepted({ ...issue, state: "open" });
+  return accepted({ ...issue, state: "open", deferredAt: undefined });
 }
 
 /** The node of a deferred issue was selected again after the guard cleared */

@@ -56,6 +56,8 @@ export interface Issue {
   lastDetectedAt: string;
   ignoredReason?: string;
   ignoredAt?: string;
+  /** When it was put off, set by defer and gone again once it leaves the deferred state */
+  deferredAt?: string;
   severityAtIgnore?: Severity;
   /** Set when a worse finding reopened this ignored issue */
   changedSinceIgnore?: boolean;

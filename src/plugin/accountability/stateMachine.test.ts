@@ -51,6 +51,29 @@ describe("deferIssue", () => {
   it.each<IssueState>(["deferred", "ignored", "resolved"])("rejects from %s", (state) => {
     expect(deferIssue(issueIn(state)).ok).toBe(false);
   });
+
+  it("keeps the time it was put off when one is given, so its marker can fade", () => {
+    const result = deferIssue(issueIn("open"), LATER);
+    expect(result).toEqual({
+      ok: true,
+      issue: issueIn("open", { state: "deferred", deferredAt: LATER })
+    });
+  });
+
+  it.each([
+    ["flagged important", (issue: Issue) => flagImportant(issue)],
+    ["reopened", (issue: Issue) => reopenIssue(issue)],
+    ["ignored", (issue: Issue) => ignoreIssue(issue, "Brand color", LATER)]
+  ])("forgets the time it was put off once it is %s", (_name, move) => {
+    const result = move(issueIn("deferred", { deferredAt: NOW }));
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.issue.deferredAt).toBeUndefined();
+  });
+
+  it("keeps the time through a fresh scan that finds it still failing", () => {
+    const deferred = issueIn("deferred", { deferredAt: NOW });
+    expect(reconcileDetection(deferred, "medium", LATER).deferredAt).toBe(NOW);
+  });
 });
 
 describe("flagImportant", () => {

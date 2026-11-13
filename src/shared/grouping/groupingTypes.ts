@@ -11,6 +11,8 @@ export interface GroupableFinding {
   screenName: string;
   state: IssueState;
   severity: Severity;
+  /** When the issue was deferred, absent for an issue deferred before the time was kept */
+  deferredAt?: string;
   measuredRatio: number;
   requiredRatio: number;
   foregroundHex: string;

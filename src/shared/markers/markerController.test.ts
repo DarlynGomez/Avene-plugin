@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { MarkerStateChange } from "../study/studyEvents";
 import { SCREEN_DWELL_MS } from "./currentScreen";
 import { ANNOTATION_RECONCILE_MS, createMarkerController } from "./markerController";
+import { FADE_REFRESH_MS } from "./markerFade";
 import { instance, root } from "./markerFixtures";
 import type { MarkerRenderer, ShowResult } from "./markerRenderer";
 import type { Marker } from "./markerSet";
@@ -14,6 +15,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
   let launch = options.launch === undefined ? "A" : options.launch;
   const shows: { screen: string; nodes: string[] }[] = [];
   const counts: (number | undefined)[][] = [];
+  const opacities: (number | undefined)[][] = [];
   const styles: MarkerStyle[] = [];
   const undoFlags: boolean[] = [];
   const events: [MarkerStateChange, number][] = [];
@@ -33,6 +35,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
         undoFlags.push(undo ?? true);
         shows.push({ screen, nodes: markers.map((marker) => marker.nodeId) });
         counts.push(markers.map((marker) => marker.count));
+        opacities.push(markers.map((marker) => marker.opacity));
         if (showStyle) styles.push(showStyle);
         return result;
       }
@@ -66,6 +69,7 @@ function setup(options: { visible?: boolean; launch?: string | null } = {}) {
     renderer,
     shows,
     counts,
+    opacities,
     styles,
     undoFlags,
     stateStyles,
@@ -489,5 +493,61 @@ describe("clicking a marker of a group of issues", () => {
     t.controller.onSelection(designer("A"), ["1:2"], { signature: "r1", nodeId: "1:2" });
     await t.controller.idle();
     expect(t.counts.at(-1)).toEqual([undefined, 3, undefined, undefined]);
+  });
+
+  describe("the fade of a deferred marker", () => {
+    const DEFERRED_AT = new Date(0).toISOString();
+    const DEFERRED = [
+      root("r1", [instance("1:1", "A", "deferred", 0, { deferredAt: DEFERRED_AT })], "deferred")
+    ];
+
+    it("starts solid, and is drawn fainter each time it is looked at again as the time passes", async () => {
+      const t = setup();
+      t.controller.onRoots(DEFERRED);
+      await t.controller.idle();
+      expect(t.opacities.at(-1)).toEqual([undefined]);
+
+      t.advance(FADE_REFRESH_MS + 10 * 60 * 1000);
+      await t.controller.idle();
+      const first = t.opacities.at(-1)?.[0];
+      expect(first).toBeLessThan(1);
+
+      t.advance(FADE_REFRESH_MS + 10 * 60 * 1000);
+      await t.controller.idle();
+      expect(t.opacities.at(-1)?.[0]).toBeLessThan(first as number);
+    });
+
+    it("repaints with no undo step, so fading never fills the undo list", async () => {
+      const t = setup();
+      t.controller.onRoots(DEFERRED);
+      await t.controller.idle();
+      t.undoFlags.length = 0;
+      t.advance(FADE_REFRESH_MS);
+      await t.controller.idle();
+      expect(t.undoFlags.length).toBeGreaterThan(0);
+      expect(t.undoFlags.every((flag) => flag === false)).toBe(true);
+    });
+
+    it("is not looked at again when no deferred marker is shown", async () => {
+      const t = setup();
+      t.controller.onRoots(ROOTS);
+      await t.controller.idle();
+      const timersBefore = t.timers.size;
+      t.advance(FADE_REFRESH_MS * 3);
+      await t.controller.idle();
+      expect(t.timers.size).toBeLessThanOrEqual(timersBefore);
+    });
+
+    it("stops looking when the markers are hidden", async () => {
+      const t = setup();
+      t.controller.onRoots(DEFERRED);
+      await t.controller.idle();
+      t.setVisible(false);
+      await t.controller.refreshVisibility();
+      t.timers.clear();
+      t.advance(FADE_REFRESH_MS * 3);
+      await t.controller.idle();
+      expect(t.timers.size).toBe(0);
+    });
   });
 });

@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   CONTAINER_NAME,
+  MARKER_POINTS,
+  SEVERITY_COLORS,
   SHAPE_COLOR,
   SHAPE_COLOR_DEFERRED,
   shapeGeometry
@@ -70,17 +72,17 @@ describe("the dot and the ring", () => {
     expect(shape).toMatchObject({ width: 18, height: 18, strokeWeight: 1, strokeAlign: "INSIDE" });
   });
 
-  it("draws a failing marker as a triangle in the warning red with a white outline", async () => {
+  it("draws a failing marker in the shape of its kind, in the warning red when its severity is not known, with a white outline", async () => {
     fake.addNode("1:1", [], "", BOX);
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
 
     const [shape] = shapesOnCanvas();
-    expect(shape).toMatchObject({ pointCount: 3, width: 18, height: 18 });
+    expect(shape).toMatchObject({ pointCount: MARKER_POINTS.fail, width: 18, height: 18 });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
   });
 
-  it("draws an important failing marker as a diamond in the same red, with a white outline", async () => {
+  it("draws an important failing marker in the shape of its kind, with a white outline", async () => {
     fake.addNode("1:1", [], "", BOX);
     await createMarkerRenderer("s1").show(
       "A",
@@ -89,7 +91,7 @@ describe("the dot and the ring", () => {
     );
 
     const [shape] = shapesOnCanvas();
-    expect(shape).toMatchObject({ pointCount: 4, width: 18, height: 18 });
+    expect(shape).toMatchObject({ pointCount: MARKER_POINTS.important, width: 18, height: 18 });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
   });
@@ -105,7 +107,7 @@ describe("the dot and the ring", () => {
     const [shape] = shapesOnCanvas();
     const expected = shapeGeometry("dot", BOX, 1);
     expect(shape).toMatchObject({ x: expected.x, y: expected.y, width: 18, height: 18 });
-    expect(shape).toMatchObject({ pointCount: 3 });
+    expect(shape).toMatchObject({ pointCount: MARKER_POINTS.deferred });
     expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
     expect(shape?.strokes).toEqual([{ type: "SOLID", color: WHITE }]);
     expect(SHAPE_COLOR_DEFERRED.r).toBeCloseTo(SHAPE_COLOR_DEFERRED.g, 2);
@@ -116,7 +118,7 @@ describe("the dot and the ring", () => {
     fake.addNode("1:1", [], "", BOX);
     const renderer = createMarkerRenderer("s1");
     await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
-    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 3 });
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: MARKER_POINTS.fail });
     expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
 
     await renderer.show("A", [{ ...marker("r1", "A", "1:1"), deferred: true }], "dot");
@@ -125,11 +127,11 @@ describe("the dot and the ring", () => {
 
     await renderer.show("A", [{ ...marker("r1", "A", "1:1"), important: true }], "dot");
     expect(shapesOnCanvas()).toHaveLength(1);
-    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 4 });
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: MARKER_POINTS.important });
     expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR }]);
 
     await renderer.show("A", [marker("r1", "A", "1:1")], "dot");
-    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: 3 });
+    expect(shapesOnCanvas()[0]).toMatchObject({ pointCount: MARKER_POINTS.fail });
   });
 
   it("draws a deferred ring with the muted gray on its stroke", async () => {
@@ -212,6 +214,67 @@ describe("the dot and the ring", () => {
     await createMarkerRenderer("s1").show("A", [marker("r1", "A", "1:1")], "dot");
 
     expect(drawn()).toEqual([]);
+  });
+});
+
+describe("the color and the fade of a marker", () => {
+  it.each(["low", "medium", "high"] as const)(
+    "fills a failing marker by its %s severity",
+    async (severity) => {
+      fake.addNode("1:1", [], "", BOX);
+      await createMarkerRenderer("s1").show(
+        "A",
+        [{ ...marker("r1", "A", "1:1"), severity }],
+        "dot"
+      );
+      expect(shapesOnCanvas()[0]?.fills).toEqual([
+        { type: "SOLID", color: SEVERITY_COLORS[severity] }
+      ]);
+      expect(shapesOnCanvas()[0]?.strokes).toEqual([
+        { type: "SOLID", color: { r: 1, g: 1, b: 1 } }
+      ]);
+    }
+  );
+
+  it("repaints the same shape when the severity changes", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    await renderer.show("A", [{ ...marker("r1", "A", "1:1"), severity: "low" }], "dot");
+    await renderer.show("A", [{ ...marker("r1", "A", "1:1"), severity: "high" }], "dot");
+    expect(shapesOnCanvas()).toHaveLength(1);
+    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SEVERITY_COLORS.high }]);
+  });
+
+  it("keeps a deferred marker gray whatever its severity, and fades only its fill, never the white outline", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    await createMarkerRenderer("s1").show(
+      "A",
+      [{ ...marker("r1", "A", "1:1"), severity: "high", deferred: true, opacity: 0.5 }],
+      "dot"
+    );
+    const [shape] = shapesOnCanvas();
+    expect(shape?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED, opacity: 0.5 }]);
+    expect(shape?.strokes).toEqual([{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
+  });
+
+  it("fades the same shape further as the opacity falls, and writes nothing when it has not changed", async () => {
+    fake.addNode("1:1", [], "", BOX);
+    const renderer = createMarkerRenderer("s1");
+    const deferred = (opacity?: number) => ({
+      ...marker("r1", "A", "1:1"),
+      deferred: true,
+      ...(opacity === undefined ? {} : { opacity })
+    });
+    await renderer.show("A", [deferred()], "dot");
+    expect(shapesOnCanvas()[0]?.fills).toEqual([{ type: "SOLID", color: SHAPE_COLOR_DEFERRED }]);
+    await renderer.show("A", [deferred(0.7)], "dot");
+    expect(shapesOnCanvas()).toHaveLength(1);
+    expect(shapesOnCanvas()[0]?.fills).toEqual([
+      { type: "SOLID", color: SHAPE_COLOR_DEFERRED, opacity: 0.7 }
+    ]);
+    fake.calls.length = 0;
+    await renderer.show("A", [deferred(0.7)], "dot");
+    expect(fake.calls).toEqual([]);
   });
 });
 

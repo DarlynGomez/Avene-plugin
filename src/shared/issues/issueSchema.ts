@@ -33,6 +33,9 @@ function hasValidPersistedFields(issue: Record<string, unknown>): boolean {
   if (issue.ignoredAt !== undefined && typeof issue.ignoredAt !== "string") {
     return false;
   }
+  if (issue.deferredAt !== undefined && typeof issue.deferredAt !== "string") {
+    return false;
+  }
   if (
     issue.severityAtIgnore !== undefined &&
     (typeof issue.severityAtIgnore !== "string" || !VALID_SEVERITIES.has(issue.severityAtIgnore))

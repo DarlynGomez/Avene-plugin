@@ -37,37 +37,38 @@ export function makeContainer(userId: string, sessionId: string): FrameNode {
   return frame;
 }
 
-/** The outline is white for every kind, so the shape reads against a light or a dark background alike */
+/** The outline is white and solid for every kind, so the shape reads against a light or a dark background alike */
 export function paintShape(
   shape: PolygonNode,
   style: ShapeStyle,
   weight: number,
-  color: MarkerLook["color"]
+  look: MarkerLook
 ): void {
-  const solid = (paint: MarkerLook["color"]): SolidPaint => ({ type: "SOLID", color: paint });
+  const solid = (paint: MarkerLook["color"], opacity = 1): SolidPaint => ({
+    type: "SOLID",
+    color: paint,
+    ...(opacity < 1 ? { opacity } : {})
+  });
   if (style === "dot") {
-    shape.fills = [solid(color)];
+    shape.fills = [solid(look.color, look.opacity)];
     shape.strokes = [solid(SHAPE_STROKE_WHITE)];
   } else {
     shape.fills = [];
-    shape.strokes = [solid(color)];
+    shape.strokes = [solid(look.color, look.opacity)];
   }
   shape.strokeWeight = weight;
   shape.strokeAlign = "INSIDE";
 }
 
-/** Whether the shape already has the color its marker wants, so a layer that changed kind is painted again */
-export function hasColor(
-  shape: PolygonNode,
-  style: ShapeStyle,
-  want: MarkerLook["color"]
-): boolean {
+/** Whether the shape already has the color and opacity its marker wants, so a layer that changed is painted again */
+export function hasColor(shape: PolygonNode, style: ShapeStyle, look: MarkerLook): boolean {
   const paints = (style === "dot" ? shape.fills : shape.strokes) as readonly Paint[];
   const paint = paints[0];
   if (!paint || paint.type !== "SOLID") return false;
   return (
-    nearlyEqual(paint.color.r, want.r) &&
-    nearlyEqual(paint.color.g, want.g) &&
-    nearlyEqual(paint.color.b, want.b)
+    nearlyEqual(paint.color.r, look.color.r) &&
+    nearlyEqual(paint.color.g, look.color.g) &&
+    nearlyEqual(paint.color.b, look.color.b) &&
+    nearlyEqual(paint.opacity ?? 1, look.opacity)
   );
 }

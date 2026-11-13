@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { contrastRatio } from "../colour/contrastRatio";
+import { contrastRatio, relativeLuminance } from "../colour/contrastRatio";
 import {
   DOT_STROKE,
-  MARKER_LOOKS,
+  MARKER_POINTS,
+  SHAPE_COLOR,
+  SHAPE_COLOR_DEFERRED,
+  markerLook,
   SHAPE_STROKE_WHITE,
   markerKind,
-  type MarkerKind,
   ZOOM_CHANGE_RATIO,
   ZOOM_POLL_MS,
   zoomChanged,
@@ -98,35 +100,67 @@ describe("zoomChanged", () => {
   });
 });
 
-describe("the look of each kind of marker", () => {
-  const KINDS = Object.keys(MARKER_LOOKS) as MarkerKind[];
-  const pair = (kind: MarkerKind) =>
-    `${MARKER_LOOKS[kind].points}|${Object.values(MARKER_LOOKS[kind].color).join(",")}`;
+describe("the look of each marker", () => {
+  const SEVERITIES = ["low", "medium", "high"] as const;
+  const KINDS = ["fail", "important", "deferred"] as const;
+  const everyLook = () =>
+    KINDS.flatMap((kind) =>
+      SEVERITIES.map((severity) => ({
+        kind,
+        severity,
+        look: markerLook({
+          ...(kind === "deferred" ? { deferred: true } : {}),
+          ...(kind === "important" ? { important: true } : {}),
+          severity
+        })
+      }))
+    );
+  const pair = (look: ReturnType<typeof markerLook>) =>
+    `${look.points}|${Object.values(look.color).join(",")}`;
 
-  it("is a triangle for a failing marker, a diamond for an important one, a gray triangle for a deferred one", () => {
-    expect(MARKER_LOOKS.fail.points).toBe(3);
-    expect(MARKER_LOOKS.important.points).toBe(4);
-    expect(MARKER_LOOKS.deferred.points).toBe(3);
-    expect(MARKER_LOOKS.fail.color).toEqual(MARKER_LOOKS.important.color);
-    expect(MARKER_LOOKS.deferred.color).not.toEqual(MARKER_LOOKS.fail.color);
+  it("has a shape for each kind, and the failing and important kinds differ in their corners", () => {
+    expect(MARKER_POINTS.fail).not.toBe(MARKER_POINTS.important);
+    expect(markerLook({ severity: "high" }).points).toBe(MARKER_POINTS.fail);
+    expect(markerLook({ severity: "high", important: true }).points).toBe(MARKER_POINTS.important);
+    expect(markerLook({ severity: "high", deferred: true }).points).toBe(MARKER_POINTS.deferred);
   });
 
-  it("never gives two kinds the same shape and color pair", () => {
-    expect(new Set(KINDS.map(pair)).size).toBe(KINDS.length);
+  it("colors a failing marker by its severity, three different colors, and a deferred one gray whatever it was", () => {
+    const failing = SEVERITIES.map((severity) => markerLook({ severity }).color);
+    expect(new Set(failing.map((color) => Object.values(color).join(","))).size).toBe(3);
+    const deferred = SEVERITIES.map((severity) => markerLook({ severity, deferred: true }).color);
+    expect(new Set(deferred.map((color) => Object.values(color).join(","))).size).toBe(1);
+    expect(deferred[0]).toEqual(SHAPE_COLOR_DEFERRED);
   });
 
-  it("lets the shape alone tell a failing marker from an important one, and the color alone only a deferred one", () => {
-    expect(MARKER_LOOKS.fail.points).not.toBe(MARKER_LOOKS.important.points);
-    expect(MARKER_LOOKS.fail.points).toBe(MARKER_LOOKS.deferred.points);
+  it("is darker as the severity gets worse, so the steps do not rest on hue alone", () => {
+    const light = (severity: (typeof SEVERITIES)[number]) =>
+      relativeLuminance(markerLook({ severity }).color);
+    expect(light("high")).toBeLessThan(light("medium"));
+    expect(light("medium")).toBeLessThan(light("low"));
+  });
+
+  it("falls back to the one warning color when the severity is not known", () => {
+    expect(markerLook({}).color).toEqual(SHAPE_COLOR);
+  });
+
+  it("never gives two kinds of failing marker the same shape and color pair", () => {
+    const pairs = everyLook().map(({ look }) => pair(look));
+    expect(new Set(pairs).size).toBe(pairs.length - (SEVERITIES.length - 1));
   });
 
   it("keeps every fill readable against the white outline, which is what makes it work on any background", () => {
-    for (const kind of KINDS) {
+    for (const { kind, severity, look } of everyLook()) {
       expect(
-        contrastRatio(MARKER_LOOKS[kind].color, SHAPE_STROKE_WHITE),
-        kind
+        contrastRatio(look.color, SHAPE_STROKE_WHITE),
+        `${kind} ${severity}`
       ).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it("carries the fade as the fill opacity, solid when there is none", () => {
+    expect(markerLook({ severity: "low" }).opacity).toBe(1);
+    expect(markerLook({ severity: "low", deferred: true, opacity: 0.5 }).opacity).toBe(0.5);
   });
 
   it("is chosen by the root: deferred first, then important, otherwise failing", () => {

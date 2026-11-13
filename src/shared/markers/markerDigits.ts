@@ -32,7 +32,7 @@ export function countText(count: number | undefined): string | null {
 
 /** How big one glyph unit is on the marker, fewer characters get bigger glyphs so they stay readable */
 export function glyphScale(characters: number): number {
-  if (characters <= 1) return 1.05;
+  if (characters <= 1) return 0.8;
   return characters === 2 ? 0.8 : 0.5;
 }
 

@@ -18,6 +18,7 @@ describe("buildMarkerSet", () => {
         issueId: "contrast:1:1",
         nodeId: "1:1",
         label: "2.2 x2",
+        severity: "high",
         count: 2
       }
     ]);
@@ -270,6 +271,50 @@ describe("buildMarkerSet", () => {
         root("r1", [instance("1:1", "A", "open", 0), instance("2:1", "B", "open", 1)])
       ];
       expect(buildMarkerSet(roots, "A", [])[0]?.count).toBeUndefined();
+    });
+  });
+
+  describe("severity and fade", () => {
+    it("carries the severity of the layer each marker sits on", () => {
+      const roots = [
+        root("r1", [
+          instance("1:1", "A", "open", 0, { severity: "low" }),
+          instance("1:2", "A", "open", 1, { severity: "high" })
+        ])
+      ];
+      const markers = buildMarkerSet(roots, "A", [], { signature: "r1", nodeId: "1:1" });
+      expect(markers.map((m) => [m.nodeId, m.severity])).toEqual([
+        ["1:1", "low"],
+        ["1:2", "high"]
+      ]);
+    });
+
+    it("fades only a deferred marker, by the time since its layer was put off", () => {
+      const at = "2026-11-13T10:00:00.000Z";
+      const now = Date.parse(at) + 10 * 60 * 1000;
+      const deferred = root(
+        "r1",
+        [instance("1:1", "A", "deferred", 0, { deferredAt: at })],
+        "deferred"
+      );
+      const [marker] = buildMarkerSet([deferred], "A", [], null, now);
+      expect(marker?.deferred).toBe(true);
+      expect(marker?.opacity).toBeLessThan(1);
+      expect(marker?.opacity).toBeGreaterThan(0.35);
+      const [justNow] = buildMarkerSet([deferred], "A", [], null, Date.parse(at));
+      expect(justNow?.opacity).toBeUndefined();
+    });
+
+    it("never fades an open or important marker, whatever its layer carries", () => {
+      const at = "2026-11-13T10:00:00.000Z";
+      const open = root("r1", [instance("1:1", "A", "open", 0, { deferredAt: at })]);
+      const [marker] = buildMarkerSet([open], "A", [], null, Date.parse(at) + 3_600_000);
+      expect(marker?.opacity).toBeUndefined();
+    });
+
+    it("leaves a deferred layer with no deferral time solid", () => {
+      const deferred = root("r1", [instance("1:1", "A", "deferred", 0)], "deferred");
+      expect(buildMarkerSet([deferred], "A", [], null, Date.now())[0]?.opacity).toBeUndefined();
     });
   });
 });

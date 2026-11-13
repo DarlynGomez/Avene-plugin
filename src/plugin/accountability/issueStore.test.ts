@@ -174,6 +174,13 @@ describe("saveIssues", () => {
     expect(written[ignored.id]).not.toHaveProperty("nodeId");
   });
 
+  it("writes the time an issue was put off, and reads it back", () => {
+    const deferred: Issue = { ...ALIVE, state: "deferred", deferredAt: "2026-11-13T10:00:00.000Z" };
+    saveIssues({ [deferred.id]: deferred });
+    const written = JSON.parse(setPluginData.mock.calls[0][1]);
+    expect(written[deferred.id].deferredAt).toBe("2026-11-13T10:00:00.000Z");
+  });
+
   it("reports the failure reason rather than throwing when the write is rejected", () => {
     setPluginData.mockImplementation(() => {
       throw new Error("Cannot write to internal and read-only nodes");

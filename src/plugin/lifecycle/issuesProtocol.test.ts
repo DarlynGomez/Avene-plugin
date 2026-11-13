@@ -103,17 +103,20 @@ describe("handleIssueMessage", () => {
     });
   });
 
-  it("defers an open issue and persists only section 5.5's fields", async () => {
+  it("defers an open issue and persists only section 5.5's fields, with the time it was put off", async () => {
     const reply = vi.fn();
     await handleIssueMessage({ type: "ISSUE_DEFER", issueId: ISSUE_ID }, reply);
 
-    expect(setPluginData).toHaveBeenCalledWith(
-      "cadt.issues.v1",
-      JSON.stringify({ [ISSUE_ID]: { ...PERSISTED_OPEN, state: "deferred" } })
-    );
+    const written = JSON.parse(setPluginData.mock.calls[0][1] as string) as Record<
+      string,
+      Record<string, unknown>
+    >;
+    const { deferredAt, ...rest } = written[ISSUE_ID];
+    expect(rest).toEqual({ ...PERSISTED_OPEN, state: "deferred" });
+    expect(Number.isNaN(Date.parse(String(deferredAt)))).toBe(false);
     expect(reply).toHaveBeenCalledWith({
       type: "ISSUES_UPDATED",
-      issues: [{ ...RESOLVED_OPEN_ISSUE, state: "deferred" }],
+      issues: [{ ...RESOLVED_OPEN_ISSUE, state: "deferred", deferredAt }],
       decisions: {}
     });
   });

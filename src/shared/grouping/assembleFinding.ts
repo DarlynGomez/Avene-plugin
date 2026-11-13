@@ -23,6 +23,7 @@ export function assembleGroupableFinding(
     screenName: issue.screenName,
     state: issue.state,
     severity: issue.severityAtLastDetection,
+    ...(issue.deferredAt === undefined ? {} : { deferredAt: issue.deferredAt }),
     measuredRatio: evidence.measuredRatio,
     requiredRatio: evidence.requiredRatio,
     foregroundHex: evidence.foregroundHex,

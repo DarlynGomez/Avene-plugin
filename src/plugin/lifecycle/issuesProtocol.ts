@@ -104,7 +104,10 @@ export async function handleIssueMessage(message: IssueMessage, reply: Reply): P
       await applyTransition(
         message.issueId,
         reply,
-        (record) => transitionFor(record, message.issueId, deferIssue),
+        (record) =>
+          transitionFor(record, message.issueId, (issue) =>
+            deferIssue(issue, new Date().toISOString())
+          ),
         (saved) => {
           markIssueDeferred(message.issueId);
           recordIssueAction("defer", message.issueId, saved);

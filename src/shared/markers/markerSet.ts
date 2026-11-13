@@ -1,6 +1,7 @@
 import type { Root } from "../grouping/groupingTypes";
 import { pickRepresentativeInstance } from "../grouping/representativeInstance";
-import type { IssueState } from "../issues/issueTypes";
+import type { IssueState, Severity } from "../issues/issueTypes";
+import { fadeOpacity } from "./markerFade";
 import { markerLabel } from "./markerLabel";
 
 /** The states that earn a full marker */
@@ -20,8 +21,22 @@ export interface Marker {
   deferred?: boolean;
   /** The root is important, so its marker is a diamond and not a triangle */
   important?: boolean;
+  /** How bad the failure is on this layer, the fill color follows it */
+  severity?: Severity;
+  /** The fill opacity of a deferred marker that has begun to fade, absent while it is solid */
+  opacity?: number;
   /** How many layers of the root are marked on this screen, present only for a group of more than one */
   count?: number;
+}
+
+/** The opacity a deferred layer's marker has by now, nothing while it is still solid */
+function fadeOf(
+  deferred: boolean,
+  deferredAt: string | undefined,
+  now: number
+): { opacity?: number } {
+  const opacity = deferred ? fadeOpacity(deferredAt, now) : 1;
+  return opacity < 1 ? { opacity } : {};
 }
 
 /** The group a designer clicked a marker of, and the layer of it that marker sits on */
@@ -40,7 +55,8 @@ export function buildMarkerSet(
   roots: readonly Root[],
   currentScreenId: string | null,
   designerSelectionOrder: readonly string[],
-  expanded: ExpandedMarker | null = null
+  expanded: ExpandedMarker | null = null,
+  now = 0
 ): Marker[] {
   if (currentScreenId === null) {
     return [];
@@ -75,6 +91,8 @@ export function buildMarkerSet(
         nodeId: layer.nodeId,
         ...(deferred ? { deferred: true } : {}),
         ...(root.displayState === "important" ? { important: true } : {}),
+        severity: layer.severity,
+        ...fadeOf(deferred, layer.deferredAt, now),
         ...(pool.length > 1 && layer.nodeId === numbered ? { count: pool.length } : {}),
         label: markerLabel({
           measuredRatio: layer.measuredRatio,

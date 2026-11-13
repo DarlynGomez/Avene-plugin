@@ -48,6 +48,12 @@ describe("assembleGroupableFinding", () => {
     });
   });
 
+  it("carries the time an issue was deferred, and nothing when there is none", () => {
+    const at = "2026-11-13T10:00:00.000Z";
+    expect(assembleGroupableFinding(issueSummary({ deferredAt: at }), 0)?.deferredAt).toBe(at);
+    expect(assembleGroupableFinding(issueSummary(), 0)).not.toHaveProperty("deferredAt");
+  });
+
   it("records an unbound foreground as null, not dropped", () => {
     const evidence = issueSummary().evidence as Record<string, unknown>;
     const finding = assembleGroupableFinding(

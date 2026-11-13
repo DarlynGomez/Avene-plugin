@@ -1,6 +1,7 @@
 import type { Root } from "../grouping/groupingTypes";
 import { SCREEN_DWELL_MS, type SelectionEvent } from "./currentScreen";
 import { ANNOTATION_RECONCILE_MS, type MarkerControllerDeps } from "./markerControllerTypes";
+import { FADE_REFRESH_MS } from "./markerFade";
 import { buildMarkerSet, type ExpandedMarker, type Marker } from "./markerSet";
 import type { MarkerStyle } from "./markerStyle";
 import { createScreenTracker } from "./screenTracker";
@@ -21,11 +22,24 @@ export function createMarkerController(deps: MarkerControllerDeps) {
   let shownStyle: MarkerStyle = deps.style();
   let timer: unknown = null;
   let reconcileTimer: unknown = null;
+  // Looks again at deferred markers now and then, so they fade as the time since the deferral passes
+  let fadeTimer: unknown = null;
   let zoomQueued = false;
   let queue: Promise<void> = Promise.resolve();
 
+  function watchFade(shown: readonly Marker[]): void {
+    if (fadeTimer !== null) deps.cancel(fadeTimer);
+    fadeTimer = null;
+    if (!shown.some((marker) => marker.deferred)) return;
+    fadeTimer = deps.schedule(() => {
+      fadeTimer = null;
+      void enqueue(() => run(false));
+    }, FADE_REFRESH_MS);
+  }
+
   async function run(undoStep = true): Promise<void> {
     if (!deps.isVisible()) {
+      watchFade([]);
       if (active) {
         await deps.renderer.clear();
         active = false;
@@ -36,7 +50,7 @@ export function createMarkerController(deps: MarkerControllerDeps) {
       return;
     }
     const screen = tracker.currentScreenId();
-    const next = buildMarkerSet(roots, screen, designerOrder, expanded);
+    const next = buildMarkerSet(roots, screen, designerOrder, expanded, deps.clock());
     const style = deps.style();
     const result = await deps.renderer.show(screen ?? "", next, style, undoStep);
     if (!result.written) {
@@ -44,6 +58,7 @@ export function createMarkerController(deps: MarkerControllerDeps) {
       return;
     }
     markers = next;
+    watchFade(next);
     shownStyle = style;
     if (!active) {
       active = true;
