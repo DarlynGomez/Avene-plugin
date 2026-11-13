@@ -10,6 +10,7 @@ import type {
   CalendarUiMessage
 } from "../../shared/calendar/calendarMessages";
 import { isGoogleCalendarUrl } from "../../shared/calendar/googleUrl";
+import { STUDY_BUILD } from "../../shared/studyBuild";
 import { normalizeSettings } from "../../shared/calendar/settings";
 import { FEATURE_CALENDAR, calendarAllowed } from "../../shared/calendarFlags";
 import { isStudyActive } from "../../shared/study/studyActive";
@@ -61,7 +62,7 @@ async function handle(message: CalendarUiMessage, reply: Reply): Promise<void> {
       break;
     case "CALENDAR_OPEN_URL":
       // Only the calendar render address is opened, whatever the panel sent
-      if (isGoogleCalendarUrl(message.url)) figma.openExternal(message.url);
+      if (!STUDY_BUILD && isGoogleCalendarUrl(message.url)) figma.openExternal(message.url);
       return;
   }
   reply(await state());

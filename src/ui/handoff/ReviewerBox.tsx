@@ -1,6 +1,7 @@
 import { Check, User } from "lucide-react";
 import { useId } from "react";
 
+import { STUDY_BUILD } from "../../shared/studyBuild";
 import sheet from "./HandoffSheet.module.css";
 
 interface ReviewerBoxProps {
@@ -15,7 +16,7 @@ export function ReviewerBox({ name, onChange }: ReviewerBoxProps) {
     <div className={sheet.reviewer}>
       <label className={sheet.reviewerLabel} htmlFor={id}>
         <User size={16} aria-hidden="true" />
-        Reviewer full name
+        {STUDY_BUILD ? "Reviewer" : "Reviewer full name"}
         <span className={sheet.required}>REQUIRED TO COPY</span>
       </label>
       <input

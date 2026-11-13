@@ -14,6 +14,9 @@ import { emitStudy } from "../study/adapter/studyEmitter";
 import { handleCalendarMessage } from "./calendarProtocol";
 import { handleExplanationOrRole, isExplanationOrRole } from "./otherProtocols";
 
+// These tests are about the demo build, so the study build switch is off here
+vi.mock("../../shared/studyBuild", () => ({ STUDY_BUILD: false }));
+
 vi.mock("../../shared/calendarFlags", async (original) => ({
   ...(await original<typeof import("../../shared/calendarFlags")>()),
   FEATURE_CALENDAR: true

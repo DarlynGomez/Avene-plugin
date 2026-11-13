@@ -11,7 +11,12 @@ import {
   hasCurrentExport
 } from "./studyExport";
 
-const BUILD = { commit: "abc1234", dirty: false, builtAt: "2026-11-10T13:45:21.718Z" };
+const BUILD = {
+  commit: "abc1234",
+  dirty: false,
+  builtAt: "2026-11-10T13:45:21.718Z",
+  studyBuild: true
+};
 
 const rows = (count: number): SnapshotRow[] =>
   Array.from({ length: count }, (_, i) => ({
@@ -93,6 +98,40 @@ describe("buildStudyExport", () => {
       expect.arrayContaining(["schemaVersion", "exportedAt", "session", "events", "adjustLog"])
     );
     expect(file.build).toEqual(BUILD);
+  });
+
+  it("has a header with the schema version, the time and the build, which says it is the study build", () => {
+    const file = buildStudyExport({
+      exportedAt: T,
+      build: BUILD,
+      session: sessionFor(LIVE_CTX),
+      events: [],
+      adjustLog: [],
+      droppedWrites: {}
+    });
+    const { schemaVersion, exportedAt, build } = file;
+    expect({ schemaVersion, exportedAt, build }).toEqual({
+      schemaVersion: 1,
+      exportedAt: T,
+      build: {
+        commit: "abc1234",
+        dirty: false,
+        builtAt: "2026-11-10T13:45:21.718Z",
+        studyBuild: true
+      }
+    });
+  });
+
+  it("records a demo build as not the study build", () => {
+    const file = buildStudyExport({
+      exportedAt: T,
+      build: { ...BUILD, studyBuild: false },
+      session: sessionFor(LIVE_CTX),
+      events: [],
+      adjustLog: [],
+      droppedWrites: {}
+    });
+    expect(file.build.studyBuild).toBe(false);
   });
 
   it("has no final snapshot when taken mid block, and survives JSON", () => {

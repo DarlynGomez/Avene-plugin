@@ -9,6 +9,9 @@ import { ScheduleSheet } from "./ScheduleSheet";
 vi.mock("./downloadText", () => ({ downloadText: vi.fn() }));
 import { downloadText } from "./downloadText";
 
+// These tests are about the demo build, so the study build switch is off here
+vi.mock("../../shared/studyBuild", () => ({ STUDY_BUILD: false }));
+
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();

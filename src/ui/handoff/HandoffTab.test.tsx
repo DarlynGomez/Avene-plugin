@@ -6,6 +6,9 @@ import { copyText } from "../study/downloadFile";
 import { emit, handoffData, HELPER_SIG, PRICE_SIG, showText } from "./fixtures";
 import { HandoffTab } from "./HandoffTab";
 
+// These tests are about the demo build, so the study build switch is off here
+vi.mock("../../shared/studyBuild", () => ({ STUDY_BUILD: false }));
+
 vi.mock("../study/downloadFile", () => ({
   copyText: vi.fn().mockResolvedValue(true),
   saveTextFile: vi.fn()

@@ -6,6 +6,9 @@ import { DEFAULT_SETTINGS } from "../../shared/calendar/settings";
 import { CalendarContext, INERT, type CalendarValue } from "./CalendarContext";
 import { SettingsPill } from "./SettingsPill";
 
+// These tests are about the demo build, so the study build switch is off here
+vi.mock("../../shared/studyBuild", () => ({ STUDY_BUILD: false }));
+
 afterEach(cleanup);
 
 function mount(over: Partial<CalendarValue> = {}) {

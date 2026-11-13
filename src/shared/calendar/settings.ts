@@ -1,3 +1,4 @@
+import { STUDY_BUILD } from "../studyBuild";
 import type {
   CalendarFormat,
   CalendarSettings,
@@ -7,13 +8,14 @@ import type {
 } from "./types";
 
 export const DEFAULT_SETTINGS: CalendarSettings = {
-  format: "google",
+  // The study build hands a calendar a file only, a demo build can also open Google Calendar
+  format: STUDY_BUILD ? "ics" : "google",
   trigger: 3,
   minutes: 45,
   slot: "morning"
 };
 
-export const FORMAT_CHOICES: readonly CalendarFormat[] = ["google", "ics"];
+export const FORMAT_CHOICES: readonly CalendarFormat[] = STUDY_BUILD ? ["ics"] : ["google", "ics"];
 export const TRIGGER_CHOICES: readonly TriggerCount[] = [3, 5, "off"];
 export const MINUTE_CHOICES: readonly SessionMinutes[] = [15, 30, 45];
 export const SLOT_CHOICES: readonly SlotPreference[] = ["morning", "afternoon", "custom"];

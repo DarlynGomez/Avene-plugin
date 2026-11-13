@@ -1,8 +1,7 @@
-import { CalendarDays, Download, ExternalLink, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useId, useMemo, useRef, useState } from "react";
 
 import { eventSummary } from "../../shared/calendar/eventSummary";
-import { googleCalendarUrl } from "../../shared/calendar/googleUrl";
 import { buildIcs, eventUid, ICS_MIME } from "../../shared/calendar/ics";
 import { customStart, fieldValues, suggestStart } from "../../shared/calendar/slots";
 import { buildEvent, sessionMinutes } from "../../shared/calendar/suggest";
@@ -12,6 +11,7 @@ import { copyText } from "../study/downloadFile";
 import { downloadText } from "./downloadText";
 import { FocusSummary } from "./FocusSummary";
 import styles from "./Schedule.module.css";
+import { ScheduleButtons } from "./ScheduleButtons";
 import { SlotChoices } from "./SlotChoices";
 
 interface ScheduleSheetProps {
@@ -57,32 +57,6 @@ export function ScheduleSheet({
     setUsed(true);
     setStatus(message);
   }
-  const google = () => {
-    if (!event) return;
-    onOpenUrl(googleCalendarUrl(event));
-    use("Opened in your browser. Save the event there.");
-  };
-  const download = () => {
-    if (!event || !start) return;
-    downloadText(
-      "avene-focus-time.ics",
-      buildIcs(event, eventUid(signatures, start), new Date()),
-      ICS_MIME
-    );
-    use("Downloaded. If nothing arrived, copy the event text instead.");
-  };
-  const buttons = [
-    <button key="g" type="button" className={styles.primary} disabled={!event} onClick={google}>
-      <CalendarDays size={16} aria-hidden="true" />
-      Open in Google Calendar
-      <ExternalLink size={14} aria-hidden="true" />
-    </button>,
-    <button key="i" type="button" className={styles.secondary} disabled={!event} onClick={download}>
-      <Download size={16} aria-hidden="true" />
-      Download .ICS file (Outlook / Apple)
-    </button>
-  ];
-
   return (
     <div
       ref={ref}
@@ -124,7 +98,23 @@ export function ScheduleSheet({
         invalid={mode === "custom" && !start}
       />
       <hr className={styles.rule} />
-      {settings.format === "google" ? buttons : [...buttons].reverse()}
+      <ScheduleButtons
+        event={event}
+        format={settings.format}
+        onGoogle={(url) => {
+          onOpenUrl(url);
+          use("Opened in your browser. Save the event there.");
+        }}
+        onDownload={() => {
+          if (!event || !start) return;
+          downloadText(
+            "avene-focus-time.ics",
+            buildIcs(event, eventUid(signatures, start), new Date()),
+            ICS_MIME
+          );
+          use("Downloaded. If nothing arrived, copy the event text instead.");
+        }}
+      />
       <button
         type="button"
         className={styles.link}

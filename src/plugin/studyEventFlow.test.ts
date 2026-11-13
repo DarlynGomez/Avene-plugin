@@ -404,12 +404,22 @@ describe("exporting a block through the real handlers", () => {
 
     const ready = exportReply(replies);
     const file = JSON.parse(ready && "text" in ready ? ready.text : "{}");
-    expect(file.build).toEqual({ commit: "unknown", dirty: null, builtAt: "unknown" });
+    expect(file.build).toEqual({
+      commit: "unknown",
+      dirty: null,
+      builtAt: "unknown",
+      studyBuild: true
+    });
     expect(file.schemaVersion).toBe(1);
   });
 
   it("records the commit, dirty flag and build time from the bundle stamp", async () => {
-    const stamp = { commit: "223fd02", dirty: false, builtAt: "2026-11-10T13:45:21.718Z" };
+    const stamp = {
+      commit: "223fd02",
+      dirty: false,
+      builtAt: "2026-11-10T13:45:21.718Z",
+      studyBuild: false
+    };
     vi.stubGlobal("__CADT_BUILD__", stamp);
     const m = await modules(true);
     await runBlock(m);

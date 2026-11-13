@@ -11,6 +11,8 @@ export interface BuildStamp {
   commit: string;
   dirty: boolean | null;
   builtAt: string;
+  /** False for a demo build, so an export says whether the study changes were on */
+  studyBuild: boolean;
 }
 
 export interface StudyExportInput {

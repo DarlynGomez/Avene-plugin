@@ -1,6 +1,7 @@
 import { ExternalLink } from "lucide-react";
 
 import type { CalendarSettings } from "../../shared/calendar/types";
+import { STUDY_BUILD } from "../../shared/studyBuild";
 import { Segmented } from "./Segmented";
 import styles from "./Settings.module.css";
 import { SettingsCard, SettingsRow } from "./SettingsRow";
@@ -26,17 +27,19 @@ export function CalendarTab({ settings, onChange, onTest }: CalendarTabProps) {
         sub="Avene hands your calendar a link or a file. It never signs in."
         aside={ready}
       >
-        <SettingsRow label="Format">
-          <Segmented
-            label="Calendar format"
-            value={settings.format}
-            choices={[
-              { value: "google", text: "Google Calendar" },
-              { value: "ics", text: "Outlook / .ics" }
-            ]}
-            onChange={(format) => onChange({ ...settings, format })}
-          />
-        </SettingsRow>
+        {!STUDY_BUILD && (
+          <SettingsRow label="Format">
+            <Segmented
+              label="Calendar format"
+              value={settings.format}
+              choices={[
+                { value: "google", text: "Google Calendar" },
+                { value: "ics", text: "Outlook / .ics" }
+              ]}
+              onChange={(format) => onChange({ ...settings, format })}
+            />
+          </SettingsRow>
+        )}
         <button type="button" className={styles.link} onClick={onTest}>
           <ExternalLink size={14} aria-hidden="true" />
           Test event generation

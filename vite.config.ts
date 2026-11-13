@@ -21,9 +21,13 @@ function buildInfo() {
   return {
     commit: git("rev-parse --short HEAD") ?? "unknown",
     dirty: status === null ? null : status !== "",
-    builtAt: new Date().toISOString()
+    builtAt: new Date().toISOString(),
+    studyBuild: STUDY_BUILD
   };
 }
+
+/** True unless the env var STUDY_BUILD is 0, a demo build sets it to 0 to turn the study changes off */
+const STUDY_BUILD = process.env.STUDY_BUILD !== "0";
 
 function buildPluginSandbox(): Plugin {
   return {
@@ -32,7 +36,10 @@ function buildPluginSandbox(): Plugin {
       await build({
         bundle: true,
         entryPoints: [path.resolve("src/plugin/main.ts")],
-        define: { __CADT_BUILD__: JSON.stringify(buildInfo()) },
+        define: {
+          __CADT_BUILD__: JSON.stringify(buildInfo()),
+          __STUDY_BUILD__: JSON.stringify(STUDY_BUILD)
+        },
         format: "iife",
         outfile: path.resolve("dist/code.js"),
         platform: "browser",
@@ -44,6 +51,7 @@ function buildPluginSandbox(): Plugin {
 
 export default defineConfig({
   plugins: [react(), viteSingleFile(), buildPluginSandbox()],
+  define: { __STUDY_BUILD__: JSON.stringify(STUDY_BUILD) },
   build: {
     assetsInlineLimit: Number.POSITIVE_INFINITY,
     outDir: "dist",
