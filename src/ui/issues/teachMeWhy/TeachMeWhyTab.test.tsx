@@ -222,6 +222,30 @@ describe("Teach Me Why tab", () => {
       expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
     });
 
+    it("offers Back to issue in the lesson when it was opened from the issue, and it returns to Live Watch", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      await user.click(screen.getByRole("button", DEEP_DIVE));
+      const lesson = screen.getByRole("region", { name: "Why Text Contrast Matters module" });
+      await user.click(within(lesson).getByRole("button", { name: "Back to issue" }));
+      expect(screen.getByRole("tab", { name: /Live Watch/ })).toHaveAttribute(
+        "aria-selected",
+        "true"
+      );
+    });
+
+    it("has no Back to issue in a lesson opened from the topic list", async () => {
+      const user = userEvent.setup();
+      open(null);
+      await goToExplanation(user);
+      await user.click(screen.getByRole("button", DEEP_DIVE));
+      await user.click(screen.getByRole("button", { name: "All topics" }));
+      await user.click(screen.getByRole("button", { name: /Why Text Contrast Matters/ }));
+      const lesson = screen.getByRole("region", { name: "Why Text Contrast Matters module" });
+      expect(within(lesson).queryByRole("button", { name: "Back to issue" })).toBeNull();
+    });
+
     it("shows the lesson as text only, with no video and no article link", async () => {
       const user = userEvent.setup();
       open(null);

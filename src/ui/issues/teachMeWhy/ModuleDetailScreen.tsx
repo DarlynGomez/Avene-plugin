@@ -8,9 +8,11 @@ import styles from "./ModuleDetailScreen.module.css";
 interface ModuleDetailScreenProps {
   module: LearningModule;
   onBack: () => void;
+  /** Present only when the lesson was opened from an issue, it returns to that issue */
+  onBackToIssue?: () => void;
 }
 
-export function ModuleDetailScreen({ module, onBack }: ModuleDetailScreenProps) {
+export function ModuleDetailScreen({ module, onBack, onBackToIssue }: ModuleDetailScreenProps) {
   const screen = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -31,10 +33,17 @@ export function ModuleDetailScreen({ module, onBack }: ModuleDetailScreenProps) 
       aria-label={`${module.title} module`}
       onKeyDown={onKeyDown}
     >
-      <button type="button" className={styles.back} onClick={onBack}>
-        <ArrowLeft size={16} aria-hidden="true" />
-        <span>All topics</span>
-      </button>
+      <div className={styles.backRow}>
+        <button type="button" className={styles.back} onClick={onBack}>
+          <ArrowLeft className={styles.icon} size={16} aria-hidden="true" />
+          <span>All topics</span>
+        </button>
+        {onBackToIssue && (
+          <button type="button" className={styles.toIssue} onClick={onBackToIssue}>
+            Back to issue
+          </button>
+        )}
+      </div>
       <ModuleLessonView module={module} />
     </section>
   );

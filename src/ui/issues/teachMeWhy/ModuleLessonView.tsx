@@ -1,48 +1,48 @@
 import { useEffect, useRef } from "react";
 
+import { readingMinutes } from "../../../shared/teachMeWhy/lessonParts";
 import type { LearningModule } from "../../../shared/teachMeWhy/modules/moduleTypes";
-import styles from "./ModuleLessonView.module.css";
+import { quizQuestionCount } from "../../../shared/teachMeWhy/modules/quizCounts";
+import { STUDY_BUILD } from "../../../shared/studyBuild";
+import { LessonBody } from "./lesson/LessonBody";
+import { LessonObjectives } from "./lesson/LessonObjectives";
+import { LessonResources } from "./lesson/LessonResources";
+import { LessonTakeaways } from "./lesson/LessonTakeaways";
+import { LessonVideo } from "./lesson/LessonVideo";
+import styles from "./lesson/Lesson.module.css";
 
 /**
- * The lesson as text: no video and no article link, which need the internet and a link out
- * When it opens, focus moves to its heading so a keyboard or screen reader reader starts at the lesson
+ * The lesson page: header, what it teaches, the clip, the text, what to read next, and the takeaways last
+ * The study build shows no clip and no link, nothing in it reaches the network
+ * When it opens, focus moves to its heading so a keyboard or screen reader starts at the lesson
  */
 export function ModuleLessonView({ module }: { module: LearningModule }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     heading.current?.focus();
   }, []);
+  const titleId = `${module.id}-title`;
 
   return (
-    <article className={styles.lesson} aria-labelledby={`${module.id}-title`}>
-      <p className={styles.context}>{module.context}</p>
-      <h3 ref={heading} tabIndex={-1} id={`${module.id}-title`} className={styles.title}>
-        {module.title}
-      </h3>
-      <p className={styles.estimate}>{module.timeBudgetMinutes.reading} min read</p>
-      <section className={styles.section} aria-label="Lesson">
-        {module.lessonParagraphs.map((paragraph) => (
-          <p key={paragraph} className={styles.paragraph}>
-            {paragraph}
-          </p>
-        ))}
-      </section>
-      <section className={styles.section} aria-label="What you will learn">
-        <h4 className={styles.heading}>What you will learn</h4>
-        <ul className={styles.list}>
-          {module.learningObjectives.map((objective) => (
-            <li key={objective}>{objective}</li>
-          ))}
-        </ul>
-      </section>
-      <section className={styles.section} aria-label="Key takeaways">
-        <h4 className={styles.heading}>Key takeaways</h4>
-        <ul className={styles.list}>
-          {module.keyTakeaways.map((takeaway) => (
-            <li key={takeaway}>{takeaway}</li>
-          ))}
-        </ul>
-      </section>
+    <article className={styles.lesson} aria-labelledby={titleId}>
+      <header className={styles.header}>
+        <p className={styles.eyebrow}>Lesson · {readingMinutes(module)} min read</p>
+        <h1 ref={heading} tabIndex={-1} id={titleId} className={styles.title}>
+          {module.title}
+        </h1>
+        {module.subtitle && <p className={styles.subtitle}>{module.subtitle}</p>}
+      </header>
+      <LessonObjectives id={module.id} objectives={module.learningObjectives} />
+      {!STUDY_BUILD && module.video && <LessonVideo id={module.id} video={module.video} />}
+      <LessonBody module={module} />
+      {module.optionalArticle && (
+        <LessonResources id={module.id} article={module.optionalArticle} />
+      )}
+      <LessonTakeaways
+        id={module.id}
+        takeaways={module.keyTakeaways}
+        questions={quizQuestionCount(module.id)}
+      />
     </article>
   );
 }

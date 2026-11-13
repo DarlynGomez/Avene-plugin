@@ -12,6 +12,8 @@ import styles from "./TeachMeWhyTab.module.css";
 /** Shows the selected issue explanation above the educational topic library */
 export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  // Whether the open lesson came from an issue's deep dive, which is when it offers Back to issue
+  const [fromIssue, setFromIssue] = useState(false);
   const { root, view, requestedModule } = state;
   const modulesOn = useModulesAvailable();
   const outer = useRef<HTMLDivElement>(null);
@@ -34,7 +36,8 @@ export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
     opener?.focus();
   }, [selectedModuleId]);
 
-  function open(id: string) {
+  function open(id: string, viaIssue = false) {
+    setFromIssue(viaIssue);
     const active = document.activeElement;
     returnTo.current = active instanceof HTMLElement ? (active.dataset.returnFocus ?? null) : null;
     setSelectedModuleId(id);
@@ -54,7 +57,7 @@ export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
               hidden={state.hidden}
               onHide={state.hide}
               onShowAgain={state.showAgain}
-              onDeepDive={modulesOn ? () => open(moduleForKey(view.key)) : undefined}
+              onDeepDive={modulesOn ? () => open(moduleForKey(view.key), true) : undefined}
             />
           </div>
         </div>
@@ -62,6 +65,7 @@ export function TeachMeWhyTab({ state }: { state: TeachMeWhyState }) {
       <ModuleLibrary
         selectedModuleId={selectedModuleId}
         onSelectModule={(id) => (id === null ? setSelectedModuleId(null) : open(id))}
+        onBackToIssue={fromIssue && root && view ? state.backToIssue : undefined}
       />
     </div>
   );

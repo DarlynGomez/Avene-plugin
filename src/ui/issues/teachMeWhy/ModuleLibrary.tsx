@@ -12,9 +12,15 @@ type Category = (typeof CATEGORIES)[number];
 interface ModuleLibraryProps {
   selectedModuleId: string | null;
   onSelectModule: (id: string | null) => void;
+  /** Passed on to the lesson when it was opened from an issue */
+  onBackToIssue?: () => void;
 }
 
-export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibraryProps) {
+export function ModuleLibrary({
+  selectedModuleId,
+  onSelectModule,
+  onBackToIssue
+}: ModuleLibraryProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
   const selectedModule = LEARNING_MODULES.find((module) => module.id === selectedModuleId) ?? null;
@@ -48,7 +54,13 @@ export function ModuleLibrary({ selectedModuleId, onSelectModule }: ModuleLibrar
   }
 
   if (selectedModule) {
-    return <ModuleDetailScreen module={selectedModule} onBack={() => onSelectModule(null)} />;
+    return (
+      <ModuleDetailScreen
+        module={selectedModule}
+        onBack={() => onSelectModule(null)}
+        onBackToIssue={onBackToIssue}
+      />
+    );
   }
 
   return (
