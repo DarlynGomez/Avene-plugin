@@ -128,26 +128,31 @@ describe("open questions", () => {
 describe("the table view", () => {
   beforeEach(() => fireEvent.click(screen.getByRole("button", { name: "Table" })));
 
-  it("shows a real table of the same items the cards do", () => {
+  it("shows a table of the same items the cards do, under a heading with the count", () => {
     expect(screen.getByRole("button", { name: "Table" })).toHaveAttribute("aria-pressed", "true");
-    const table = screen.getByRole("table", { name: /Text contrast/ });
-    expect(within(table).getByRole("rowheader", { name: "Helper text" })).toBeInTheDocument();
-    expect(within(table).getByRole("rowheader", { name: "Price label" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: /^Text contrast \d+$/ })
+    ).toBeInTheDocument();
+    const table = screen.getByRole("table", { name: /^Text contrast/ });
+    expect(within(table).getByText("Helper text")).toBeInTheDocument();
+    expect(within(table).getByText("Price label")).toBeInTheDocument();
     expect(screen.queryByLabelText("Cards for developers")).toBeNull();
   });
 
   it("finds a row's layers in the file", () => {
-    fireEvent.click(screen.getByRole("button", { name: "Show Helper text on the canvas" }));
+    fireEvent.click(screen.getByRole("button", { name: "Show Helper text in Figma" }));
     expect(posted.at(-1)).toEqual({ type: "SHOW_ON_CANVAS", nodeIds: ["1:1"] });
   });
 
-  it("copies a plain text table of the same rows, and says it was not reviewed", async () => {
+  it("copies a plain text table of the same groups and rows, and says it was not reviewed", async () => {
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Quick copy raw" }));
     });
     const copied = String(vi.mocked(copyText).mock.calls[0][0]);
-    expect(copied).toContain("## Text contrast");
-    expect(copied).toMatch(/Element +\| Location/);
+    expect(copied).toMatch(/^Checkout\nAccessibility handoff · /);
+    expect(copied).toMatch(/\d+ need action, \d+ decided/);
+    expect(copied).toMatch(/Text contrast \(\d+\)/);
+    expect(copied).toMatch(/Element +\| Location +\| Contrast +\| Status +\| Detail/);
     expect(copied).toContain("Helper text");
     expect(copied).toContain("Price label");
     expect(copied).toContain("Not covered by this check");

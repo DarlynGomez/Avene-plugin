@@ -1,8 +1,8 @@
 import { altRows } from "./tableAltRows";
-import { statusFor } from "./tableStatus";
 import { buildItems } from "./buildItems";
 import { CHECKS_LINE, NOT_COVERED_LINE } from "./fixedLines";
-import { LABEL_DECISION, LABEL_DETECTED, LABEL_NEEDS_CHECK } from "./labels";
+import { shortDate } from "./tableFormat";
+import { adjustedRow, ignoredRow, openRow } from "./tableRows";
 import {
   EMPTY_TABLE_SENTENCE,
   type GroupId,
@@ -10,69 +10,41 @@ import {
   type TableGroup,
   type TableRow
 } from "./tableTypes";
-import { dateOnly, formatRatio, oneLine, plural } from "./text";
-import type { Audience, HandoffInput, HandoffItem, Label } from "./types";
+import type { Audience, HandoffInput, HandoffItem } from "./types";
 
-/** Hex values never print here, names print for developers and PMs only, the same reach as the other versions */
-const SHOW_NAMES: Record<Audience, boolean> = {
-  developer: true,
-  pm: true,
-  higherUp: false,
-  client: false
-};
+const TITLES: Record<GroupId, string> = { contrast: "Text contrast", alt: "Alt text" };
 
-/** Developers get the items that still need action, everyone else the ones knowingly left as they are */
+/** The items an audience is shown, the ones that still fail and the ones left as they are for a developer */
 function itemsFor(input: HandoffInput, audience: Audience): HandoffItem[] {
   const { items } = buildItems(input);
-  if (audience === "developer") return items.filter((item) => item.kind === "action");
+  if (audience === "developer") return items;
   const left = items.filter((item) => item.kind === "left");
   return audience === "higherUp" ? left.filter((item) => item.meta.signOff === "needs") : left;
 }
 
-function noteFor(item: HandoffItem): string {
-  const parts: string[] = [];
-  const { meta, decision } = item;
-  if (meta.mitigation) parts.push(`Mitigation: ${oneLine(meta.mitigation)}`);
-  if (meta.revisitTrigger) parts.push(`Revisit: ${oneLine(meta.revisitTrigger)}`);
-  if (decision && item.instances.some((i) => i.changedSinceIgnore)) {
-    parts.push(
-      `Worse since it was decided: ${decision.severityAtDecision} then, ${item.highestSeverity} now`
-    );
-  }
-  return parts.join(". ");
+function contrastRows(input: HandoffInput, audience: Audience): TableRow[] {
+  const items = itemsFor(input, audience).map((item) =>
+    item.kind === "action" ? openRow(item, audience) : ignoredRow(item, audience)
+  );
+  const adjusted = audience === "developer" ? input.changes.map(adjustedRow) : [];
+  return [...items, ...adjusted];
 }
 
-function rowFor(item: HandoffItem, audience: Audience): TableRow {
-  const r = item.representative;
-  const count = item.instances.length;
-  const screen =
-    count > 1
-      ? `${item.screenName}, ${count} ${plural(count, "layer", "layers")}`
-      : item.screenName;
-  const action = item.kind === "action";
-  const label = action
-    ? LABEL_DETECTED
-    : item.meta.signOff === "signed"
-      ? LABEL_DECISION
-      : LABEL_NEEDS_CHECK;
-  return {
-    id: item.signature,
-    element: SHOW_NAMES[audience] ? r.nodeName : "Text layer",
-    location: screen,
-    measured: `${formatRatio(r.measuredRatio)}:1`,
-    required: `${r.requiredRatio}:1`,
-    status: statusFor(label, audience),
-    decision: action ? "" : oneLine(item.decision?.reason ?? ""),
-    decidedBy: action ? "Dev" : oneLine(item.meta.decidedBy ?? ""),
-    note: action ? "" : noteFor(item),
-    nodeIds: item.instances.map((i) => i.nodeId)
-  };
+/** Open and Needs check first, then everything else, each part in the order it came in */
+function needsActionFirst(rows: readonly TableRow[]): TableRow[] {
+  return [
+    ...rows.filter((row) => row.status.needsAction),
+    ...rows.filter((row) => !row.status.needsAction)
+  ];
 }
 
-const TITLES: Record<GroupId, string> = { contrast: "Text contrast", alt: "Alt text" };
+/** The screens that have rows, in the order they first appear */
+function screensOf(rows: readonly TableRow[]): string[] {
+  return [...new Set(rows.map((row) => row.location).filter((name) => name !== ""))];
+}
 
 /**
- * The one table every version of the handoff reads: a row for each color pair, grouped by kind of issue
+ * The one table every version of the handoff reads: a row for each item, grouped by kind of issue
  * Nothing here is written by a model, and the same explanation is never printed twice
  */
 export function buildHandoffTable(
@@ -80,35 +52,43 @@ export function buildHandoffTable(
   audience: Audience,
   buildId: string | null = null
 ): HandoffTableModel {
-  const contrast = itemsFor(input, audience).map((item) => rowFor(item, audience));
-  const alt = audience === "developer" ? altRows(input, audience) : [];
   const groups: TableGroup[] = (
     [
-      { id: "contrast", rows: contrast },
-      { id: "alt", rows: alt }
+      { id: "contrast", rows: contrastRows(input, audience) },
+      { id: "alt", rows: audience === "developer" ? altRows(input) : [] }
     ] as const
   )
     .filter((group) => group.rows.length > 0)
-    .map((group) => ({ id: group.id, title: TITLES[group.id], rows: group.rows }));
+    .map((group) => ({
+      id: group.id,
+      title: TITLES[group.id],
+      rows: needsActionFirst(group.rows)
+    }));
   const rows = groups.flatMap((group) => group.rows);
-  const count = (label: Label) => rows.filter((row) => row.status.label === label).length;
+  const screens = screensOf(rows);
+  const date = shortDate(input.generatedAt);
+  const needAction = rows.filter((row) => row.status.needsAction).length;
   return {
     audience,
     header: {
-      fileName: input.fileName,
-      screens: input.screens.map((screen) => screen.name),
-      date: dateOnly(input.generatedAt),
+      title: input.fileName,
+      subtitle: [
+        "Accessibility handoff",
+        date,
+        ...(screens.length > 0 ? [screens.join(", ")] : [])
+      ].join(" · "),
+      date,
+      screens,
       buildId,
       counts: {
         rows: rows.length,
         groups: groups.length,
-        detected: count(LABEL_DETECTED),
-        decision: count(LABEL_DECISION),
-        needsCheck: count(LABEL_NEEDS_CHECK)
+        needAction,
+        decided: rows.length - needAction
       }
     },
     groups,
-    footer: { notCovered: NOT_COVERED_LINE, limitation: CHECKS_LINE },
+    footer: { notCovered: NOT_COVERED_LINE.replace(/^Needs check: /, ""), limitation: CHECKS_LINE },
     empty: rows.length === 0 ? EMPTY_TABLE_SENTENCE : null
   };
 }

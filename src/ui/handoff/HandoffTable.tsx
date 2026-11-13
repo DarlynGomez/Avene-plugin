@@ -1,97 +1,127 @@
-import type { HandoffTableModel, TableGroup } from "../../shared/handoff/tableTypes";
+import type { HandoffTableModel, TableGroup, TableRow } from "../../shared/handoff/tableTypes";
 import styles from "./HandoffTable.module.css";
-import { StatusMark } from "./StatusMark";
 
 interface HandoffTableProps {
   model: HandoffTableModel;
   onShow: (nodeIds: readonly string[]) => void;
 }
 
-const COLUMNS = ["Location", "Measured", "Needed", "Status", "Decision", "Decides", "Note"];
-
-const dash = (text: string) => (text === "" ? "None" : text);
-
-function GroupTable({ group, onShow }: { group: TableGroup; onShow: HandoffTableProps["onShow"] }) {
-  const id = `handoff-group-${group.id}`;
+/** The element's name, then where it is, anything short to know about it, and the link that finds it */
+function ElementBlock({ row, onShow }: { row: TableRow; onShow: HandoffTableProps["onShow"] }) {
+  const facts = [row.location, ...row.details].filter((part) => part !== "");
   return (
-    <section aria-labelledby={id} className={styles.group}>
-      <h4 id={id} className={styles.groupTitle}>
-        {group.title}
-      </h4>
-      <div className={styles.scroll} tabIndex={0} role="region" aria-label={`${group.title} table`}>
-        <table className={styles.table}>
-          <caption className={styles.caption}>
-            {group.title}, {group.rows.length} {group.rows.length === 1 ? "row" : "rows"}, one for
-            each item
-          </caption>
+    <>
+      <span className={styles.name}>{row.element}</span>
+      <span className={styles.where}>
+        {facts.map((fact) => (
+          <span key={fact}>{fact} · </span>
+        ))}
+        <button
+          type="button"
+          className={styles.show}
+          onClick={() => onShow(row.nodeIds)}
+          disabled={row.nodeIds.length === 0}
+          aria-label={`Show ${row.element} in Figma`}
+        >
+          Show
+        </button>
+      </span>
+    </>
+  );
+}
+
+function ItemRows({
+  row,
+  contrast,
+  onShow
+}: {
+  row: TableRow;
+  contrast: boolean;
+  onShow: HandoffTableProps["onShow"];
+}) {
+  const columns = contrast ? 3 : 2;
+  return (
+    <tbody>
+      <tr>
+        <th scope="row" className={styles.element}>
+          <ElementBlock row={row} onShow={onShow} />
+        </th>
+        {contrast && (
+          <td className={styles.contrast}>
+            <span className={styles.measured}>{row.contrast?.measured}</span>
+            {row.contrast?.required && (
+              <span className={styles.needs}>needs {row.contrast.required}</span>
+            )}
+          </td>
+        )}
+        <td className={row.status.needsAction ? styles.statusStrong : styles.statusQuiet}>
+          {row.status.text}
+        </td>
+      </tr>
+      <tr>
+        <td colSpan={columns} className={row.detail.muted ? styles.detailQuiet : styles.detail}>
+          {row.detail.text}
+        </td>
+      </tr>
+    </tbody>
+  );
+}
+
+function Group({ group, onShow }: { group: TableGroup; onShow: HandoffTableProps["onShow"] }) {
+  const id = `handoff-group-${group.id}`;
+  const contrast = group.id === "contrast";
+  return (
+    <section className={styles.group}>
+      <h2 id={id} className={styles.groupTitle}>
+        {group.title} <span className={styles.count}>{group.rows.length}</span>
+      </h2>
+      <div className={styles.box}>
+        <table className={styles.table} aria-labelledby={id}>
+          <colgroup>
+            <col />
+            {contrast && <col className={styles.fixed} />}
+            <col className={styles.fixed} />
+          </colgroup>
           <thead>
             <tr>
-              <th scope="col">Element</th>
-              {COLUMNS.map((name) => (
-                <th key={name} scope="col">
-                  {name}
-                </th>
-              ))}
-              <th scope="col">Find</th>
+              <th scope="col">{contrast ? "Element" : "Image"}</th>
+              {contrast && <th scope="col">Contrast</th>}
+              <th scope="col" className={styles.right}>
+                Status
+              </th>
             </tr>
           </thead>
-          <tbody>
-            {group.rows.map((row) => (
-              <tr key={row.id}>
-                <th scope="row">{row.element}</th>
-                <td>{dash(row.location)}</td>
-                <td>{row.measured ?? "None"}</td>
-                <td>{row.required ?? "None"}</td>
-                <td>
-                  <StatusMark status={row.status} />
-                </td>
-                <td>{dash(row.decision)}</td>
-                <td>{dash(row.decidedBy)}</td>
-                <td>{dash(row.note)}</td>
-                <td>
-                  <button
-                    type="button"
-                    className={styles.find}
-                    onClick={() => onShow(row.nodeIds)}
-                    disabled={row.nodeIds.length === 0}
-                    aria-label={`Show ${row.element} on the canvas`}
-                  >
-                    Show
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+          {group.rows.map((row) => (
+            <ItemRows key={row.id} row={row} contrast={contrast} onShow={onShow} />
+          ))}
         </table>
       </div>
     </section>
   );
 }
 
-/** The model as a table: a heading and a real table for each kind of issue, and the footer said once */
+/** The model as a document: the file as the title, a section for each kind of issue, and the footer once */
 export function HandoffTable({ model, onShow }: HandoffTableProps) {
   const { header, footer } = model;
-  const { counts } = header;
   return (
-    <div className={styles.wrap}>
-      <h3 className={styles.title}>
-        Accessibility handoff: {header.fileName}
-        {header.screens.length > 0 ? `, ${header.screens.join(", ")}` : ""}
-      </h3>
-      <p className={styles.meta}>
-        Made {header.date}
-        {header.buildId ? `, build ${header.buildId}` : ""}. {counts.rows}{" "}
-        {counts.rows === 1 ? "row" : "rows"} in {counts.groups}{" "}
-        {counts.groups === 1 ? "group" : "groups"}.
-      </p>
+    <article className={styles.wrap} aria-labelledby="handoff-title">
+      <header>
+        <p id="handoff-title" className={styles.title}>
+          {header.title}
+        </p>
+        <p className={styles.subtitle}>{header.subtitle}</p>
+        <p className={styles.counts}>
+          <strong>{header.counts.needAction} need action</strong>, {header.counts.decided} decided
+        </p>
+      </header>
       {model.empty && <p className={styles.empty}>{model.empty}</p>}
       {model.groups.map((group) => (
-        <GroupTable key={group.id} group={group} onShow={onShow} />
+        <Group key={group.id} group={group} onShow={onShow} />
       ))}
       <footer className={styles.footer}>
         <p>{footer.notCovered}</p>
-        <p>{footer.limitation}</p>
+        {header.buildId && <p className={styles.build}>Build {header.buildId}</p>}
       </footer>
-    </div>
+    </article>
   );
 }

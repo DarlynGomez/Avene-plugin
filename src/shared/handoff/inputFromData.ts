@@ -1,6 +1,7 @@
 import type { ImageLayer } from "./alt/altTypes";
 import { deriveRoots } from "../grouping/deriveRoots";
 import { assembleGroupableFindings } from "../grouping/assembleFinding";
+import { readContrastEvidence } from "../issues/contrastEvidenceView";
 import type { IssueSummary } from "../issues/issueTypes";
 import type { HandoffDataMessage } from "./handoffMessages";
 import { attachLinks, nodeLink, parseFileUrl } from "./links";
@@ -38,6 +39,7 @@ function changesOf(
     const issue = byId.get(entry.issueId);
     if (!issue || entry.abandoned || entry.optionChosen === null) return [];
     if (entry.afterHex === null || entry.afterRatio === null) return [];
+    const evidence = readContrastEvidence(issue.ruleId, issue.evidence);
     return [
       {
         nodeName: issue.nodeName,
@@ -45,7 +47,10 @@ function changesOf(
         beforeRatio: entry.beforeRatio,
         afterHex: entry.afterHex,
         afterRatio: entry.afterRatio,
-        instanceCount: entry.instanceCount
+        instanceCount: entry.instanceCount,
+        ...(evidence ? { requiredRatio: evidence.requiredRatio } : {}),
+        ...(issue.screenName ? { screenName: issue.screenName } : {}),
+        nodeId: issue.nodeId
       }
     ];
   });

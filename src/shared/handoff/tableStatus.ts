@@ -1,14 +1,14 @@
-import { displayLabel } from "./labels";
-import type { StatusShape, TableStatus } from "./tableTypes";
-import type { Audience, Label } from "./types";
+import type { StatusKind, TableStatus } from "./tableTypes";
 
-const SHAPES: Record<Label, StatusShape> = {
-  Detected: "triangle",
-  Decision: "square",
-  "Needs check": "diamond"
+const WORDS: Record<StatusKind, string> = {
+  open: "Open",
+  needsCheck: "Needs check",
+  adjusted: "Adjusted",
+  ignored: "Ignored",
+  decided: "Decided"
 };
 
-/** The words for a reader, the exact label for a developer, and a shape that says the same without color */
-export function statusFor(label: Label, audience: Audience): TableStatus {
-  return { label, text: displayLabel(label, audience), shape: SHAPES[label] };
+/** The word for a status, and whether it still needs someone to act */
+export function statusFor(kind: StatusKind): TableStatus {
+  return { kind, text: WORDS[kind], needsAction: kind === "open" || kind === "needsCheck" };
 }

@@ -43,6 +43,7 @@ export const TOKEN_VALUES = {
   "--font-line-height-severity-label": "1",
   "--font-weight-regular": "400",
   "--font-weight-medium": "500",
+  "--font-weight-semibold": "600",
   "--space-1": "8px",
   "--space-2": "12px",
   "--space-3": "16px",

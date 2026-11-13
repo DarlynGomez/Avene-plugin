@@ -1,28 +1,29 @@
-import type { Audience, Label } from "./types";
+import type { Audience } from "./types";
 
-/** A shape beside the status words, so the status never rests on color alone */
-export type StatusShape = "triangle" | "square" | "diamond";
+/** Every status a row can have, and which of them still need someone to act */
+export type StatusKind = "open" | "needsCheck" | "adjusted" | "ignored" | "decided";
 
 export interface TableStatus {
-  label: Label;
-  /** What is printed, the label itself for a developer and the plain word for everyone else */
+  kind: StatusKind;
+  /** The word that is printed, the meaning is in the word and never in a color or a shape */
   text: string;
-  shape: StatusShape;
+  /** Open and Needs check, the two that someone still has to deal with */
+  needsAction: boolean;
 }
 
 export interface TableRow {
   /** The root signature, or the layer id for an alt row */
   id: string;
   element: string;
+  /** The screen the layer is on, empty when it is not known */
   location: string;
-  /** Printed as 3.45:1, null for a row that is not a contrast measurement */
-  measured: string | null;
-  required: string | null;
+  /** Short facts printed after the location, such as 3 layers or large text */
+  details: readonly string[];
+  /** The measurement of a contrast row, null for an alt row */
+  contrast: { measured: string; required: string | null } | null;
   status: TableStatus;
-  /** Empty when nothing is recorded */
-  decision: string;
-  decidedBy: string;
-  note: string;
+  /** The line across the whole row, muted when it only says nothing is recorded yet */
+  detail: { text: string; muted: boolean };
   /** The layers the row is about, so a panel can select them */
   nodeIds: readonly string[];
 }
@@ -36,18 +37,20 @@ export interface TableGroup {
 }
 
 export interface TableHeader {
-  fileName: string;
-  screens: readonly string[];
-  /** The day it was made, as YYYY-MM-DD */
+  /** The file name, the title of the document */
+  title: string;
+  /** Accessibility handoff, the date and the screens that have rows */
+  subtitle: string;
   date: string;
+  screens: readonly string[];
   buildId: string | null;
-  counts: { rows: number; groups: number; detected: number; decision: number; needsCheck: number };
+  counts: { rows: number; groups: number; needAction: number; decided: number };
 }
 
 export interface TableFooter {
-  /** The fixed Not covered line, never edited */
+  /** The fixed Not covered line without its label, otherwise as it is written */
   notCovered: string;
-  /** What the check can and cannot see, said once for the whole table */
+  /** What the check can and cannot see, kept for the exports and not printed on the screen */
   limitation: string;
 }
 

@@ -42,6 +42,11 @@ export interface HandoffChange {
   afterHex: string;
   afterRatio: number;
   instanceCount: number;
+  /** What the layer needed, from the issue it was joined to, absent when that is not known */
+  requiredRatio?: number;
+  screenName?: string;
+  /** The layer, so a row can find it */
+  nodeId?: string;
 }
 
 /** A designer note on one layer, the layer name comes from the file as it is now */

@@ -105,7 +105,10 @@ describe("inputFromData", () => {
         beforeRatio: 2.8,
         afterHex: "#595959",
         afterRatio: 7,
-        instanceCount: 2
+        instanceCount: 2,
+        requiredRatio: 4.5,
+        screenName: "Payment",
+        nodeId: "1:1"
       }
     ]);
   });
