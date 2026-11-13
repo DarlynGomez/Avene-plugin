@@ -113,7 +113,6 @@ describe("the tag sequence of the file", () => {
       "  P",
       "  P",
       "  P",
-      "  P",
       "  P"
     ]);
   });
@@ -129,7 +128,6 @@ describe("the tag sequence of the file", () => {
       "    Table",
       ...indent(TABLE_HEAD3, 6),
       ...indent(ROW3, 6),
-      "  P",
       "  P"
     ]);
   });
@@ -160,7 +158,6 @@ describe("the tag sequence of the file", () => {
       ...indent(DETAIL(2), 6),
       ...indent(["TR", "  TH:Row", "  TD"], 6),
       ...indent(DETAIL(2), 6),
-      "  P",
       "  P"
     ]);
   });

@@ -120,7 +120,6 @@ export function buildTablePdf(
       c.y += 14;
     }
     paragraph(c, root, "P", "Body", 9, theme.muted, NOT_REVIEWED_LINE);
-    if (header.buildId) paragraph(c, root, "P", "Body", 9, theme.muted, `Build ${header.buildId}`);
   });
   listEveryGlyph(doc);
   doc.end();
