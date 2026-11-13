@@ -1,13 +1,16 @@
-import { Copy } from "lucide-react";
+import { Copy, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { buildItems } from "../../shared/handoff/buildItems";
 import { NOT_REVIEWED_LINE } from "../../shared/handoff/fixedLines";
 import { ALL_FORMATS, FORMAT_NAMES, rawText, type Format } from "../../shared/handoff/formats";
+import { buildTableHtml, handoffHtmlFileName } from "../../shared/handoff/tableHtml";
 import { buildHandoffTable } from "../../shared/handoff/tableModel";
 import { renderTableText } from "../../shared/handoff/tableText";
 import type { ChosenText } from "../../shared/handoff/compose";
 import type { Audience, AudienceDoc, HandoffInput } from "../../shared/handoff/types";
+import { TOKEN_VALUES } from "../theme/tokens";
+import { downloadText } from "../calendar/downloadText";
 import { copyText } from "../study/downloadFile";
 import { AUDIENCE_NAMES } from "./AudiencePicker";
 import { BriefCards } from "./BriefCards";
@@ -67,6 +70,23 @@ export function HandoffDocument({
     );
   }
 
+  /** The same table as the page, written out as one file the designer can send */
+  function downloadHtml() {
+    const theme = {
+      ink: TOKEN_VALUES["--color-ink"],
+      muted: TOKEN_VALUES["--color-muted"],
+      background: TOKEN_VALUES["--color-background"],
+      card: TOKEN_VALUES["--color-card"],
+      line: TOKEN_VALUES["--color-line"]
+    };
+    downloadText(
+      handoffHtmlFileName(input.generatedAt),
+      buildTableHtml(model, theme),
+      "text/html;charset=utf-8"
+    );
+    setStatus("The file was offered for download. Your computer decides where it goes.");
+  }
+
   return (
     <StepCard
       emphasis
@@ -96,6 +116,12 @@ export function HandoffDocument({
         <span>
           Format: <strong>{asTable ? "Table" : FORMAT_NAMES[format]}</strong>
         </span>
+        {asTable && (
+          <button type="button" className={styles.quickCopy} onClick={downloadHtml}>
+            <Download size={16} aria-hidden="true" />
+            Download HTML
+          </button>
+        )}
         <button type="button" className={styles.quickCopy} onClick={() => void quickCopy()}>
           <Copy size={16} aria-hidden="true" />
           Quick copy raw

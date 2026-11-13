@@ -145,6 +145,34 @@ describe("the table view", () => {
     expect(screen.getByText("1-Page Spec", { selector: "strong" })).toBeInTheDocument();
   });
 
+  it("offers the table as a named html file, and only while the table shows", async () => {
+    const blobs: Blob[] = [];
+    const create = vi.fn((blob: Blob) => {
+      blobs.push(blob);
+      return "blob:x";
+    });
+    Object.assign(URL, { createObjectURL: create, revokeObjectURL: vi.fn() });
+    const names: string[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (
+      this: HTMLAnchorElement
+    ) {
+      names.push(this.download);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Download HTML" }));
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(blobs[0].type).toBe("text/html;charset=utf-8");
+    const body = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.readAsText(blobs[0]);
+    });
+    expect(body).toContain("<h1>");
+    expect(names[0]).toMatch(/^avene-handoff-\d{4}-\d{2}-\d{2}\.html$/);
+    click.mockRestore();
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    expect(screen.queryByRole("button", { name: "Download HTML" })).toBeNull();
+  });
+
   it("finds a row's layers in the file", () => {
     fireEvent.click(screen.getByRole("button", { name: "Show Helper text in Figma" }));
     expect(posted.at(-1)).toEqual({ type: "SHOW_ON_CANVAS", nodeIds: ["1:1"] });
