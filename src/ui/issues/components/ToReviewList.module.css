@@ -12,6 +12,12 @@
   padding: var(--space-3);
 }
 
+/* Headed groups are rows of their own, so they sit edge to edge and the divider between two rows is centered */
+.grouped {
+  gap: 0;
+  padding-block: 0;
+}
+
 .sectionLabel {
   margin: 0 0 var(--space-2);
   color: var(--color-muted);

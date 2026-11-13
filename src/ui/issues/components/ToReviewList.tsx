@@ -104,7 +104,11 @@ export function ToReviewList(props: ToReviewListProps) {
   );
 
   return (
-    <div className={styles.sections}>
+    <div
+      className={
+        sections.some((s) => s.label) ? `${styles.sections} ${styles.grouped}` : styles.sections
+      }
+    >
       {sections.map((section) =>
         section.label ? (
           <SectionAccordion
