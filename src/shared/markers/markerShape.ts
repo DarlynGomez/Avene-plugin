@@ -34,9 +34,10 @@ const hexToRgb = (hex: string) => ({
 });
 
 /**
- * The fill of a failing marker by how bad the failure is, darker as it gets worse
- * Each reaches 4.5 to 1 against the white outline, and the steps in lightness keep them apart for
- * people who see little difference between red and orange
+ * The fill of a failing marker by how bad the failure is, high is the darkest
+ * Severity is no longer ordered by lightness: the orange medium is lighter than the blue low, so hue
+ * tells the three apart as well
+ * Each reaches 4.5 to 1 against the white outline
  */
 export const SEVERITY_COLORS: Readonly<Record<Severity, { r: number; g: number; b: number }>> = {
   high: hexToRgb("#A72020"),
