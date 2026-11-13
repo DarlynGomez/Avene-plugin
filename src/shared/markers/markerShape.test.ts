@@ -133,11 +133,24 @@ describe("the look of each marker", () => {
     expect(deferred[0]).toEqual(SHAPE_COLOR_DEFERRED);
   });
 
-  it("is darker as the severity gets worse, so the steps do not rest on hue alone", () => {
+  it("uses the severity colors chosen on 13 November, high #A72020, medium #BD580A and low #2878A3", () => {
+    const rgb = (hex: string) => ({
+      r: Number((parseInt(hex.slice(1, 3), 16) / 255).toFixed(3)),
+      g: Number((parseInt(hex.slice(3, 5), 16) / 255).toFixed(3)),
+      b: Number((parseInt(hex.slice(5, 7), 16) / 255).toFixed(3))
+    });
+    expect(markerLook({ severity: "high" }).color).toEqual(rgb("#A72020"));
+    expect(markerLook({ severity: "medium" }).color).toEqual(rgb("#BD580A"));
+    expect(markerLook({ severity: "low" }).color).toEqual(rgb("#2878A3"));
+  });
+
+  // High is the darkest, but the orange medium is now lighter than the blue low, so lightness alone
+  // no longer orders the three, the hue tells them apart as well
+  it("keeps high the darkest, and medium lighter than low", () => {
     const light = (severity: (typeof SEVERITIES)[number]) =>
       relativeLuminance(markerLook({ severity }).color);
-    expect(light("high")).toBeLessThan(light("medium"));
-    expect(light("medium")).toBeLessThan(light("low"));
+    expect(light("high")).toBeLessThan(light("low"));
+    expect(light("low")).toBeLessThan(light("medium"));
   });
 
   it("falls back to the one warning color when the severity is not known", () => {

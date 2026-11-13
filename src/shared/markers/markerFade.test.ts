@@ -5,6 +5,11 @@ import { FADE_FLOOR, FADE_FULL_MS, FADE_STEP, fadeOpacity } from "./markerFade";
 const AT = "2026-11-13T10:00:00.000Z";
 const later = (ms: number) => Date.parse(AT) + ms;
 
+it("fades fully in one minute and no further than 0.35", () => {
+  expect(FADE_FULL_MS).toBe(60_000);
+  expect(FADE_FLOOR).toBe(0.35);
+});
+
 describe("fadeOpacity", () => {
   it("is solid for an issue with no deferral time, one that cannot be read, and one just put off", () => {
     expect(fadeOpacity(undefined, later(FADE_FULL_MS))).toBe(1);

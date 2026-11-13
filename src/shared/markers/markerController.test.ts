@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { MarkerStateChange } from "../study/studyEvents";
 import { SCREEN_DWELL_MS } from "./currentScreen";
 import { ANNOTATION_RECONCILE_MS, createMarkerController } from "./markerController";
-import { FADE_REFRESH_MS } from "./markerFade";
+import { FADE_FLOOR, FADE_REFRESH_MS } from "./markerFade";
 import { instance, root } from "./markerFixtures";
 import type { MarkerRenderer, ShowResult } from "./markerRenderer";
 import type { Marker } from "./markerSet";
@@ -501,20 +501,21 @@ describe("clicking a marker of a group of issues", () => {
       root("r1", [instance("1:1", "A", "deferred", 0, { deferredAt: DEFERRED_AT })], "deferred")
     ];
 
-    it("starts solid, and is drawn fainter each time it is looked at again as the time passes", async () => {
+    // The fade takes one minute and a shown marker is looked at again every minute, so the first look
+    // after the deferral already finds it at its faintest and later looks change nothing
+    it("starts solid, is drawn at its faintest on the first look after a minute, and stays there", async () => {
       const t = setup();
       t.controller.onRoots(DEFERRED);
       await t.controller.idle();
       expect(t.opacities.at(-1)).toEqual([undefined]);
 
-      t.advance(FADE_REFRESH_MS + 10 * 60 * 1000);
+      t.advance(FADE_REFRESH_MS);
       await t.controller.idle();
-      const first = t.opacities.at(-1)?.[0];
-      expect(first).toBeLessThan(1);
+      expect(t.opacities.at(-1)).toEqual([FADE_FLOOR]);
 
       t.advance(FADE_REFRESH_MS + 10 * 60 * 1000);
       await t.controller.idle();
-      expect(t.opacities.at(-1)?.[0]).toBeLessThan(first as number);
+      expect(t.opacities.at(-1)).toEqual([FADE_FLOOR]);
     });
 
     it("repaints with no undo step, so fading never fills the undo list", async () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { FADE_FLOOR, FADE_FULL_MS } from "./markerFade";
 import { buildMarkerSet } from "./markerSet";
 import { instance, root } from "./markerFixtures";
 
@@ -291,7 +292,8 @@ describe("buildMarkerSet", () => {
 
     it("fades only a deferred marker, by the time since its layer was put off", () => {
       const at = "2026-11-13T10:00:00.000Z";
-      const now = Date.parse(at) + 10 * 60 * 1000;
+      // Half way through the one minute fade
+      const now = Date.parse(at) + FADE_FULL_MS / 2;
       const deferred = root(
         "r1",
         [instance("1:1", "A", "deferred", 0, { deferredAt: at })],
@@ -300,7 +302,9 @@ describe("buildMarkerSet", () => {
       const [marker] = buildMarkerSet([deferred], "A", [], null, now);
       expect(marker?.deferred).toBe(true);
       expect(marker?.opacity).toBeLessThan(1);
-      expect(marker?.opacity).toBeGreaterThan(0.35);
+      expect(marker?.opacity).toBeGreaterThan(FADE_FLOOR);
+      const [faintest] = buildMarkerSet([deferred], "A", [], null, Date.parse(at) + 10 * 60 * 1000);
+      expect(faintest?.opacity).toBe(FADE_FLOOR);
       const [justNow] = buildMarkerSet([deferred], "A", [], null, Date.parse(at));
       expect(justNow?.opacity).toBeUndefined();
     });
