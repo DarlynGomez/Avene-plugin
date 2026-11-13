@@ -8,9 +8,34 @@ interface HandoffTableProps {
   onShow: (nodeIds: readonly string[]) => void;
 }
 
-/** The element's name, then where it is, anything short to know about it, and the magnifier that finds it */
+/** The magnifier that finds the row's layers in the file */
+function ShowButton({ row, onShow }: { row: TableRow; onShow: HandoffTableProps["onShow"] }) {
+  return (
+    <button
+      type="button"
+      className={styles.show}
+      onClick={() => onShow(row.nodeIds)}
+      disabled={row.nodeIds.length === 0}
+      aria-label={`Show ${row.element} in Figma`}
+    >
+      <Search size={14} aria-hidden="true" />
+    </button>
+  );
+}
+
+/** The element's name, then where it is and anything short to know about it, with the magnifier at the end of the line that has the room */
 function ElementBlock({ row, onShow }: { row: TableRow; onShow: HandoffTableProps["onShow"] }) {
   const facts = [row.location, ...row.details].filter((part) => part !== "");
+  const button = <ShowButton row={row} onShow={onShow} />;
+  // With nothing to say about where it is, the magnifier would sit alone on a line, so it follows the name
+  if (facts.length === 0) {
+    return (
+      <span className={styles.name}>
+        {row.element}
+        <span className={styles.afterName}>{button}</span>
+      </span>
+    );
+  }
   return (
     <>
       <span className={styles.name}>{row.element}</span>
@@ -18,15 +43,7 @@ function ElementBlock({ row, onShow }: { row: TableRow; onShow: HandoffTableProp
         {facts.map((fact) => (
           <span key={fact}>{fact} · </span>
         ))}
-        <button
-          type="button"
-          className={styles.show}
-          onClick={() => onShow(row.nodeIds)}
-          disabled={row.nodeIds.length === 0}
-          aria-label={`Show ${row.element} in Figma`}
-        >
-          <Search size={14} aria-hidden="true" />
-        </button>
+        {button}
       </span>
     </>
   );

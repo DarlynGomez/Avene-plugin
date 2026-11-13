@@ -118,6 +118,10 @@
   padding-bottom: 2px;
 }
 
+.afterName {
+  margin-left: var(--space-1);
+}
+
 .where {
   display: block;
   color: var(--color-muted);

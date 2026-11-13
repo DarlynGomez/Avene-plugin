@@ -360,3 +360,33 @@ describe("the lines under a row", () => {
     expect(screen.queryByText(/deferred/)).toBeNull();
   });
 });
+
+describe("where the magnifier sits", () => {
+  const noteOnly = input({
+    notes: [
+      {
+        nodeId: "9:1",
+        nodeName: "Dog photo",
+        note: { category: "alt", text: "A dog", updatedAt: AT }
+      }
+    ]
+  });
+
+  it("follows the name on its own line when the row has no location to show", () => {
+    render(
+      <HandoffTable model={buildHandoffTable(noteOnly, "developer")} onShow={() => undefined} />
+    );
+    const cell = screen.getByRole("rowheader");
+    // One line holds the name and the magnifier, there is no second line for it
+    expect(cell.children).toHaveLength(1);
+    expect(cell.firstElementChild).toHaveTextContent("Dog photo");
+    expect(cell.querySelector("button")).not.toBeNull();
+  });
+
+  it("ends the gray line under the name when the row has a location", () => {
+    show(1);
+    const cell = screen.getByRole("rowheader");
+    expect(cell.children).toHaveLength(2);
+    expect(cell.children[1].querySelector("button")).not.toBeNull();
+  });
+});
