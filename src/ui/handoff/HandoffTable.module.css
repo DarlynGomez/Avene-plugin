@@ -1,6 +1,5 @@
-/* Two fixed columns beside a flexible one, the narrow window gives them a share instead of a width */
+/* Contrast and Status fit their words, the first column takes the rest and wraps */
 .wrap {
-  --handoff-fixed-column: 84px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -69,11 +68,12 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
-.fixed {
-  width: var(--handoff-fixed-column);
+.fit {
+  width: 1%;
+  white-space: nowrap;
 }
 
 .table thead th {
@@ -152,13 +152,23 @@
   font-weight: var(--font-weight-regular);
 }
 
-.detail,
-.detailQuiet {
+.detail {
   padding-top: 0;
 }
 
-.detailQuiet {
+.line,
+.quiet,
+.note {
+  display: block;
+}
+
+.quiet,
+.note {
   color: var(--color-muted);
+}
+
+.note {
+  font-size: var(--font-size-severity-label);
 }
 
 .show {
@@ -198,10 +208,4 @@
 
 .build {
   margin-top: var(--space-1);
-}
-
-@media (max-width: 360px) {
-  .wrap {
-    --handoff-fixed-column: 27%;
-  }
 }

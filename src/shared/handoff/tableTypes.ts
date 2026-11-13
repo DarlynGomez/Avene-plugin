@@ -11,6 +11,12 @@ export interface TableStatus {
   needsAction: boolean;
 }
 
+export interface TableNote {
+  text: string;
+  /** Quiet lines are small and gray, a normal one reads like the detail */
+  tone: "normal" | "quiet";
+}
+
 export interface TableRow {
   /** The root signature, or the layer id for an alt row */
   id: string;
@@ -22,8 +28,10 @@ export interface TableRow {
   /** The measurement of a contrast row, null for an alt row */
   contrast: { measured: string; required: string | null } | null;
   status: TableStatus;
-  /** The line across the whole row, muted when it only says nothing is recorded yet */
-  detail: { text: string; muted: boolean };
+  /** The line across the whole row, muted when it only says nothing is recorded yet, null when there is nothing to say */
+  detail: { text: string; muted: boolean } | null;
+  /** Further lines under the detail, in the order they print */
+  notes: readonly TableNote[];
   /** The layers the row is about, so a panel can select them */
   nodeIds: readonly string[];
 }
@@ -44,7 +52,14 @@ export interface TableHeader {
   date: string;
   screens: readonly string[];
   buildId: string | null;
-  counts: { rows: number; groups: number; needAction: number; decided: number };
+  /** Deferred layers are not rows, they are only counted so the header does not hide them */
+  counts: {
+    rows: number;
+    groups: number;
+    needAction: number;
+    decided: number;
+    deferred: number;
+  };
 }
 
 export interface TableFooter {

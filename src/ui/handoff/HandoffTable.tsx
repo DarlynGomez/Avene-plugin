@@ -47,22 +47,35 @@ function ItemRows({
           <ElementBlock row={row} onShow={onShow} />
         </th>
         {contrast && (
-          <td className={styles.contrast}>
+          <td className={`${styles.contrast} ${styles.fit}`}>
             <span className={styles.measured}>{row.contrast?.measured}</span>
             {row.contrast?.required && (
               <span className={styles.needs}>needs {row.contrast.required}</span>
             )}
           </td>
         )}
-        <td className={row.status.needsAction ? styles.statusStrong : styles.statusQuiet}>
+        <td
+          className={`${row.status.needsAction ? styles.statusStrong : styles.statusQuiet} ${styles.fit}`}
+        >
           {row.status.text}
         </td>
       </tr>
-      <tr>
-        <td colSpan={columns} className={row.detail.muted ? styles.detailQuiet : styles.detail}>
-          {row.detail.text}
-        </td>
-      </tr>
+      {(row.detail || row.notes.length > 0) && (
+        <tr>
+          <td colSpan={columns} className={styles.detail}>
+            {row.detail && (
+              <span className={row.detail.muted ? styles.quiet : styles.line}>
+                {row.detail.text}
+              </span>
+            )}
+            {row.notes.map((note) => (
+              <span key={note.text} className={note.tone === "quiet" ? styles.note : styles.line}>
+                {note.text}
+              </span>
+            ))}
+          </td>
+        </tr>
+      )}
     </tbody>
   );
 }
@@ -77,16 +90,15 @@ function Group({ group, onShow }: { group: TableGroup; onShow: HandoffTableProps
       </h2>
       <div className={styles.box}>
         <table className={styles.table} aria-labelledby={id}>
-          <colgroup>
-            <col />
-            {contrast && <col className={styles.fixed} />}
-            <col className={styles.fixed} />
-          </colgroup>
           <thead>
             <tr>
               <th scope="col">{contrast ? "Element" : "Image"}</th>
-              {contrast && <th scope="col">Contrast</th>}
-              <th scope="col" className={styles.right}>
+              {contrast && (
+                <th scope="col" className={styles.fit}>
+                  Contrast
+                </th>
+              )}
+              <th scope="col" className={`${styles.right} ${styles.fit}`}>
                 Status
               </th>
             </tr>
@@ -112,6 +124,7 @@ export function HandoffTable({ model, onShow }: HandoffTableProps) {
         <p className={styles.subtitle}>{header.subtitle}</p>
         <p className={styles.counts}>
           <strong>{header.counts.needAction} need action</strong>, {header.counts.decided} decided
+          {header.counts.deferred > 0 && `, ${header.counts.deferred} deferred, not listed`}
         </p>
       </header>
       {model.empty && <p className={styles.empty}>{model.empty}</p>}

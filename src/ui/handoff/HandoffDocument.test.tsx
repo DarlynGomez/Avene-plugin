@@ -139,6 +139,12 @@ describe("the table view", () => {
     expect(screen.queryByLabelText("Cards for developers")).toBeNull();
   });
 
+  it("says the format is Table while the table shows, and the kind of document in the other views", () => {
+    expect(screen.getByText("Table", { selector: "strong" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Cards" }));
+    expect(screen.getByText("1-Page Spec", { selector: "strong" })).toBeInTheDocument();
+  });
+
   it("finds a row's layers in the file", () => {
     fireEvent.click(screen.getByRole("button", { name: "Show Helper text in Figma" }));
     expect(posted.at(-1)).toEqual({ type: "SHOW_ON_CANVAS", nodeIds: ["1:1"] });

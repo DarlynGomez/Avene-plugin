@@ -94,7 +94,7 @@ export function HandoffDocument({
       )}
       <div className={styles.footer}>
         <span>
-          Format: <strong>{FORMAT_NAMES[format]}</strong>
+          Format: <strong>{asTable ? "Table" : FORMAT_NAMES[format]}</strong>
         </span>
         <button type="button" className={styles.quickCopy} onClick={() => void quickCopy()}>
           <Copy size={16} aria-hidden="true" />

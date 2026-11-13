@@ -97,7 +97,8 @@ describe("renderTableText", () => {
   it("has one line for each item with its fields, the line across the row included", () => {
     const body = text();
     expect(body).toContain("Helper text");
-    expect(body).toMatch(/2\.80:1 needs 4\.5:1 +\| Open +\| No decision yet · Decides: designer/);
+    expect(body).toMatch(/2\.80:1 needs 4\.5:1 +\| Open( |$)/m);
+    expect(body).not.toContain("No decision yet");
     expect(body).toContain("Fill #F28C28 changed to #C2410C. Now 5.18:1.");
     expect(body).toContain("Brand campaign color, requested by Marketing");
     expect(body).toContain("“A dog”");
@@ -127,5 +128,21 @@ describe("renderTableText", () => {
     expect(empty).toContain("No findings to hand off yet.");
     expect(empty).not.toMatch(/\(\d+\)/);
     expect(empty).toContain("Not covered by this check");
+  });
+});
+
+describe("the count line of the copied text", () => {
+  it("adds the deferred part only when something was deferred", () => {
+    const plain = renderTableText(buildHandoffTable(input({ findings: [finding()] }), "developer"));
+    expect(plain).toContain("1 need action, 0 decided\n");
+    const deferred = renderTableText(
+      buildHandoffTable(
+        input({
+          findings: [finding(), finding({ issueId: "d:1", nodeId: "d:1", state: "deferred" })]
+        }),
+        "developer"
+      )
+    );
+    expect(deferred).toContain("1 need action, 0 decided, 1 deferred, not listed");
   });
 });

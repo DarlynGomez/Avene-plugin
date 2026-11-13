@@ -89,7 +89,13 @@ describe("a handoff with one item", () => {
       ["contrast", "Text contrast", 1]
     ]);
     expect(model.empty).toBeNull();
-    expect(model.header.counts).toEqual({ rows: 1, groups: 1, needAction: 1, decided: 0 });
+    expect(model.header.counts).toEqual({
+      rows: 1,
+      groups: 1,
+      needAction: 1,
+      decided: 0,
+      deferred: 0
+    });
     expect(model.header.subtitle).toBe("Accessibility handoff · 27 Oct 2026 · Payment");
   });
 
@@ -100,7 +106,8 @@ describe("a handoff with one item", () => {
       location: "Payment",
       details: [],
       contrast: { measured: "2.80:1", required: "4.5:1" },
-      detail: { text: "No decision yet · Decides: designer", muted: true }
+      detail: null,
+      notes: []
     });
     expect(row.status).toEqual({ kind: "open", text: "Open", needsAction: true });
   });
@@ -127,7 +134,13 @@ describe("a handoff with five items", () => {
   });
 
   it("counts what needs action and what is decided, which together are every row", () => {
-    expect(model.header.counts).toEqual({ rows: 5, groups: 2, needAction: 2, decided: 3 });
+    expect(model.header.counts).toEqual({
+      rows: 5,
+      groups: 2,
+      needAction: 2,
+      decided: 3,
+      deferred: 0
+    });
     expect(model.header.subtitle).toBe("Accessibility handoff · 27 Oct 2026 · Payment, Checkout");
   });
 
@@ -137,7 +150,7 @@ describe("a handoff with five items", () => {
 
   it("writes each kind of line across the row", () => {
     const [open, ignored, adjusted] = model.groups[0].rows;
-    expect(open.detail).toEqual({ text: "No decision yet · Decides: designer", muted: true });
+    expect(open.detail).toBeNull();
     expect(ignored.detail).toEqual({
       text: "Brand campaign color, requested by Marketing",
       muted: false
@@ -150,7 +163,7 @@ describe("a handoff with five items", () => {
   });
 
   it("repeats no written explanation, and prints no None placeholder anywhere", () => {
-    const written = rows.filter((r) => !r.detail.muted).map((r) => r.detail.text);
+    const written = rows.flatMap((r) => (r.detail && !r.detail.muted ? [r.detail.text] : []));
     expect(new Set(written).size).toBe(written.length);
     expect(JSON.stringify(model)).not.toMatch(/\bNone\b/);
   });
@@ -224,7 +237,7 @@ describe("the alt text group", () => {
       }
     ]);
     expect(row.status.text).toBe("Needs check");
-    expect(row.detail.text).toBe("No alt text yet · Decides: Content team");
+    expect(row.detail?.text).toBe("No alt text yet · Decides: Content team");
   });
 
   it("says nothing about who wrote a note the designer wrote, and keeps the wording for one a model drafted", () => {
@@ -235,7 +248,7 @@ describe("the alt text group", () => {
         note: { category: "alt", text: "A dog", updatedAt: AT }
       }
     ]);
-    expect(mine.details).toEqual([]);
+    expect(mine.notes).toEqual([]);
     const [drafted] = withAlt([
       {
         nodeId: "9:1",
@@ -243,7 +256,11 @@ describe("the alt text group", () => {
         note: { category: "alt", text: "A dog", source: "ai", updatedAt: AT }
       }
     ]);
-    expect(drafted.details).toEqual(["Drafted by a language model, confirmed by the designer"]);
+    expect(drafted.details).toEqual([]);
+    expect(drafted.notes).toEqual([
+      { text: "Drafted by a language model, confirmed by the designer", tone: "quiet" }
+    ]);
+    expect(drafted.detail?.text).toBe("\u201CA dog\u201D");
   });
 
   it("has no row of its own for a picture a note already speaks for", () => {
@@ -288,5 +305,101 @@ describe("what each reader gets", () => {
   it("never holds a sentence from a model unless a model's alt text is in the data", () => {
     const shown = JSON.stringify(buildHandoffTable(five(), "developer"));
     expect(shown).not.toMatch(/language model|\bAI\b/);
+  });
+});
+
+describe("the lines under an open row or an alt row", () => {
+  it("gives an open row no detail line at all, whoever might decide", () => {
+    const [row] = buildHandoffTable(input({ findings: [finding()] }), "developer").groups[0].rows;
+    expect(row.detail).toBeNull();
+    expect(row.notes).toEqual([]);
+  });
+
+  it("names a decider only when it is not the designer", () => {
+    const owned = (contact: string) =>
+      buildHandoffTable(
+        input({
+          notes: [
+            {
+              nodeId: "9:1",
+              nodeName: "Dog photo",
+              note: { category: "alt", text: "", contact, updatedAt: AT }
+            }
+          ],
+          imageLayers: [layer("9:1", "Dog photo")]
+        }),
+        "developer"
+      ).groups[0].rows[0].detail?.text;
+    expect(owned("Designer")).toBe("No alt text yet");
+    expect(owned("")).toBe("No alt text yet");
+    expect(owned("Content team")).toBe("No alt text yet · Decides: Content team");
+  });
+});
+
+describe("what an ignored row says about the decision", () => {
+  const sig = ignoredSignature();
+  const withMeta = (
+    meta: HandoffInput["meta"][string] | undefined,
+    findings = [ignoredFinding()]
+  ) =>
+    buildHandoffTable(
+      input({
+        findings,
+        decisions: { [sig]: { ...DECISION, signature: sig } },
+        meta: meta ? { [sig]: meta } : {}
+      }),
+      "developer"
+    ).groups[0].rows[0];
+  const FULL = {
+    signOff: "needs" as const,
+    leaveOut: false,
+    mitigation: "Larger type on mobile",
+    revisitTrigger: "the campaign ends",
+    decidedBy: "Sam Lee"
+  };
+
+  it("prints the reason, then mitigation, revisit and decided by, each only when it exists", () => {
+    const row = withMeta(FULL);
+    expect(row.detail?.text).toBe("Brand campaign color, requested by Marketing");
+    expect(row.notes.map((n) => [n.text, n.tone])).toEqual([
+      ["Mitigation: Larger type on mobile", "quiet"],
+      ["Revisit: the campaign ends", "quiet"],
+      ["Decided by Sam Lee, 27 Oct 2026", "quiet"]
+    ]);
+    expect(withMeta({ signOff: "needs", leaveOut: false, revisitTrigger: "later" }).notes).toEqual([
+      { text: "Revisit: later", tone: "quiet" }
+    ]);
+    expect(withMeta(undefined).notes).toEqual([]);
+  });
+
+  it("adds the worse line, in normal weight and first, only when the flag is true", () => {
+    const worse = withMeta(FULL, [ignoredFinding({ changedSinceIgnore: true, severity: "high" })]);
+    expect(worse.notes[0]).toEqual({
+      text: "Worse since it was decided: medium then, high now.",
+      tone: "normal"
+    });
+    expect(worse.notes).toHaveLength(4);
+    expect(withMeta(FULL, [ignoredFinding({ changedSinceIgnore: false })]).notes).toHaveLength(3);
+    expect(worse.status.text).toBe("Ignored");
+  });
+});
+
+describe("deferred layers", () => {
+  const deferred = (n: number) =>
+    input({
+      findings: [
+        finding(),
+        ...Array.from({ length: n }, (_, i) =>
+          finding({ issueId: `contrast:d${i}:1`, nodeId: `d${i}:1`, state: "deferred" })
+        )
+      ]
+    });
+
+  it.each([0, 1, 2])("are counted and never listed when there are %i", (n) => {
+    const model = buildHandoffTable(deferred(n), "developer");
+    const rows = model.groups.flatMap((g) => g.rows);
+    expect(rows).toHaveLength(1);
+    expect(model.header.counts.deferred).toBe(n);
+    expect(model.header.counts.needAction + model.header.counts.decided).toBe(rows.length);
   });
 });

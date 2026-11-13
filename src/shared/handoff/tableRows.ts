@@ -1,6 +1,6 @@
-import { measuredText, neededText } from "./tableFormat";
+import { measuredText, neededText, shortDate } from "./tableFormat";
 import { statusFor } from "./tableStatus";
-import type { TableRow } from "./tableTypes";
+import type { TableNote, TableRow } from "./tableTypes";
 import { oneLine } from "./text";
 import type { Audience, HandoffChange, HandoffItem } from "./types";
 
@@ -31,9 +31,33 @@ export function openRow(item: HandoffItem, audience: Audience): TableRow {
     details: details(item.instances.length, r.requiredRatio),
     contrast: { measured: measuredText(r.measuredRatio), required: neededText(r.requiredRatio) },
     status: statusFor("open"),
-    detail: { text: "No decision yet · Decides: designer", muted: true },
+    // Nothing is known about an open item beyond the row itself, so there is no line to print
+    detail: null,
+    notes: [],
     nodeIds: item.instances.map((i) => i.nodeId)
   };
+}
+
+/** The fields the designer filled in for a decision, each only when it exists */
+function decisionNotes(item: HandoffItem): TableNote[] {
+  const { meta, decision } = item;
+  const worse = decision && item.instances.some((i) => i.changedSinceIgnore);
+  const by = oneLine(meta.decidedBy ?? "");
+  const when = decision?.recordedAt ? `, ${shortDate(decision.recordedAt)}` : "";
+  const quiet = (text: string): TableNote => ({ text, tone: "quiet" });
+  return [
+    ...(worse
+      ? [
+          {
+            text: `Worse since it was decided: ${decision.severityAtDecision} then, ${item.highestSeverity} now.`,
+            tone: "normal" as const
+          }
+        ]
+      : []),
+    ...(meta.mitigation ? [quiet(`Mitigation: ${oneLine(meta.mitigation)}`)] : []),
+    ...(meta.revisitTrigger ? [quiet(`Revisit: ${oneLine(meta.revisitTrigger)}`)] : []),
+    ...(by !== "" ? [quiet(`Decided by ${by}${when}`)] : [])
+  ];
 }
 
 /** An item the designer knowingly left as it is, with the reason written for it */
@@ -49,6 +73,7 @@ export function ignoredRow(item: HandoffItem, audience: Audience): TableRow {
     status: statusFor("ignored"),
     detail:
       reason === "" ? { text: "No reason recorded.", muted: true } : { text: reason, muted: false },
+    notes: decisionNotes(item),
     nodeIds: item.instances.map((i) => i.nodeId)
   };
 }
@@ -70,6 +95,7 @@ export function adjustedRow(change: HandoffChange, index: number): TableRow {
       text: `Fill ${change.beforeHex} changed to ${change.afterHex}. Now ${measuredText(change.afterRatio)}.`,
       muted: false
     },
+    notes: [],
     nodeIds: change.nodeId ? [change.nodeId] : []
   };
 }

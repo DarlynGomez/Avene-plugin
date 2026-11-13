@@ -132,15 +132,22 @@ describe("with one item", () => {
     for (const head of heads) expect(head).toHaveAttribute("scope", "col");
   });
 
-  it("puts the item in its own body of two rows, the second one across every column", () => {
+  it("puts an open item in one row, with no line across it when there is nothing to say", () => {
     show(1);
     const bodies = screen.getByRole("table").querySelectorAll("tbody");
     expect(bodies).toHaveLength(1);
-    const rows = bodies[0].querySelectorAll("tr");
+    expect(bodies[0].querySelectorAll("tr")).toHaveLength(1);
+    expect(screen.queryByText(/No decision yet/)).toBeNull();
+  });
+
+  it("puts a decided item in a body of two rows, the second one across every column", () => {
+    show(5);
+    const body = screen.getByText("Order note").closest("tbody") as HTMLElement;
+    const rows = body.querySelectorAll("tr");
     expect(rows).toHaveLength(2);
     expect(rows[1].querySelector("td")).toHaveAttribute("colspan", "3");
     expect(
-      within(rows[1] as HTMLElement).getByText("No decision yet · Decides: designer")
+      within(rows[1] as HTMLElement).getByText("Brand campaign color, requested by Marketing")
     ).toBeInTheDocument();
   });
 
@@ -234,11 +241,18 @@ describe("the layout", () => {
     }
   });
 
-  it("gives the Contrast and Status columns a fixed share and lets Element take the rest", () => {
-    expect(css).toMatch(/\.fixed\s*\{[^}]*width:\s*var\(--handoff-fixed-column\)/);
-    expect(css).toMatch(/--handoff-fixed-column:\s*84px/);
-    expect(css).toMatch(/@media \(max-width: 360px\)[\s\S]*--handoff-fixed-column:\s*27%/);
-    expect(css).toMatch(/table-layout:\s*fixed/);
+  it("lets the table size itself, with Contrast and Status fitted to their words that never wrap", () => {
+    expect(css).toMatch(/table-layout:\s*auto/);
+    expect(css).toMatch(/\.fit\s*\{[^}]*width:\s*1%/);
+    expect(css).toMatch(/\.fit\s*\{[^}]*white-space:\s*nowrap/);
+    expect(css).not.toMatch(/--handoff-fixed-column|table-layout:\s*fixed/);
+    show(5);
+    for (const word of ["2.80:1", "Open", "Ignored", "Needs check", "Decided"]) {
+      const cell = screen.getAllByText(word)[0].closest("td, th") as HTMLElement;
+      expect(cell.className).toContain("fit");
+    }
+    const head = screen.getAllByRole("columnheader", { name: "Contrast" })[0];
+    expect(head.className).toContain("fit");
   });
 
   it("keeps every text readable on the surface it sits on", () => {
@@ -251,5 +265,94 @@ describe("the layout", () => {
   it("makes Show look like a link and gives it a visible focus ring", () => {
     expect(css).toMatch(/\.show\s*\{[^}]*text-decoration:\s*underline/);
     expect(css).toMatch(/\.show:focus-visible\s*\{[^}]*outline/);
+  });
+});
+
+describe("the lines under a row", () => {
+  const sigOf = sig();
+  function withDecision(extra: Partial<HandoffInput> = {}) {
+    return input({
+      findings: [
+        ignoredFinding({ nodeName: "Order note", changedSinceIgnore: true, severity: "high" })
+      ],
+      decisions: { [sigOf]: { ...DECISION, signature: sigOf } },
+      meta: {
+        [sigOf]: {
+          signOff: "needs",
+          leaveOut: false,
+          mitigation: "Larger type on mobile",
+          revisitTrigger: "the campaign ends",
+          decidedBy: "Sam Lee"
+        }
+      },
+      ...extra
+    });
+  }
+
+  it("prints the worse line first in normal weight, then the quiet fields in order", () => {
+    render(
+      <HandoffTable
+        model={buildHandoffTable(withDecision(), "developer")}
+        onShow={() => undefined}
+      />
+    );
+    const cell = screen
+      .getByText("Brand campaign color, requested by Marketing")
+      .closest("td") as HTMLElement;
+    const lines = [...cell.querySelectorAll("span")].map((el) => [el.textContent, el.className]);
+    expect(lines.map(([text]) => text)).toEqual([
+      "Brand campaign color, requested by Marketing",
+      "Worse since it was decided: medium then, high now.",
+      "Mitigation: Larger type on mobile",
+      "Revisit: the campaign ends",
+      "Decided by Sam Lee, 27 Oct 2026"
+    ]);
+    expect(lines[1][1]).toContain("line");
+    expect(lines[2][1]).toContain("note");
+  });
+
+  it("keeps the model's drafted line out of the name cell and under the quote", () => {
+    const model = buildHandoffTable(
+      input({
+        notes: [
+          {
+            nodeId: "9:1",
+            nodeName: "Dog photo",
+            note: { category: "alt", text: "A dog", source: "ai", updatedAt: AT }
+          }
+        ],
+        imageLayers: [
+          {
+            nodeId: "9:1",
+            name: "Dog photo",
+            screenId: "s1",
+            screenName: "Payment",
+            width: 1,
+            height: 1,
+            imageHash: "a"
+          }
+        ]
+      }),
+      "developer"
+    );
+    render(<HandoffTable model={model} onShow={() => undefined} />);
+    const drafted = screen.getByText("Drafted by a language model, confirmed by the designer");
+    expect(drafted.closest("th")).toBeNull();
+    expect(drafted.closest("td")).toBe(screen.getByText("\u201CA dog\u201D").closest("td"));
+    const where = screen.getByText("Dog photo").closest("th") as HTMLElement;
+    expect(within(where).queryByText(/Drafted by/)).toBeNull();
+  });
+
+  it("says how many layers are deferred and not listed, only when there are some", () => {
+    const deferred = input({
+      findings: [finding(), finding({ issueId: "d:1", nodeId: "d:1", state: "deferred" })]
+    });
+    const { unmount } = render(
+      <HandoffTable model={buildHandoffTable(deferred, "developer")} onShow={() => undefined} />
+    );
+    expect(screen.getByText(/0 decided, 1 deferred, not listed/)).toBeInTheDocument();
+    unmount();
+    show(1);
+    expect(screen.queryByText(/deferred/)).toBeNull();
   });
 });

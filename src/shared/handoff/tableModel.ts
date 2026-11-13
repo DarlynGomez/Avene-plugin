@@ -68,6 +68,8 @@ export function buildHandoffTable(
   const screens = screensOf(rows);
   const date = shortDate(input.generatedAt);
   const needAction = rows.filter((row) => row.status.needsAction).length;
+  // Deferred is not for developers now, so it stays out of the rows and is only counted
+  const { deferredLayers } = buildItems(input);
   return {
     audience,
     header: {
@@ -84,7 +86,8 @@ export function buildHandoffTable(
         rows: rows.length,
         groups: groups.length,
         needAction,
-        decided: rows.length - needAction
+        decided: rows.length - needAction,
+        deferred: deferredLayers
       }
     },
     groups,

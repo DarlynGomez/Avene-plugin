@@ -9,6 +9,9 @@ export const DRAFTED_BY_MODEL = "Drafted by a language model, confirmed by the d
 /** The words for a picture nobody has spoken for, the owner is added only when the data has one */
 const NO_ALT = "No alt text yet";
 
+/** The designer is the default decider, so naming them says nothing */
+const DEFAULT_OWNERS = ["", "designer", "design"];
+
 /**
  * A row for each alt text note, and one for each image layer nobody has spoken for
  * The owner after Decides comes from the note, and a picture with no note has none to name
@@ -28,14 +31,20 @@ export function altRows(input: HandoffInput): TableRow[] {
       id: nodeId ?? nodeName,
       element: nodeName,
       location: (nodeId && where.get(nodeId)) || "",
-      details: drafted && spoken ? [DRAFTED_BY_MODEL] : [],
+      details: [],
       contrast: null,
       status: statusFor(spoken ? "decided" : "needsCheck"),
       detail: note.decorative
         ? { text: "Decorative, alt text is empty", muted: false }
         : text !== ""
           ? { text: `“${text}”`, muted: false }
-          : { text: owner === "" ? NO_ALT : `${NO_ALT} · Decides: ${owner}`, muted: true },
+          : {
+              text: DEFAULT_OWNERS.includes(owner.toLowerCase())
+                ? NO_ALT
+                : `${NO_ALT} · Decides: ${owner}`,
+              muted: true
+            },
+      notes: drafted && spoken ? [{ text: DRAFTED_BY_MODEL, tone: "quiet" }] : [],
       nodeIds: nodeId ? [nodeId] : []
     };
   });
@@ -49,6 +58,7 @@ export function altRows(input: HandoffInput): TableRow[] {
       contrast: null,
       status: statusFor("needsCheck"),
       detail: { text: NO_ALT, muted: true },
+      notes: [],
       nodeIds: [layer.nodeId]
     }));
   return [...rows, ...open];
