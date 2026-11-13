@@ -1,0 +1,59 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--space-5);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-button);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+/* Opens upward, the button sits at the bottom of the panel */
+.menu {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  margin-bottom: var(--space-1);
+  padding: var(--space-1) 0;
+  border: var(--size-hairline) solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-card);
+}
+
+.item {
+  min-height: var(--space-5);
+  padding: 0 var(--space-3);
+  border: none;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--color-background);
+}
+
+.trigger:focus-visible,
+.item:focus-visible {
+  outline: var(--size-focus-ring) solid var(--color-focus-ring);
+  outline-offset: var(--size-focus-offset);
+}

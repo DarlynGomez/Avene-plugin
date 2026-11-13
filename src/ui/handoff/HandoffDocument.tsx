@@ -1,4 +1,4 @@
-import { Copy, Download, FileText } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { buildItems } from "../../shared/handoff/buildItems";
@@ -9,6 +9,7 @@ import type { ChosenText } from "../../shared/handoff/compose";
 import type { Audience, AudienceDoc, HandoffInput } from "../../shared/handoff/types";
 import { copyText } from "../study/downloadFile";
 import { AUDIENCE_NAMES } from "./AudiencePicker";
+import { DownloadMenu } from "./DownloadMenu";
 import { downloadHtmlFile, downloadPdfFile } from "./handoffDownloads";
 import { BriefCards } from "./BriefCards";
 import { CardsView } from "./CardsView";
@@ -104,18 +105,7 @@ export function HandoffDocument({
         <span>
           Format: <strong>{asTable ? "Table" : FORMAT_NAMES[format]}</strong>
         </span>
-        {asTable && (
-          <button type="button" className={styles.quickCopy} onClick={() => void download("html")}>
-            <Download size={16} aria-hidden="true" />
-            Download HTML
-          </button>
-        )}
-        {asTable && (
-          <button type="button" className={styles.quickCopy} onClick={() => void download("pdf")}>
-            <FileText size={16} aria-hidden="true" />
-            Download PDF
-          </button>
-        )}
+        {asTable && <DownloadMenu onPick={(kind) => void download(kind)} />}
         <button type="button" className={styles.quickCopy} onClick={() => void quickCopy()}>
           <Copy size={16} aria-hidden="true" />
           Quick copy raw

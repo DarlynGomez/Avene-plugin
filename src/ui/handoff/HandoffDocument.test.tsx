@@ -158,7 +158,8 @@ describe("the table view", () => {
     ) {
       names.push(this.download);
     });
-    fireEvent.click(screen.getByRole("button", { name: "Download HTML" }));
+    fireEvent.click(screen.getByRole("button", { name: "Download" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "HTML" }));
     expect(create).toHaveBeenCalledTimes(1);
     expect(blobs[0].type).toBe("text/html;charset=utf-8");
     const body = await new Promise<string>((resolve) => {
@@ -170,7 +171,7 @@ describe("the table view", () => {
     expect(names[0]).toMatch(/^avene-handoff-\d{4}-\d{2}-\d{2}\.html$/);
     click.mockRestore();
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
-    expect(screen.queryByRole("button", { name: "Download HTML" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Download" })).toBeNull();
   });
 
   it("offers the table as a named tagged PDF, and only while the table shows", async () => {
@@ -188,8 +189,9 @@ describe("the table view", () => {
     ) {
       names.push(this.download);
     });
+    fireEvent.click(screen.getByRole("button", { name: "Download" }));
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Download PDF" }));
+      fireEvent.click(screen.getByRole("menuitem", { name: "PDF" }));
     });
     await waitFor(() => expect(blobs).toHaveLength(1));
     expect(blobs[0].type).toBe("application/pdf");
@@ -202,7 +204,7 @@ describe("the table view", () => {
     expect(head).toMatch(/^%PDF-1\.7/);
     click.mockRestore();
     fireEvent.click(screen.getByRole("button", { name: "Cards" }));
-    expect(screen.queryByRole("button", { name: "Download PDF" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Download" })).toBeNull();
   });
 
   it("finds a row's layers in the file", () => {
