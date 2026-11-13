@@ -1,0 +1,25 @@
+.stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-helper);
+  list-style: none;
+}
+
+.done,
+.next {
+  color: var(--color-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.now {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-semibold);
+}
+
+.word {
+  font-weight: var(--font-weight-regular);
+}

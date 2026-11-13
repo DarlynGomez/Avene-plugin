@@ -55,6 +55,12 @@
   padding: var(--space-3);
 }
 
+.note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-helper);
+}
+
 .waiting {
   margin: 0;
   color: var(--color-muted);

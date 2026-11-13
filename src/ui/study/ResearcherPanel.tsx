@@ -1,6 +1,7 @@
 import { useRef } from "react";
 
 import { isStudyActive } from "../../shared/study/studyActive";
+import { EXPLORATION_NOTE, showsExplorationNote } from "../../shared/study/studyStage";
 import type {
   StudyExportReadyMessage,
   StudyMessage,
@@ -11,6 +12,7 @@ import { ExportResult } from "./ExportResult";
 import { refusalText } from "./refusalText";
 import styles from "./ResearcherPanel.module.css";
 import { SessionLine } from "./SessionLine";
+import { StageLine } from "./StageLine";
 import { StartForm } from "./StartForm";
 import { useFocusTrap } from "./useFocusTrap";
 
@@ -55,6 +57,10 @@ export function ResearcherPanel({ state, exportFile, onSend, onClose }: Research
           </p>
         )}
         {session && <SessionLine session={session} />}
+        {session && <StageLine session={session} />}
+        {session && showsExplorationNote(session) && (
+          <p className={styles.note}>{EXPLORATION_NOTE}</p>
+        )}
         {state && isStudyActive(session) && <BlockControls session={session} onSend={onSend} />}
         {exportFile && isStudyActive(session) && <ExportResult file={exportFile} />}
         {state && !isStudyActive(session) && <StartForm onSend={onSend} />}

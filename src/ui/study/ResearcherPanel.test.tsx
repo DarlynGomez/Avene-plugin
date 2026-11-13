@@ -478,3 +478,53 @@ describe("export result", () => {
     expect(screen.queryByRole("region", { name: "Export" })).not.toBeInTheDocument();
   });
 });
+
+describe("stage line and exploration note", () => {
+  const ENDED = { phase: "ended" as const, endedAt: "2026-10-06T09:40:00.000Z" };
+  const EXITED = { exitedAt: "2026-10-06T09:50:00.000Z" };
+
+  it("shows the stages as a read-only list in the open panel, with the current one marked", () => {
+    openPanel({ ...SESSION, block: 2 });
+    const list = screen.getByRole("list", { name: "Study stage" });
+    expect(
+      within(list)
+        .getAllByRole("listitem")
+        .map((li) => li.textContent)
+    ).toEqual(["Block 1 Done", "Block 2 Now", "Post-task Next", "Export done Next", "Exited Next"]);
+    expect(within(list).getByText("Block 2", { exact: false }).closest("li")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
+    expect(within(list).queryByRole("button")).toBeNull();
+    expect(within(list).queryByRole("checkbox")).toBeNull();
+  });
+
+  it("says nothing about exploration while the study is running", () => {
+    openPanel({ ...SESSION, block: 2, ...ENDED });
+    expect(screen.queryByText(/Exploration/)).toBeNull();
+  });
+
+  it("says nothing from the exploration is in the export once the second block is exited", () => {
+    openPanel({ ...SESSION, block: 2, ...ENDED, exports: [ENDED.endedAt], ...EXITED });
+    expect(
+      screen.getByText("Exploration: nothing from here is in the study export.")
+    ).toBeInTheDocument();
+    expect(sentTypes()).not.toContain("STUDY_EVENT");
+  });
+
+  it("leaves the note out after the first block, where more of the study is still to come", () => {
+    openPanel({ ...SESSION, ...ENDED, ...EXITED });
+    expect(screen.queryByText(/Exploration/)).toBeNull();
+  });
+
+  it("keeps both out of the page while the panel is closed", () => {
+    render(
+      <StudyHost>
+        <button type="button">Participant content</button>
+      </StudyHost>
+    );
+    sandboxState({ ...SESSION, block: 2, ...EXITED });
+    expect(screen.queryByRole("list", { name: "Study stage" })).toBeNull();
+    expect(screen.queryByText(/Exploration/)).toBeNull();
+  });
+});
