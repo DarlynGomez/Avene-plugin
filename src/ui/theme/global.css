@@ -72,7 +72,7 @@
   --stagger-max: 216ms;
 
   /* The Teach Me Why lesson page, its own paper palette and type scale */
-  --color-lesson-paper: #F6F3EC;
+  --color-lesson-paper: #FAFAF8;
   --color-lesson-ink: #17191C;
   --color-lesson-secondary: #4A4D52;
   --color-lesson-muted: #66696F;

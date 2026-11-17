@@ -67,7 +67,7 @@ export const TOKEN_VALUES = {
   "--ease-standard": "cubic-bezier(0.2, 0, 0.2, 1)",
   "--stagger-step": "36ms",
   "--stagger-max": "216ms",
-  "--color-lesson-paper": "#F6F3EC",
+  "--color-lesson-paper": "#FAFAF8",
   "--color-lesson-ink": "#17191C",
   "--color-lesson-secondary": "#4A4D52",
   "--color-lesson-muted": "#66696F",

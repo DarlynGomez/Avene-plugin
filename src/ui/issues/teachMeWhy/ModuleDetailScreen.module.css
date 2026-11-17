@@ -5,7 +5,7 @@
   gap: var(--space-2);
   min-height: 100%;
   margin: calc(var(--space-3) * -1);
-  padding: var(--space-2) var(--space-lesson-side) var(--space-5);
+  padding: var(--space-2) calc(var(--space-3) * 2) var(--space-5);
   background: var(--color-lesson-paper);
   color: var(--color-lesson-ink);
 }
