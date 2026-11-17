@@ -58,16 +58,38 @@ describe("Teach Me Why module library", () => {
     expect(screen.queryByRole("tablist", { name: "Topic categories" })).not.toBeInTheDocument();
   });
 
-  it("searches lesson details as well as topic titles", () => {
+  it("searches lesson details as well as topic titles, within the study set", () => {
     render(<ModuleLibrary selectedModuleId={null} onSelectModule={() => {}} />);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "buttons" } });
 
     expect(
-      screen.getByRole("button", { name: /Contrast for Interface Parts/ })
-    ).toBeInTheDocument();
-    expect(
       screen.getByRole("button", { name: /Placeholder and Decorative Text/ })
     ).toBeInTheDocument();
+    // M09 also mentions buttons, it is outside the study set
+    expect(screen.queryByRole("button", { name: /Contrast for Interface Parts/ })).toBeNull();
+  });
+
+  it("offers only M01 to M08 in the study build", () => {
+    render(<ModuleLibrary selectedModuleId={null} onSelectModule={() => {}} />);
+    expect(screen.getByText("8 of 8 topics")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Explore topic/ })).toHaveLength(8);
+    for (const title of [/Contrast for Interface Parts/, /Making Multimedia Accessible/]) {
+      expect(screen.queryByRole("button", { name: title })).toBeNull();
+    }
+  });
+
+  it("does not find a lesson by a video or article title the study build never shows", () => {
+    render(<ModuleLibrary selectedModuleId={null} onSelectModule={() => {}} />);
+    fireEvent.change(screen.getByRole("searchbox"), {
+      target: { value: "Web Accessibility Perspectives" }
+    });
+    expect(screen.queryAllByRole("button", { name: /Explore topic/ })).toHaveLength(0);
+  });
+
+  it("does not open a lesson outside the study set, even when asked to", () => {
+    render(<ModuleLibrary selectedModuleId="M09" onSelectModule={() => {}} />);
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+    expect(screen.getByRole("tablist", { name: "Topic categories" })).toBeInTheDocument();
   });
 
   describe("the lesson is text only", () => {

@@ -2,11 +2,16 @@ import { useMemo, useState, type KeyboardEvent } from "react";
 import { ArrowRight, BookOpen, Search } from "lucide-react";
 
 import { LEARNING_MODULES } from "../../../shared/teachMeWhy/modules/modules";
+import { libraryModules } from "../../../shared/teachMeWhy/modules/studyLibrary";
+import { STUDY_BUILD } from "../../../shared/studyBuild";
 import { ModuleDetailScreen } from "./ModuleDetailScreen";
 import controls from "./ModuleLibraryControls.module.css";
 import styles from "./ModuleLibrary.module.css";
 
 const CATEGORIES = ["all", "visual", "motor", "cognitive", "system"] as const;
+
+/** The lessons on offer, the study build keeps to the study set */
+const MODULES = libraryModules(LEARNING_MODULES, STUDY_BUILD);
 type Category = (typeof CATEGORIES)[number];
 
 interface ModuleLibraryProps {
@@ -23,10 +28,10 @@ export function ModuleLibrary({
 }: ModuleLibraryProps) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
-  const selectedModule = LEARNING_MODULES.find((module) => module.id === selectedModuleId) ?? null;
+  const selectedModule = MODULES.find((module) => module.id === selectedModuleId) ?? null;
   const filteredModules = useMemo(() => {
     const search = query.trim().toLowerCase();
-    return LEARNING_MODULES.filter((module) => {
+    return MODULES.filter((module) => {
       const matchesCategory = category === "all" || module.category === category;
       const searchable = [
         module.title,
@@ -36,8 +41,8 @@ export function ModuleLibrary({
         ...module.learningObjectives,
         ...module.lessonParagraphs,
         ...module.keyTakeaways,
-        module.video?.title ?? "",
-        module.optionalArticle?.title ?? ""
+        // The study build shows no clip and no article, so their titles are not searched there
+        ...(STUDY_BUILD ? [] : [module.video?.title ?? "", module.optionalArticle?.title ?? ""])
       ]
         .join(" ")
         .toLowerCase();
@@ -71,7 +76,7 @@ export function ModuleLibrary({
           <span>Accessibility Topics</span>
         </h2>
         <span className={styles.count}>
-          {filteredModules.length} of {LEARNING_MODULES.length} topics
+          {filteredModules.length} of {MODULES.length} topics
         </span>
       </div>
       <label className={controls.search}>
