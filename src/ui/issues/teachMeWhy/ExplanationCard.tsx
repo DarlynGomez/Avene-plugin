@@ -3,10 +3,6 @@ import { ArrowRight } from "lucide-react";
 import type { ExplanationView } from "../../../shared/teachMeWhy/explanationView";
 import styles from "./ExplanationCard.module.css";
 
-/** The one place the wording of the AI label lives */
-export const AI_LABEL =
-  "Drafted in advance with AI help and reviewed by the research team. This text is not generated while you use Avene.";
-
 const LIST_MARK = "- ";
 
 /** A block whose every line starts with the list mark is a list, anything else is a paragraph */
@@ -71,13 +67,8 @@ export function ExplanationCard({
       {view.text.split(/\n{2,}/).map((block) => (
         <TextBlock key={block} block={block} />
       ))}
-      {view.isAi && (
-        <>
-          <p className={styles.note}>{AI_LABEL}</p>
-          {view.basedOn.length > 0 && (
-            <p className={styles.note}>Based on: {view.basedOn.join("; ")}</p>
-          )}
-        </>
+      {view.isAi && view.basedOn.length > 0 && (
+        <p className={styles.note}>Based on: {view.basedOn.join("; ")}</p>
       )}
       <div className={styles.actions}>
         <button type="button" className={styles.action} onClick={onHide}>

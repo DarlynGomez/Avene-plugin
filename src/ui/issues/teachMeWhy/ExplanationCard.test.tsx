@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { ExplanationView } from "../../../shared/teachMeWhy/explanationView";
-import { AI_LABEL, ExplanationCard } from "./ExplanationCard";
+import { ExplanationCard } from "./ExplanationCard";
 
 afterEach(cleanup);
 
@@ -53,20 +53,14 @@ describe("ExplanationCard text blocks", () => {
   });
 });
 
-describe("the AI label", () => {
-  it("says the text was drafted with AI help and is not generated while Avene is used", () => {
-    expect(AI_LABEL).toBe(
-      "Drafted in advance with AI help and reviewed by the research team. This text is not generated while you use Avene."
-    );
-    expect(AI_LABEL).not.toMatch(/hand/i);
-    // Live role suggestions do run in a study, so no participant text may say that no AI runs
-    expect(AI_LABEL).not.toMatch(/no AI/i);
-  });
-  it("shows for an approved entry and not for a fallback", () => {
-    const shown = renderCard(view(1, "Move.\n\n- One."));
-    expect(shown.getByText(AI_LABEL)).toBeInTheDocument();
-    cleanup();
-    const fallback = renderCard(view(1, "Move.\n\n- One.", false));
-    expect(fallback.queryByText(AI_LABEL)).not.toBeInTheDocument();
+describe("the drafting label", () => {
+  it("is not shown on an approved entry or a fallback", () => {
+    for (const approved of [true, false]) {
+      const card = renderCard(view(1, "Move.\n\n- One.", approved));
+      expect(card.container.textContent).not.toMatch(/AI help|Drafted in advance|research team/i);
+      // Live role suggestions do run in a study, so no participant text may say that no AI runs
+      expect(card.container.textContent).not.toMatch(/no AI/i);
+      cleanup();
+    }
   });
 });

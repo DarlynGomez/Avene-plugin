@@ -8,7 +8,6 @@ import { participantVisibility } from "../../../shared/study/participantVisibili
 import type { StudySession } from "../../../shared/study/studyTypes";
 import { StudyHost } from "../../study/StudyHost";
 import { IssuePanel } from "../IssuePanel";
-import { AI_LABEL } from "./ExplanationCard";
 
 // One approved Quick text for the finding in these tests, in the stored shape: a headline, a blank line, dashed bullets
 vi.mock("../../../shared/teachMeWhy/explanationTableData", () => ({
@@ -127,18 +126,18 @@ describe("Teach Me Why tab", () => {
     expect(screen.queryByRole("radio", { name: /Quick|Why it matters|idea behind/ })).toBeNull();
   });
 
-  it("shows the Quick text as a paragraph and a list of three, with the AI label and no numbers line", async () => {
+  it("shows the Quick text as a paragraph and a list of three, with no drafting label and no numbers line", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
     const card = screen.getByRole("region", { name: "Explanation" });
-    expect(card.querySelectorAll("p")).toHaveLength(2);
+    expect(card.querySelectorAll("p")).toHaveLength(1);
     expect(card.querySelectorAll("ul")).toHaveLength(1);
     expect(card.querySelectorAll("li")).toHaveLength(3);
     expect(
       screen.getByText("Move the colors of this text much further apart.")
     ).toBeInTheDocument();
-    expect(screen.getByText(AI_LABEL)).toBeInTheDocument();
+    expect(card.textContent).not.toMatch(/AI help|Drafted in advance/i);
     expect(screen.queryByText(/Based on:/)).not.toBeInTheDocument();
     expect(screen.queryByText("2.17:1 now, 4.5:1 needed")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
@@ -268,13 +267,12 @@ describe("Teach Me Why tab", () => {
     expect(screen.queryByRole("link", { name: "Why this matters" })).not.toBeInTheDocument();
   });
 
-  it("dismisses an AI explanation and its label, and brings them back", async () => {
+  it("dismisses an AI explanation and brings it back", async () => {
     const user = userEvent.setup();
     open();
     await goToExplanation(user);
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByText("Move the colors of this text much further apart.")).toBeNull();
-    expect(screen.queryByText(AI_LABEL)).not.toBeInTheDocument();
     expect(screen.getByText("This explanation is hidden.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Show again" }));
     expect(
