@@ -50,6 +50,12 @@
   color: var(--color-ink);
 }
 
+.secondary:disabled {
+  background: var(--color-background);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
 .primary:focus-visible,
 .secondary:focus-visible {
   outline: var(--size-focus-ring) solid var(--color-focus-ring);

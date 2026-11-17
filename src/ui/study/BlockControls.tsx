@@ -19,10 +19,8 @@ export function BlockControls({ session, onSend }: BlockControlsProps) {
   const live = session.condition === "live";
   const canReveal = !live && session.phase === "designing";
   const canEnd = live ? session.phase === "designing" : session.phase === "reviewing";
-  const exportNote = hasCurrentExport(session)
-    ? "Exiting study mode keeps every recorded answer and returns the plugin to normal."
-    : "No export yet. Exiting keeps records but the file has not been saved.";
-  const exitNote = session.phase === "ended" ? "" : "This block has not ended. ";
+  // A block can never be exported after exit, so exit waits for an export taken after the block ended
+  const canExit = hasCurrentExport(session);
 
   function confirm(action: () => void) {
     setPending(null);
@@ -52,8 +50,8 @@ export function BlockControls({ session, onSend }: BlockControlsProps) {
   if (pending === "exit") {
     return (
       <ConfirmStep
-        message={`${exitNote}${exportNote}`}
-        confirmLabel={hasCurrentExport(session) ? "Exit study mode" : "Exit without exporting"}
+        message="Exiting study mode keeps every recorded answer and returns the plugin to normal."
+        confirmLabel="Exit study mode"
         onConfirm={() => confirm(() => onSend({ type: "STUDY_EXIT" }))}
         onCancel={() => setPending(null)}
       />
@@ -79,9 +77,20 @@ export function BlockControls({ session, onSend }: BlockControlsProps) {
       >
         Export block
       </button>
-      <button type="button" className={styles.secondary} onClick={() => setPending("exit")}>
+      <button
+        type="button"
+        className={styles.secondary}
+        disabled={!canExit}
+        aria-describedby={canExit ? undefined : "study-exit-locked"}
+        onClick={() => setPending("exit")}
+      >
         Exit study mode
       </button>
+      {!canExit && (
+        <p id="study-exit-locked" className={styles.note}>
+          Exit unlocks once the block has ended and been exported.
+        </p>
+      )}
     </div>
   );
 }

@@ -23,6 +23,13 @@ const SESSION: StudySession = {
   exitedAt: null
 };
 
+const EXPORTED: StudySession = {
+  ...SESSION,
+  phase: "ended",
+  endedAt: "2026-10-06T09:40:00.000Z",
+  exports: ["2026-10-06T09:41:00.000Z"]
+};
+
 let posted: { type?: string; [key: string]: unknown }[];
 
 function sandboxState(session: StudySession | null, refusal: StudyRefusal | null = null) {
@@ -350,59 +357,51 @@ describe("block controls", () => {
     expect(screen.queryByText(/not connected yet/)).not.toBeInTheDocument();
   });
 
-  it("warns that an unended block has no export and exits only on the skip button", async () => {
-    const user = userEvent.setup();
+  it("keeps Exit locked while the block has not ended, and says why", () => {
     openPanel(SESSION);
-    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
 
-    const confirm = screen.getByRole("group", { name: "Confirm" });
-    expect(within(confirm).getByText(/This block has not ended/)).toBeInTheDocument();
-    expect(
-      within(confirm).getByText(
-        /No export yet\. Exiting keeps records but the file has not been saved\./
-      )
-    ).toBeInTheDocument();
-    expect(sentTypes()).not.toContain("STUDY_EXIT");
-    await user.click(within(confirm).getByRole("button", { name: "Exit without exporting" }));
-    expect(sentTypes()).toContain("STUDY_EXIT");
+    const exit = screen.getByRole("button", { name: "Exit study mode" });
+    expect(exit).toBeDisabled();
+    expect(exit).toHaveAccessibleDescription(
+      "Exit unlocks once the block has ended and been exported."
+    );
+    expect(screen.queryByRole("button", { name: "Exit without exporting" })).toBeNull();
   });
 
-  it("warns when the only export was taken before the block ended", async () => {
-    const user = userEvent.setup();
+  it("keeps Exit locked when the block ended but has not been exported", () => {
+    openPanel({ ...SESSION, phase: "ended", endedAt: "2026-10-06T09:40:00.000Z" });
+
+    expect(screen.getByRole("button", { name: "Exit study mode" })).toBeDisabled();
+  });
+
+  it("keeps Exit locked when the only export was taken before the block ended", () => {
     openPanel({
       ...SESSION,
       phase: "ended",
       endedAt: "2026-10-06T09:40:00.000Z",
       exports: ["2026-10-06T09:30:00.000Z"]
     });
-    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
 
-    expect(
-      screen.getByText(/No export yet\. Exiting keeps records but the file has not been saved\./)
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Exit without exporting" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Exit study mode" })).toBeDisabled();
   });
 
   it("exits on a plain confirm once the ended block has been exported", async () => {
     const user = userEvent.setup();
-    openPanel({
-      ...SESSION,
-      phase: "ended",
-      endedAt: "2026-10-06T09:40:00.000Z",
-      exports: ["2026-10-06T09:41:00.000Z"]
-    });
-    await user.click(screen.getByRole("button", { name: "Exit study mode" }));
+    openPanel(EXPORTED);
+    const exit = screen.getByRole("button", { name: "Exit study mode" });
+    expect(exit).toBeEnabled();
+    expect(screen.queryByText(/Exit unlocks once/)).not.toBeInTheDocument();
+    await user.click(exit);
 
     const confirm = screen.getByRole("group", { name: "Confirm" });
-    expect(within(confirm).queryByText(/No export yet/)).not.toBeInTheDocument();
-    expect(within(confirm).queryByRole("button", { name: "Exit without exporting" })).toBeNull();
+    expect(sentTypes()).not.toContain("STUDY_EXIT");
     await user.click(within(confirm).getByRole("button", { name: "Exit study mode" }));
     expect(sentTypes()).toContain("STUDY_EXIT");
   });
 
   it("sends nothing on Exit when it is cancelled", async () => {
     const user = userEvent.setup();
-    openPanel(SESSION);
+    openPanel(EXPORTED);
     await user.click(screen.getByRole("button", { name: "Exit study mode" }));
     await user.click(screen.getByRole("button", { name: "Cancel" }));
 
