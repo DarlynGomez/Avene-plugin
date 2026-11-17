@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Markers are on in the build, these tests are about other things and their fake file cannot hold markers
+vi.mock("../../shared/featureFlags", async (original) => ({
+  ...(await original<typeof import("../../shared/featureFlags")>()),
+  FEATURE_MARKERS: false
+}));
+
 /** Lets a fire-and-forget async chain finish before asserting on its effects */
 function settle(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));

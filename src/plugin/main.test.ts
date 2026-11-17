@@ -2,6 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { STORAGE_KEY_PROFILE } from "./storage/storageKeys";
 
+// Markers are on in the build, these tests are about other things and their fake file cannot hold markers
+vi.mock("../shared/featureFlags", async (original) => ({
+  ...(await original<typeof import("../shared/featureFlags")>()),
+  FEATURE_MARKERS: false
+}));
+
 const showUI = vi.fn();
 const notify = vi.fn();
 const closePlugin = vi.fn();

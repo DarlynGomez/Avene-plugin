@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Markers are on in the build, these tests are about other things and their fake file cannot hold markers
+vi.mock("../../shared/featureFlags", async (original) => ({
+  ...(await original<typeof import("../../shared/featureFlags")>()),
+  FEATURE_MARKERS: false
+}));
+
 const DEFERRED = {
   state: "deferred",
   severityAtLastDetection: "high",
@@ -94,9 +100,8 @@ describe("selectionListener", () => {
   });
 
   it("initializes the guard as already armed for a deferred issue selected at startup", async () => {
-    const { handleSelectionChange, initializeReEncounterFromCurrentSelection } = await import(
-      "./selectionListener"
-    );
+    const { handleSelectionChange, initializeReEncounterFromCurrentSelection } =
+      await import("./selectionListener");
 
     selection = [TEXT_NODE];
     await initializeReEncounterFromCurrentSelection();

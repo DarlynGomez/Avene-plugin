@@ -15,7 +15,7 @@ describe("study build flag values", () => {
     ["FEATURE_ALT_ANNOTATIONS", FEATURE_ALT_ANNOTATIONS, false],
     ["FEATURE_ALT_SUGGEST_LIVE", FEATURE_ALT_SUGGEST_LIVE, false],
     ["FEATURE_VARIABLE_SCOPE", FEATURE_VARIABLE_SCOPE, false],
-    ["FEATURE_MARKERS", FEATURE_MARKERS, false],
+    ["FEATURE_MARKERS", FEATURE_MARKERS, true],
     ["FEATURE_MODULES", FEATURE_MODULES, true]
   ])("%s is %s", (_name, actual, expected) => {
     expect(actual).toBe(expected);

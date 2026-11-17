@@ -2,6 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { scanAndSync } from "./scanAndSync";
 
+// Markers are on in the build, these tests are about other things and their fake file cannot hold markers
+vi.mock("../../shared/featureFlags", async (original) => ({
+  ...(await original<typeof import("../../shared/featureFlags")>()),
+  FEATURE_MARKERS: false
+}));
+
 const PAGE = { type: "PAGE", backgrounds: [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }] };
 
 function failingTextNode(id: string) {
@@ -65,7 +71,9 @@ describe("scanAndSync", () => {
     expect(uiPostMessage).toHaveBeenCalledTimes(1);
     const pushed = uiPostMessage.mock.calls[0][0];
     expect(pushed.type).toBe("ISSUES_UPDATED");
-    expect(pushed.issues).toMatchObject([{ id: "contrast:1:1", nodeName: "Body copy", state: "open" }]);
+    expect(pushed.issues).toMatchObject([
+      { id: "contrast:1:1", nodeName: "Body copy", state: "open" }
+    ]);
   });
 
   it("resolves an existing issue, without deleting the record, when the node no longer fails", async () => {
