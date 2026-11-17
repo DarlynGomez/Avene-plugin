@@ -10,8 +10,6 @@ import styles from "./ModuleLibrary.module.css";
 
 const CATEGORIES = ["all", "visual", "motor", "cognitive", "system"] as const;
 
-/** The lessons on offer, the study build keeps to the study set */
-const MODULES = libraryModules(LEARNING_MODULES, STUDY_BUILD);
 type Category = (typeof CATEGORIES)[number];
 
 interface ModuleLibraryProps {
@@ -26,12 +24,15 @@ export function ModuleLibrary({
   onSelectModule,
   onBackToIssue
 }: ModuleLibraryProps) {
+  // The lessons on offer, the study build keeps to the study set, read here so a test can switch builds
+  const studyBuild = STUDY_BUILD;
+  const modules = useMemo(() => libraryModules(LEARNING_MODULES, studyBuild), [studyBuild]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
-  const selectedModule = MODULES.find((module) => module.id === selectedModuleId) ?? null;
+  const selectedModule = modules.find((module) => module.id === selectedModuleId) ?? null;
   const filteredModules = useMemo(() => {
     const search = query.trim().toLowerCase();
-    return MODULES.filter((module) => {
+    return modules.filter((module) => {
       const matchesCategory = category === "all" || module.category === category;
       const searchable = [
         module.title,
@@ -42,13 +43,13 @@ export function ModuleLibrary({
         ...module.lessonParagraphs,
         ...module.keyTakeaways,
         // The study build shows no clip and no article, so their titles are not searched there
-        ...(STUDY_BUILD ? [] : [module.video?.title ?? "", module.optionalArticle?.title ?? ""])
+        ...(studyBuild ? [] : [module.video?.title ?? "", module.optionalArticle?.title ?? ""])
       ]
         .join(" ")
         .toLowerCase();
       return matchesCategory && (!search || searchable.includes(search));
     });
-  }, [category, query]);
+  }, [category, query, modules, studyBuild]);
   function moveCategory(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
@@ -76,7 +77,7 @@ export function ModuleLibrary({
           <span>Accessibility Topics</span>
         </h2>
         <span className={styles.count}>
-          {filteredModules.length} of {MODULES.length} topics
+          {filteredModules.length} of {modules.length} topics
         </span>
       </div>
       <label className={controls.search}>

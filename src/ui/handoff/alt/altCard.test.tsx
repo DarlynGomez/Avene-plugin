@@ -5,10 +5,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { capturePosts, layer, mountPanel, openAlt } from "./altHarness";
 
+// The study build by default, the question mark tests also look at the demo build, where its lesson is offered
+const build = vi.hoisted(() => ({ study: true }));
+vi.mock("../../../shared/studyBuild", () => ({
+  get STUDY_BUILD() {
+    return build.study;
+  }
+}));
+
 beforeEach(() => void capturePosts());
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  build.study = true;
 });
 
 const cards = () =>
@@ -73,7 +82,19 @@ describe("an alt text card", () => {
 });
 
 describe("the question mark on an alt text card", () => {
-  it("says what an image needs, with its own name as the example, and offers its lesson", async () => {
+  it("says what an image needs, and in the study build offers no lesson the study set leaves out", async () => {
+    const user = await open();
+    const card = cards()[0].closest("li") as HTMLElement;
+    await user.click(within(card).getByRole("button", { name: "Why this surfaced" }));
+    const popover = within(card).getByRole("status");
+    expect(within(popover).getByText("WCAG 1.1.1 (Level A)")).toBeInTheDocument();
+    expect(
+      within(popover).queryByRole("button", { name: "Learn more in Teach Me Why" })
+    ).toBeNull();
+  });
+
+  it("says what an image needs, with its own name as the example, and offers its lesson in the demo build", async () => {
+    build.study = false;
     const user = await open();
     const card = cards()[0].closest("li") as HTMLElement;
     await user.click(within(card).getByRole("button", { name: "Why this surfaced" }));
@@ -86,7 +107,8 @@ describe("the question mark on an alt text card", () => {
     ).toBeInTheDocument();
   });
 
-  it("opens the Teach Me Why tab on the alt text lesson, scrolled to the top", async () => {
+  it("opens the Teach Me Why tab on the alt text lesson, scrolled to the top, in the demo build", async () => {
+    build.study = false;
     const user = await open();
     const card = cards()[0].closest("li") as HTMLElement;
     const region = card.closest("div[class*=scrollRegion]") as HTMLElement;

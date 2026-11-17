@@ -13,12 +13,14 @@ export const STUDY_LIBRARY_MODULES: readonly string[] = [
   "M08"
 ];
 
+/** Whether a lesson can be opened in this build */
+export const lessonOffered = (id: string, studyBuild: boolean): boolean =>
+  !studyBuild || STUDY_LIBRARY_MODULES.includes(id);
+
 /** The lessons a reader can open in this build, in their usual order */
 export function libraryModules<T extends { id: string }>(
   modules: readonly T[],
   studyBuild: boolean
 ): T[] {
-  return studyBuild
-    ? modules.filter((module) => STUDY_LIBRARY_MODULES.includes(module.id))
-    : [...modules];
+  return modules.filter((module) => lessonOffered(module.id, studyBuild));
 }

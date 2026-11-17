@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ALT_WHY_REQUIREMENT, altWhyText } from "../../../shared/handoff/alt/altCopy";
 import why from "../../issues/components/WhySurfacedPopover.module.css";
 import { useExplanationLink } from "../../issues/teachMeWhy/ExplanationLinkContext";
+import { lessonOffered } from "../../../shared/teachMeWhy/modules/studyLibrary";
+import { STUDY_BUILD } from "../../../shared/studyBuild";
 
 /** The lesson on alt text in the Teach Me Why tab */
 const ALT_MODULE_ID = "M11";
@@ -41,7 +43,8 @@ export function AltWhyPopover({ name }: { name: string }) {
             <strong>{ALT_WHY_REQUIREMENT}</strong>
           </p>
           <p className={why.context}>{altWhyText(name)}</p>
-          {links && (
+          {/* The alt text lesson is outside the study set, so the study build offers no way into it */}
+          {links && lessonOffered(ALT_MODULE_ID, STUDY_BUILD) && (
             <button
               type="button"
               className={why.why}
