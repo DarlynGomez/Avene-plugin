@@ -8,7 +8,7 @@ import {
   registerAdjustSelectionRestore
 } from "./lifecycle/adjustLifecycle";
 import { handleCalibrationMessage, isCalibrationMessage } from "./lifecycle/calibrationProtocol";
-import { DEBUG_COMMANDS, runDebugCommand } from "./lifecycle/debugCommands";
+import { DEBUG_COMMANDS, refuseWhileStudyActive, runDebugCommand } from "./lifecycle/debugCommands";
 import { handleIssueMessage, isIssueMessage } from "./lifecycle/issuesProtocol";
 import { handleRootMessage, isRootMessage } from "./lifecycle/rootActionsProtocol";
 import { handleSelectionMessage, isSelectionMessage } from "./lifecycle/selectionProtocol";
@@ -93,6 +93,8 @@ function describeResetOutcome(result: CalibrationResetResult): string {
 
 /** Run the development reset command: clear both surfaces, report the result, then close */
 export async function runReset(): Promise<void> {
+  // Calibration stays resettable between participants, but never in the middle of a block
+  if (refuseWhileStudyActive()) return;
   try {
     const result = await resetCalibration();
     const fullyCleared = result.fileCleared && result.userCleared;

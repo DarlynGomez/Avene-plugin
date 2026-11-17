@@ -8,6 +8,9 @@ vi.mock("../shared/featureFlags", async (original) => ({
   FEATURE_MARKERS: false
 }));
 
+// The routing tests run the demo build, the study build refusal is tested beside the commands
+vi.mock("../shared/studyBuild", () => ({ STUDY_BUILD: false }));
+
 const showUI = vi.fn();
 const notify = vi.fn();
 const closePlugin = vi.fn();
@@ -129,6 +132,22 @@ describe("plugin entry routing", () => {
     expect(setPluginData).toHaveBeenCalledWith(STORAGE_KEY_PROFILE, "");
     expect(deleteAsync).toHaveBeenCalledWith(STORAGE_KEY_PROFILE);
     expect(notify).toHaveBeenCalledWith("Cleared user calibration and file calibration", undefined);
+  });
+
+  it("refuses the calibration reset while a study session is active, and clears nothing", async () => {
+    stubFigma("reset-calibration");
+    const { sessionFor, LIVE_CTX } = await import("../shared/study/studyEventFixtures");
+    getPluginData.mockImplementation(((key: string) =>
+      key === "cadt.study.session.v1" ? JSON.stringify(sessionFor(LIVE_CTX)) : "") as () => string);
+    await import("./main");
+
+    await vi.waitFor(() => expect(closePlugin).toHaveBeenCalledTimes(1));
+    expect(notify).toHaveBeenCalledWith("This command is off while a study session is active", {
+      error: true
+    });
+    expect(setPluginData).not.toHaveBeenCalledWith(STORAGE_KEY_PROFILE, "");
+    expect(deleteAsync).not.toHaveBeenCalled();
+    getPluginData.mockImplementation(() => "");
   });
 
   it("names the failing surface and its reason when reset partially fails", async () => {

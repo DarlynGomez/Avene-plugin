@@ -9,6 +9,8 @@ import { runDetectionCheck } from "./detectionCheck";
 import { DEBUG_COMMANDS, runDebugCommand } from "./debugCommands";
 import { exportIssuesToConsole } from "./exportIssuesDebug";
 
+// These tests are about the demo build, so the study build switch is off here
+vi.mock("../../shared/studyBuild", () => ({ STUDY_BUILD: false }));
 vi.mock("./detectionCheck", () => ({ runDetectionCheck: vi.fn(async () => undefined) }));
 vi.mock("./exportIssuesDebug", () => ({ exportIssuesToConsole: vi.fn(async () => undefined) }));
 
