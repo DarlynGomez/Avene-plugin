@@ -23,6 +23,7 @@ export interface ParticipantVisibility {
   deferPinRestore: boolean;
   showOnCanvas: boolean;
   elementRoleQuestions: boolean;
+  altChecks: boolean;
   /** Replaces the headline when feedback is withheld or the block is over */
   message: string | null;
 }
@@ -51,6 +52,7 @@ const UNRESTRICTED: ParticipantVisibility = {
   deferPinRestore: true,
   showOnCanvas: true,
   elementRoleQuestions: true,
+  altChecks: true,
   message: null
 };
 
@@ -82,6 +84,7 @@ export function participantVisibility(
     deferPinRestore: feedbackShown,
     showOnCanvas: feedbackShown,
     elementRoleQuestions: feedbackShown,
+    altChecks: feedbackShown,
     message: feedbackShown ? null : session.phase === "ended" ? ENDED_MESSAGE : WAITING_MESSAGE
   };
 }

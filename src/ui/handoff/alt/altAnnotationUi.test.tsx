@@ -190,7 +190,10 @@ describe("the Annotated chip", () => {
 describe("in a study session", () => {
   it("has no annotation control, no sheet and sends no annotation message", async () => {
     await mountPanel({ study: true, notes: { "9:1": [note()] } });
-    expect(screen.queryByRole("button", { name: /Alt Text & Media Descriptions/ })).toBeNull();
+    // The checks show to a participant, annotations never do
+    expect(
+      screen.getByRole("button", { name: /Alt Text & Media Descriptions/ })
+    ).toBeInTheDocument();
     expect(screen.queryByText(/^Annotation:/)).toBeNull();
     expect(annotationPosts()).toEqual([]);
   });

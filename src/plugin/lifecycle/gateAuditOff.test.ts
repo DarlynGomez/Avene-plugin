@@ -6,10 +6,11 @@ import { emitStudy } from "../study/adapter/studyEmitter";
 import { handledTypes, messageOf, VALID } from "./gateAuditMessages";
 import { handleExplanationOrRole } from "./otherProtocols";
 
-// Handoff is off, and the annotation flag is on, which must still not let anything through
+// Handoff and the alt checks in a study are off, and the annotation flag is on, which must still not let anything through
 vi.mock("../../shared/handoffFlags", async (original) => ({
   ...(await original<typeof import("../../shared/handoffFlags")>()),
   FEATURE_HANDOFF: false,
+  FEATURE_ALT_IN_STUDY: false,
   FEATURE_ALT_ANNOTATIONS: true,
   FEATURE_ALT_SUGGEST_LIVE: true
 }));

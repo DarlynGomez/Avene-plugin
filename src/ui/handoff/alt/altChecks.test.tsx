@@ -29,11 +29,12 @@ describe("the two sections", () => {
     expect(altHeader()).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("are not in the page while a study session is running", async () => {
+  it("show in a live block while the participant designs", async () => {
     await mountPanel({ study: true });
-    expect(screen.queryByRole("button", { name: /Alt Text & Media Descriptions/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /Color & Contrast/ })).toBeNull();
-    expect(posted.filter((m) => m.type.startsWith("HANDOFF"))).toEqual([]);
+    expect(
+      screen.getByRole("button", { name: /Alt Text & Media Descriptions/ })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Color & Contrast/ })).toBeInTheDocument();
   });
 
   it("open and close with a click or the keyboard, each on its own", async () => {

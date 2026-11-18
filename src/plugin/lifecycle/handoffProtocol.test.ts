@@ -133,20 +133,29 @@ afterEach(() => vi.unstubAllGlobals());
 describe("while a study session is active", () => {
   beforeEach(() => vi.mocked(activeStudySession).mockReturnValue(SESSION));
 
-  it.each(
-    [...ALL, ...ALT, ...SUGGEST, DRAFTS_MESSAGE].map((message) => [message.type, message] as const)
-  )("refuses %s with no read and no write", async (_name, message) => {
-    await run(message);
-    expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }]);
+  // The alt text checks answer while feedback shows, everything a handoff document needs never does
+  it.each([...ALL.slice(1), DRAFTS_MESSAGE].map((message) => [message.type, message] as const))(
+    "refuses %s with no read and no write",
+    async (_name, message) => {
+      await run(message);
+      expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }]);
+      expect(spies.gets).not.toHaveBeenCalled();
+      expect(spies.sets).not.toHaveBeenCalled();
+      expect(spies.node).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([
+    ["post-task designing", { ...SESSION, condition: "post-task" as const }],
+    ["the block has ended", { ...SESSION, phase: "ended" as const }]
+  ])("refuses every message, the alt text ones too, while %s", async (_name, session) => {
+    vi.mocked(activeStudySession).mockReturnValue(session);
+    for (const message of [...ALL, ...ALT, ...SUGGEST, DRAFTS_MESSAGE]) await run(message);
+    expect(replies.every((reply) => reply.type === "HANDOFF_REFUSED")).toBe(true);
     expect(spies.gets).not.toHaveBeenCalled();
     expect(spies.sets).not.toHaveBeenCalled();
     expect(spies.node).not.toHaveBeenCalled();
-  });
-
-  it("still refuses once the block has ended, until the researcher exits", async () => {
-    vi.mocked(activeStudySession).mockReturnValue({ ...SESSION, phase: "ended" });
-    await run(ALL[0]);
-    expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }]);
+    expect(emitStudy).not.toHaveBeenCalled();
   });
 });
 

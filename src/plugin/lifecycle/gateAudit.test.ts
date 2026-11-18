@@ -4,6 +4,7 @@ import type { StudySession } from "../../shared/study/studyTypes";
 import { installFake } from "../handoff/adapter/annotationHarness";
 import { activeStudySession } from "../study/adapter/studySessionStore";
 import { emitStudy } from "../study/adapter/studyEmitter";
+import { ALT_CHECK_MESSAGES } from "./handoffAccess";
 import { handledTypes, messageOf, VALID } from "./gateAuditMessages";
 import { handleExplanationOrRole, isExplanationOrRole } from "./otherProtocols";
 
@@ -12,7 +13,8 @@ vi.mock("../../shared/handoffFlags", async (original) => ({
   ...(await original<typeof import("../../shared/handoffFlags")>()),
   FEATURE_HANDOFF: true,
   FEATURE_ALT_ANNOTATIONS: true,
-  FEATURE_ALT_SUGGEST_LIVE: true
+  FEATURE_ALT_SUGGEST_LIVE: true,
+  FEATURE_ALT_IN_STUDY: true
 }));
 vi.mock("../study/adapter/studySessionStore", async (original) => ({
   ...(await original<typeof import("../study/adapter/studySessionStore")>()),
@@ -63,7 +65,20 @@ describe("the audit covers every message the sandbox answers", () => {
 describe("while a study session is active", () => {
   beforeEach(() => vi.mocked(activeStudySession).mockReturnValue(SESSION));
 
-  it.each(Object.keys(VALID))("%s is routed, refused, and touches nothing", async (type) => {
+  const outsideAltChecks = Object.keys(VALID).filter((type) => !ALT_CHECK_MESSAGES.has(type));
+
+  it("lets through only what the alt text checks send, and no annotation message", () => {
+    expect([...ALT_CHECK_MESSAGES].sort()).toEqual([
+      "HANDOFF_ALT_CACHE_REQUEST",
+      "HANDOFF_ALT_CACHE_SET",
+      "HANDOFF_ALT_CROP_REQUEST",
+      "HANDOFF_ALT_INVENTORY_REQUEST",
+      "HANDOFF_ALT_SET",
+      "HANDOFF_DATA_REQUEST"
+    ]);
+  });
+
+  it.each(outsideAltChecks)("%s is routed, refused, and touches nothing", async (type) => {
     const message = messageOf(type);
     expect(isExplanationOrRole(message)).toBe(true);
     const replies: { type: string }[] = [];
@@ -78,8 +93,25 @@ describe("while a study session is active", () => {
     expect(emitStudy).not.toHaveBeenCalled();
   });
 
-  it("still refuses once the block has ended, until the researcher exits", async () => {
-    vi.mocked(activeStudySession).mockReturnValue({ ...SESSION, phase: "ended" });
+  it.each([...ALT_CHECK_MESSAGES])("%s is answered while feedback shows", async (type) => {
+    // The inventory looks through the page, which the annotation fake does not have
+    Object.assign(figma.currentPage, { findAll: () => [] });
+    const replies: { type: string }[] = [];
+    await handleExplanationOrRole(messageOf(type), (reply) =>
+      replies.push(reply as { type: string })
+    );
+    expect(replies).toHaveLength(1);
+    expect(replies[0].type).not.toMatch(/REFUSED$/);
+  });
+
+  it.each([
+    ["post-task designing", { ...SESSION, condition: "post-task" as const }],
+    [
+      "once the block has ended, until the researcher exits",
+      { ...SESSION, phase: "ended" as const }
+    ]
+  ])("refuses every message, the alt text ones too, %s", async (_name, session) => {
+    vi.mocked(activeStudySession).mockReturnValue(session);
     for (const type of Object.keys(VALID)) {
       const replies: { type: string }[] = [];
       await handleExplanationOrRole(messageOf(type), (reply) =>

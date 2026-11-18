@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { FEATURE_ALT_SUGGEST_LIVE } from "../../../shared/handoffFlags";
+import { altLiveAllowed, FEATURE_ALT_SUGGEST_LIVE } from "../../../shared/handoffFlags";
 import { altCounts, altLayerViews } from "../../../shared/handoff/alt/altRoots";
-import { useHandoffAvailable } from "../useHandoffAvailable";
 import {
   AltChecksContext,
   type AltChecksValue,
@@ -10,6 +9,7 @@ import {
   type SectionName
 } from "./AltChecksContext";
 import { useAltMessages } from "./useAltMessages";
+import { useAltChecksAvailable } from "./useAltChecksAvailable";
 import { useAltSuggest } from "./useAltSuggest";
 import { useAnnotationsAvailable } from "./useAnnotationsAvailable";
 
@@ -18,12 +18,12 @@ import { useAnnotationsAvailable } from "./useAnnotationsAvailable";
  * and the sheet that is open, the choices are kept for the session only
  */
 export function AltChecksProvider({ children }: { children: ReactNode }) {
-  const available = useHandoffAvailable();
+  const available = useAltChecksAvailable();
   const annotationsOn = useAnnotationsAvailable();
   const messages = useAltMessages(available, annotationsOn);
   const { layers, notes, refresh } = messages;
-  // The live path also needs handoff to be available, which is false in a study
-  const suggest = useAltSuggest(available, available && FEATURE_ALT_SUGGEST_LIVE);
+  // Live suggestions are asked for only where the checks are shown
+  const suggest = useAltSuggest(available, altLiveAllowed(FEATURE_ALT_SUGGEST_LIVE, available));
   const [pinned, setPinned] = useState<ReadonlySet<string>>(new Set());
   const [sections, setSections] = useState({ contrast: true, alt: false });
   const [sheet, setSheet] = useState<AltSheetTarget | null>(null);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { useAltChecks } from "../handoff/alt/AltChecksContext";
+import { useHandoffAvailable } from "../handoff/useHandoffAvailable";
 import styles from "./Settings.module.css";
 import { SettingsCard, SettingsRow } from "./SettingsRow";
 
@@ -9,8 +10,10 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
 /** Development only: starts a demo from scratch by clearing what a model wrote, asking once more before it does */
 export function DevelopmentCard() {
   const { available, resetAi, resetResult } = useAltChecks();
+  // The checks can show in a study session, this reset belongs to handoff alone
+  const handoff = useHandoffAvailable();
   const [asking, setAsking] = useState(false);
-  if (!available) return null;
+  if (!available || !handoff) return null;
   const done = resetResult
     ? `Cleared ${plural(resetResult.drafts, "text draft", "text drafts")}, ${plural(resetResult.suggestions, "saved suggestion", "saved suggestions")} and ${plural(resetResult.notes, "AI-drafted note", "AI-drafted notes")}.` +
       (resetResult.annotationsRemoved + resetResult.annotationsLeft > 0

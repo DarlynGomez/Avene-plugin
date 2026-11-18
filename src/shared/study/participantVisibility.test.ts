@@ -39,7 +39,8 @@ const FEEDBACK_SURFACES = [
   "ignoreSheet",
   "deferPinRestore",
   "showOnCanvas",
-  "elementRoleQuestions"
+  "elementRoleQuestions",
+  "altChecks"
 ] as const satisfies readonly (keyof ParticipantVisibility)[];
 
 describe("participantVisibility with no restriction", () => {

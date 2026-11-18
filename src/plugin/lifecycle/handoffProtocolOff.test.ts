@@ -19,7 +19,8 @@ vi.mock("../study/adapter/studySessionStore", async (original) => ({
 afterEach(() => vi.unstubAllGlobals());
 
 describe("handoff with the committed flag", () => {
-  it("is off, so every message is refused before any storage or session is read", async () => {
+  // The alt checks may still show in a study, so the session is read, and nothing else is
+  it("is off, so outside a session every message is refused before any storage is read", async () => {
     expect(FEATURE_HANDOFF).toBe(false);
     buildTree();
     const sets = vi.fn();
@@ -33,6 +34,6 @@ describe("handoff with the committed flag", () => {
     expect(replies).toEqual([{ type: "HANDOFF_REFUSED" }, { type: "HANDOFF_REFUSED" }]);
     expect(gets).not.toHaveBeenCalled();
     expect(sets).not.toHaveBeenCalled();
-    expect(activeStudySession).not.toHaveBeenCalled();
+    expect(activeStudySession).toHaveBeenCalled();
   });
 });

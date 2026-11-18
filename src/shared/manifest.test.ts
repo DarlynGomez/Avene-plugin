@@ -28,7 +28,9 @@ describe("manifest network access", () => {
   it("says why, in the reasoning text", () => {
     expect(manifest.networkAccess.reasoning).toMatch(/YouTube media domains/);
     expect(manifest.networkAccess.reasoning).toMatch(/active study sessions/);
-    expect(manifest.networkAccess.reasoning).toMatch(/role suggestion server/);
+    expect(manifest.networkAccess.reasoning).toMatch(/one text element/);
+    expect(manifest.networkAccess.reasoning).toMatch(/one picture for an alt text suggestion/);
+    expect(manifest.networkAccess.reasoning).toMatch(/suggestion server/);
     expect(manifest.networkAccess.reasoning).toMatch(/RIT/);
   });
   it("has the debug command that reports why detection finds nothing", () => {

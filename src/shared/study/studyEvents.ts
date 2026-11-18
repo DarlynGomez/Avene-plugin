@@ -1,5 +1,10 @@
 import type { IssueState, Severity } from "../issues/issueTypes";
 import type {
+  AltAnsweredEvent,
+  AltSuggestionRequestedEvent,
+  RoleAnsweredEvent
+} from "./answerStudyEvents";
+import type {
   DepthChangedEvent,
   ExplanationDismissedEvent,
   ExplanationOpenedEvent
@@ -112,20 +117,6 @@ export interface MarkerStateEvent extends Base {
   style: MarkerStyle;
 }
 
-export interface RoleAnsweredEvent extends Base {
-  type: "role_answered";
-  nodeId: string;
-  role: string;
-  /** What produced the label that was shown: a rule, a reviewed precomputed suggestion, a live one, or none */
-  source?: "rule" | "ai_precomputed" | "ai_live" | "none";
-  /** The label that was shown to the participant, never the layer's words */
-  suggested?: string | null;
-  response?: "confirmed" | "changed" | "unsure";
-  ruleId?: string;
-  /** The model that made a suggestion, as the service reports it */
-  model?: string;
-}
-
 export type StudyEvent =
   | BlockStartedEvent
   | FeedbackRevealedEvent
@@ -139,8 +130,15 @@ export type StudyEvent =
   | ExplanationOpenedEvent
   | DepthChangedEvent
   | ExplanationDismissedEvent
-  | RoleAnsweredEvent;
+  | RoleAnsweredEvent
+  | AltAnsweredEvent
+  | AltSuggestionRequestedEvent;
 
+export type {
+  AltAnsweredEvent,
+  AltSuggestionRequestedEvent,
+  RoleAnsweredEvent
+} from "./answerStudyEvents";
 export type {
   DepthChangedEvent,
   ExplanationDismissedEvent,

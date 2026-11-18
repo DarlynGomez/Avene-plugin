@@ -93,7 +93,8 @@ export function capturePosts(onPost?: (message: { type: string; [key: string]: u
 
 /** The Live Watch panel inside the provider, fed the way the plugin would feed it */
 interface Options {
-  study?: boolean;
+  /** True for the live block while designing, or the session itself */
+  study?: boolean | StudySession;
   layers?: ImageLayer[];
   notes?: Record<string, NodeNote[]>;
   issues?: IssueSummary[];
@@ -105,7 +106,7 @@ export async function mountPanel({
   notes = {},
   issues = [issue()]
 }: Options = {}) {
-  const session = study ? SESSION : null;
+  const session = study === true ? SESSION : study || null;
   const study_ = session
     ? {
         type: "STUDY_STATE" as const,

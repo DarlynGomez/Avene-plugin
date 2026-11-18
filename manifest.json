@@ -53,6 +53,6 @@
       "https://*.googlevideo.com"
     ],
     "devAllowedDomains": ["http://localhost:8750"],
-    "reasoning": "The study sends a cropped image of one text element to the role suggestion server run locally by the research team, which asks a model hosted by RIT. Nothing leaves RIT. YouTube media domains are allowed only for Teach Me Why video embeds outside active study sessions. Active study sessions do not load external embeds or enable article links."
+    "reasoning": "The study sends a cropped image of one text element, or of one picture for an alt text suggestion, to the suggestion server run locally by the research team, which asks a model hosted by RIT. Nothing leaves RIT. YouTube media domains are allowed only for Teach Me Why video embeds outside active study sessions. Active study sessions do not load external embeds or enable article links."
   }
 }

@@ -1,3 +1,4 @@
+import { NOTE_SOURCES } from "../handoff/noteStorage";
 import { depthOk, explanationKeyOk, sourceOk } from "./explanationEventSchema";
 import { participantIdError } from "./participantIdSchema";
 import type { StudyEvent } from "./studyEvents";
@@ -94,7 +95,13 @@ const CHECKS: Record<StudyEvent["type"], (e: Rec) => boolean> = {
     (e.suggested === undefined || e.suggested === null || str(e.suggested)) &&
     (e.response === undefined || oneOf(["confirmed", "changed", "unsure"], e.response)) &&
     (e.ruleId === undefined || str(e.ruleId)) &&
-    (e.model === undefined || str(e.model))
+    (e.model === undefined || str(e.model)),
+  alt_answered: (e) =>
+    str(e.nodeId) &&
+    typeof e.decorative === "boolean" &&
+    oneOf(NOTE_SOURCES, e.source) &&
+    typeof e.cleared === "boolean",
+  alt_suggestion_requested: (e) => str(e.nodeId)
 };
 
 /** Why a stored value is not a usable event, or null when it is one */

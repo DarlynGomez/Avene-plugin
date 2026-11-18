@@ -1,11 +1,10 @@
 import type { HandoffPluginMessage, HandoffUiMessage } from "../../shared/handoff/handoffMessages";
 import { setMeta } from "../../shared/handoff/metaStorage";
+import { FEATURE_ALT_ANNOTATIONS } from "../../shared/handoffFlags";
 import {
-  FEATURE_ALT_ANNOTATIONS,
-  FEATURE_HANDOFF,
-  handoffAllowed
-} from "../../shared/handoffFlags";
-import { isStudyActive } from "../../shared/study/studyActive";
+  buildAltAnswered,
+  buildAltSuggestionRequested
+} from "../../shared/study/answerStudyEvents";
 import { saveDraftCache } from "../handoff/adapter/draftCacheStore";
 import { saveFileUrl, loadFileUrl } from "../handoff/adapter/fileUrlStore";
 import { loadHandoffMeta, saveHandoffMeta } from "../handoff/adapter/metaStore";
@@ -14,27 +13,34 @@ import { loadSuggestions, saveSuggestions } from "../handoff/adapter/altSuggestS
 import { resetAiContent } from "../handoff/adapter/resetAiContent";
 import { listImageLayers } from "../handoff/adapter/imageInventory";
 import { setAltNote, setNodeNotes } from "../handoff/adapter/notesStore";
-import { activeStudySession } from "../study/adapter/studySessionStore";
-import { buildHandoffData } from "./handoffData";
+import { emitStudy } from "../study/adapter/studyEmitter";
+import { handoffAccess, messageAllowed, type HandoffAccess } from "./handoffAccess";
+import { buildAltNotesData, buildHandoffData } from "./handoffData";
 
 type Reply = (message: HandoffPluginMessage) => void;
 
-/** The flag is read first so a build with handoff off touches no storage at all, not even the session */
-function handoffOpen(): boolean {
-  return FEATURE_HANDOFF && handoffAllowed(FEATURE_HANDOFF, isStudyActive(activeStudySession()));
-}
-
-async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
+async function handle(
+  message: HandoffUiMessage,
+  reply: Reply,
+  access: HandoffAccess
+): Promise<void> {
   switch (message.type) {
     case "HANDOFF_DATA_REQUEST":
-      reply(await buildHandoffData());
+      reply(access === "alt" ? await buildAltNotesData() : await buildHandoffData());
       return;
     case "HANDOFF_ALT_INVENTORY_REQUEST":
       reply({ type: "HANDOFF_ALT_INVENTORY", layers: listImageLayers() });
       return;
-    case "HANDOFF_ALT_CROP_REQUEST":
-      reply(await exportAltCrop(message.nodeId));
+    case "HANDOFF_ALT_CROP_REQUEST": {
+      const crop = await exportAltCrop(message.nodeId);
+      // Logged only in a session, and only a crop that was made, since only that one can be sent on
+      const at = new Date().toISOString();
+      if (access === "alt" && crop.ok) {
+        emitStudy((ctx) => [buildAltSuggestionRequested(ctx, at, message.nodeId)]);
+      }
+      reply(crop);
       return;
+    }
     case "HANDOFF_AI_RESET":
       // An annotation is taken off only where annotations are allowed, which handoff being open already settles for a study
       reply(await resetAiContent(FEATURE_ALT_ANNOTATIONS));
@@ -50,6 +56,11 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
     case "HANDOFF_ALT_SET": {
       const { nodeId, ...answer } = message;
       const result = await setAltNote(nodeId, answer);
+      // Logged only in a session, and never the words
+      const at = new Date().toISOString();
+      if (access === "alt" && result.saved) {
+        emitStudy((ctx) => [buildAltAnswered(ctx, at, nodeId, answer)]);
+      }
       reply({ type: "HANDOFF_WRITE_RESULT", target: "notes", nodeId, ...result });
       return;
     }
@@ -78,14 +89,18 @@ async function handle(message: HandoffUiMessage, reply: Reply): Promise<void> {
   }
 }
 
-/** Refuses every handoff message while handoff is off or a study session is active, with no read and no write */
+/**
+ * Refuses every message the access does not allow with no read and no write: all of handoff while it is off,
+ * and in a study session everything but the alt text checks, which follow what the participant may see
+ */
 export async function handleHandoffMessage(message: HandoffUiMessage, reply: Reply): Promise<void> {
-  if (!handoffOpen()) {
+  const access = handoffAccess();
+  if (!messageAllowed(access, message)) {
     reply({ type: "HANDOFF_REFUSED" });
     return;
   }
   try {
-    await handle(message, reply);
+    await handle(message, reply, access);
   } catch (error) {
     console.error("handleHandoffMessage: a handoff message could not be handled", error);
   }
