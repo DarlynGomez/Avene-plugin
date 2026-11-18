@@ -19,10 +19,11 @@ export function annotationsAllowed(
 }
 
 /**
- * Live alt text suggestions from the local server stay off until the model gate has passed and the server is approved
+ * Live alt text suggestions from the local server, on outside a session
+ * A session switches handoff off, and these checks with it, so a participant does not see them
  * With it off the suggestions already saved in the file still work, and nothing is sent anywhere
  */
-export const FEATURE_ALT_SUGGEST_LIVE = false;
+export const FEATURE_ALT_SUGGEST_LIVE = true;
 
 export function altLiveAllowed(
   liveFlag: boolean,

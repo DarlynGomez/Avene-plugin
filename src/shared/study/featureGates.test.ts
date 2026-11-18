@@ -51,7 +51,7 @@ describe("features with the shipped flags", () => {
     expect(handoffAllowed(FEATURE_HANDOFF, studyActive)).toBe(!active);
     expect(calendarAllowed(FEATURE_CALENDAR, studyActive)).toBe(!active);
     expect(annotationsAllowed(FEATURE_ALT_ANNOTATIONS, FEATURE_HANDOFF, studyActive)).toBe(false);
-    expect(altLiveAllowed(FEATURE_ALT_SUGGEST_LIVE, FEATURE_HANDOFF, studyActive)).toBe(false);
+    expect(altLiveAllowed(FEATURE_ALT_SUGGEST_LIVE, FEATURE_HANDOFF, studyActive)).toBe(!active);
     expect(variableScopeAllowed(FEATURE_VARIABLE_SCOPE, studyActive)).toBe(false);
     expect(modulesAllowed(FEATURE_MODULES, studyActive)).toBe(!active);
   });
