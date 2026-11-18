@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { Headline } from "../../grouping/headline";
 import type { NodeNote } from "../noteStorage";
 import { ALT_MAX_CHARS } from "./altLimits";
-import { ALT_EMPTY_ALL_SET, altLine, annotationFailureText, countLabel } from "./altCopy";
+import { ALT_EMPTY_ALL_SET, altUnansweredLine, annotationFailureText, countLabel } from "./altCopy";
 import {
   altCounts,
   altLayerViews,
@@ -131,8 +131,8 @@ describe("sourceAfterEdit", () => {
 
 describe("copy", () => {
   it("reads the line in the singular and the plural", () => {
-    expect(altLine(3, 2)).toBe("3 image layers need an alt text note across 2 screens.");
-    expect(altLine(1, 1)).toBe("1 image layer needs an alt text note across 1 screen.");
+    expect(altUnansweredLine(3)).toBe("3 unanswered");
+    expect(altUnansweredLine(1)).toBe("1 unanswered");
     expect(countLabel(1, 1)).toBe("1 root • 1 issue");
     expect(countLabel(2, 0)).toBe("2 roots • 0 issues");
   });

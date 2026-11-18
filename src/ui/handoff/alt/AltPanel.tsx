@@ -4,7 +4,7 @@ import {
   ALT_EMPTY_ALL_SET,
   ALT_EMPTY_NO_IMAGES,
   ALT_LOADING,
-  altLine
+  altUnansweredLine
 } from "../../../shared/handoff/alt/altCopy";
 import { sectionAltRoots, type AltGroupBy } from "../../../shared/handoff/alt/altRoots";
 import type { GroupBy } from "../../../shared/grouping/sectionRoots";
@@ -33,17 +33,20 @@ export function AltPanel({ groupBy }: { groupBy: GroupBy }) {
     [views, groupBy, pinned]
   );
 
-  let line = altLine(counts.layers, counts.screens);
+  let line = altUnansweredLine(counts.layers);
   if (!ready) line = ALT_LOADING;
   else if (views.length === 0) line = ALT_EMPTY_NO_IMAGES;
   else if (counts.layers === 0) line = ALT_EMPTY_ALL_SET;
 
   return (
     <div className={styles.panel}>
-      <p className={styles.line} role="status">
-        {line}
-      </p>
-      {views.length > 0 && <AltSuggestBar />}
+      {ready && views.length > 0 ? (
+        <AltSuggestBar line={line} />
+      ) : (
+        <p className={styles.line} role="status">
+          {line}
+        </p>
+      )}
       {error && (
         <p className={styles.error} role="alert">
           {error}

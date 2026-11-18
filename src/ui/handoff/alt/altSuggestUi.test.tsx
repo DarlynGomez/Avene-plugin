@@ -255,7 +255,7 @@ describe("a saved suggestion", () => {
   });
 });
 
-describe("Suggest for all unanswered", () => {
+describe("Suggest all", () => {
   const many = (n: number) =>
     Array.from({ length: n }, (_, i) => layer(`7:${i}`, `h${i}`, `Image ${i}`));
 
@@ -269,7 +269,7 @@ describe("Suggest for all unanswered", () => {
   it("runs one image at a time and shows how far it has got", async () => {
     const { state } = stubServer((call) => described(`Description number ${call}`));
     const user = await startBatch(3);
-    await user.click(screen.getByRole("button", { name: "Suggest for all unanswered" }));
+    await user.click(screen.getByRole("button", { name: "Suggest all" }));
     await waitFor(() => expect(state.calls).toBe(3));
     await waitFor(() => expect(screen.queryByText(/^\d+ of 3$/)).toBeNull());
     expect(state.mostOpen).toBe(1);
@@ -284,7 +284,7 @@ describe("Suggest for all unanswered", () => {
         : described("More")
     );
     const user = await startBatch(4);
-    await user.click(screen.getByRole("button", { name: "Suggest for all unanswered" }));
+    await user.click(screen.getByRole("button", { name: "Suggest all" }));
     expect(await screen.findByText("0 of 4")).toBeInTheDocument();
     await waitFor(() => expect(state.calls).toBe(1));
     await user.click(screen.getByRole("button", { name: "Cancel" }));
@@ -297,7 +297,7 @@ describe("Suggest for all unanswered", () => {
   it("stops at the cap for one run and says so", async () => {
     const { state } = stubServer(() => described("A sentence"));
     const user = await startBatch(ALT_BATCH_CAP + 3);
-    await user.click(screen.getByRole("button", { name: "Suggest for all unanswered" }));
+    await user.click(screen.getByRole("button", { name: "Suggest all" }));
     await waitFor(() => expect(screen.getByText(/Stopped after/)).toBeInTheDocument(), {
       timeout: 20000
     });
@@ -307,7 +307,7 @@ describe("Suggest for all unanswered", () => {
   it("stops with one plain line when the server cannot be reached, and leaves the layers as they were", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
     const user = await startBatch(3);
-    await user.click(screen.getByRole("button", { name: "Suggest for all unanswered" }));
+    await user.click(screen.getByRole("button", { name: "Suggest all" }));
     expect(await screen.findByText(/not reachable right now/)).toBeInTheDocument();
     expect(screen.queryByText("AI suggestion ready")).toBeNull();
     expect(screen.queryByRole("alert")).toBeNull();

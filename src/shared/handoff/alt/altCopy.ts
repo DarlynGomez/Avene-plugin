@@ -4,9 +4,9 @@ import type { AnnotationStatus } from "./annotationStatus";
 const plural = (count: number, one: string, many: string) => (count === 1 ? one : many);
 
 /** The line over the alt text list */
-export function altLine(layers: number, screens: number): string {
-  const subject = plural(layers, "image layer needs", "image layers need");
-  return `${layers} ${subject} an alt text note across ${screens} ${plural(screens, "screen", "screens")}.`;
+/** How many image layers still have no note, the count over the alt text list */
+export function altUnansweredLine(layers: number): string {
+  return `${layers} unanswered`;
 }
 
 export const ALT_EMPTY_ALL_SET = "Every image layer has a note or is marked decorative. Nice work.";

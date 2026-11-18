@@ -78,9 +78,7 @@ describe("the counts", () => {
     const user = userEvent.setup();
     await mountPanel();
     await openAlt(user);
-    expect(
-      screen.getByText("3 image layers need an alt text note across 2 screens.")
-    ).toBeInTheDocument();
+    expect(screen.getByText("3 unanswered")).toBeInTheDocument();
     expect(within(contrastHeader()).queryByText(/3 issues/)).toBeNull();
   });
 
@@ -95,9 +93,7 @@ describe("the alt text section", () => {
     const user = userEvent.setup();
     await mountPanel({ layers: [layer("9:1", "a", "Hero")] });
     await openAlt(user);
-    expect(
-      screen.getByText("1 image layer needs an alt text note across 1 screen.")
-    ).toBeInTheDocument();
+    expect(screen.getByText("1 unanswered")).toBeInTheDocument();
   });
 
   it("is encouraging when everything has a note or a mark, and when there are no images", async () => {

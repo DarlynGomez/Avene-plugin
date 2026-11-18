@@ -19,13 +19,13 @@ export function AltCard({ root }: { root: AltRoot }) {
   const annotated =
     annotationsOn && root.layers.some((layer) => statuses[layer.nodeId] === "in-sync");
   const suggestion = suggest.states[target.nodeId]?.status;
+  const suggestionReady = suggestion === "ready" || suggestion === "decorative";
   const tags = [
     target.source !== "designer" && target.status === "answered"
       ? target.source === "ai"
         ? "AI-drafted"
         : "AI-drafted, edited"
       : null,
-    suggestion === "ready" || suggestion === "decorative" ? "AI suggestion ready" : null,
     annotated ? "Annotated" : null
   ].filter((tag): tag is string => tag !== null);
   const locateLabel =
@@ -43,7 +43,10 @@ export function AltCard({ root }: { root: AltRoot }) {
             {Math.round(target.width)} {"×"} {Math.round(target.height)}px
           </p>
         </div>
-        <AltWhyPopover name={root.name} />
+        <div className={styles.headEnd}>
+          {suggestionReady && <span className={styles.chip}>AI suggestion ready</span>}
+          <AltWhyPopover name={root.name} />
+        </div>
       </div>
       {target.status === "answered" && <p className={styles.preview}>{target.text}</p>}
       {tags.length > 0 && (

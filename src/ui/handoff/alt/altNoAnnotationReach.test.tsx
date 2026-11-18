@@ -61,7 +61,7 @@ describe("the code behind Suggest, Apply to all and Prepare", () => {
 
     await user.click(screen.getByRole("button", { name: "Prepare suggestions" }));
     await waitFor(() => expect(screen.queryByText(/^\d+ of \d+$/)).toBeNull());
-    await user.click(screen.getByRole("button", { name: "Suggest for all unanswered" }));
+    await user.click(screen.getByRole("button", { name: "Suggest all" }));
     await waitFor(() => expect(screen.queryByText(/^\d+ of \d+$/)).toBeNull());
 
     await user.click(screen.getAllByRole("button", { name: "Add Note" })[0]);
