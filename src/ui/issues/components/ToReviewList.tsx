@@ -1,5 +1,6 @@
 import { matchRootDecision } from "../../../shared/grouping/decisionMatch";
 import type { DecisionMatch, Root, RootDecision } from "../../../shared/grouping/groupingTypes";
+import { selectionWithin } from "../../../shared/grouping/instanceScope";
 import type { RootSection } from "../../../shared/grouping/sectionRoots";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import { IgnoredTray } from "./IgnoredTray";
@@ -33,7 +34,7 @@ interface ToReviewListProps {
   onSelectAllInstances: (root: Root) => void;
   onShowOnCanvas: (root: Root) => void;
   onLocate: (issueId: string) => void;
-  onAdjust: (signature: string) => void;
+  onAdjust: (root: Root) => void;
   onIgnore: (signature: string) => void;
   onDefer: (root: Root) => void;
   onToggleImportant: (root: Root) => void;
@@ -82,14 +83,17 @@ export function ToReviewList(props: ToReviewListProps) {
             canAdjust={props.canAdjust}
             decisionOffer={decisionOffer}
             recordedReason={recordedReason}
-            selectedInstanceIds={props.selectedInstances[root.signature] ?? EMPTY_SELECTION}
+            selectedInstanceIds={selectionWithin(
+              props.selectedInstances[root.signature] ?? EMPTY_SELECTION,
+              root
+            )}
             onToggleInstanceSelected={(issueId) =>
               props.onToggleInstanceSelected(root.signature, issueId)
             }
             onSelectAllInstances={() => props.onSelectAllInstances(root)}
             onShowOnCanvas={() => props.onShowOnCanvas(root)}
             onLocate={props.onLocate}
-            onAdjust={() => props.onAdjust(root.signature)}
+            onAdjust={() => props.onAdjust(root)}
             onIgnore={() => props.onIgnore(root.signature)}
             onDefer={() => props.onDefer(root)}
             onToggleImportant={() => props.onToggleImportant(root)}

@@ -48,7 +48,6 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   } = useIssues();
 
   const visibility = useParticipantVisibility();
-  const { selectedInstances, toggleInstanceSelected, selectAllInstances } = useInstanceSelection();
   const { sheet, openAdjust, openIgnore, closeSheet } = useRootSheet();
   const {
     showingCount,
@@ -57,6 +56,7 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
   } = useSelectionBanner(showOnCanvas, restoreSelection);
 
   const view = usePanelView(issues, decisions);
+  const selection = useInstanceSelection(view.reviewRoots);
   const canAdjust = (aiAssistanceLevel ?? 1) >= 2 && visibility.adjustSheet;
   const { endAdjustRequested } = useSheetGating(visibility, sheet, closeSheet);
   const tabs = useMainTabs(visibility, view.reviewRoots, view.decisionRoots, view.issuesById);
@@ -73,7 +73,7 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
       sheet={sheet}
       roots={view.reviewRoots}
       issuesById={view.issuesById}
-      selectedInstances={selectedInstances}
+      selectedInstances={selection.selectedInstances}
       aiAssistanceLevel={aiAssistanceLevel}
       endAdjustRequested={endAdjustRequested}
       onCloseAdjust={closeSheet}
@@ -128,9 +128,9 @@ export function IssuePanel({ aiAssistanceLevel }: IssuePanelProps) {
               issuesById={view.issuesById}
               decisions={decisions}
               canAdjust={canAdjust}
-              selectedInstances={selectedInstances}
-              onToggleInstanceSelected={toggleInstanceSelected}
-              onSelectAllInstances={selectAllInstances}
+              selectedInstances={selection.selectedInstances}
+              onToggleInstanceSelected={selection.toggleInstanceSelected}
+              onSelectAllInstances={selection.selectAllInstances}
               onShowOnCanvas={showRootOnCanvas}
               onLocate={focusIssue}
               onAdjust={openAdjust}

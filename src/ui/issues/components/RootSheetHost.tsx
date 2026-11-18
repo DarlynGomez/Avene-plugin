@@ -1,3 +1,4 @@
+import { narrowRoot, selectionWithin } from "../../../shared/grouping/instanceScope";
 import type { Root } from "../../../shared/grouping/groupingTypes";
 import type { IssueSummary } from "../../../shared/issues/issueTypes";
 import type { SheetTarget } from "../hooks/useRootSheet";
@@ -54,7 +55,11 @@ function OpenSheet({
   if (!sheet) {
     return null;
   }
-  const root = roots.find((candidate) => candidate.signature === sheet.signature);
+  const found = roots.find((candidate) => candidate.signature === sheet.signature);
+  if (!found) {
+    return null;
+  }
+  const root = sheet.issueIds ? narrowRoot(found, sheet.issueIds) : found;
   if (!root) {
     return null;
   }
@@ -69,7 +74,10 @@ function OpenSheet({
         <AdjustPopup
           root={root}
           representativeIssue={representativeIssue}
-          selectedInstanceIds={selectedInstances[root.signature] ?? new Set()}
+          selectedInstanceIds={selectionWithin(
+            selectedInstances[root.signature] ?? new Set(),
+            root
+          )}
           aiAssistanceLevel={aiAssistanceLevel ?? 1}
           endRequested={endAdjustRequested}
           onClose={onCloseAdjust}

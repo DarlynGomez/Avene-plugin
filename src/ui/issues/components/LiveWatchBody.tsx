@@ -35,7 +35,7 @@ interface LiveWatchBodyProps {
   onSelectAllInstances: (root: Root) => void;
   onShowOnCanvas: (root: Root) => void;
   onLocate: (issueId: string) => void;
-  onAdjust: (signature: string) => void;
+  onAdjust: (root: Root) => void;
   onIgnore: (signature: string) => void;
   onDefer: (root: Root) => void;
   onToggleImportant: (root: Root) => void;
